@@ -1,0 +1,11 @@
+Database managning
+
+
+SQLite
+https://docs.microsoft.com/en-us/ef/core/get-started/netcore/new-db-sqlite
+
+Create the database
+Once you have a model, you can use migrations to create a database.
+Command line:
+dotnet ef migrations add InitialCreate 
+dotnet ef database update

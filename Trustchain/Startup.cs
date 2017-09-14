@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using TrustchainCore.Extensions;
+using TrustgraphCore.Extensions;
 
 namespace Trustchain
 {
@@ -26,11 +28,13 @@ namespace Trustchain
             //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc();
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Trustchain API", Version = "v1" });
             });
+
+            services.AddTrustchainCoreServices();
+            services.AddTrustgraphCoreServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
