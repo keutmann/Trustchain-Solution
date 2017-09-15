@@ -2,15 +2,15 @@
 using TrustchainCore.Model;
 using TrustgraphCore.Services;
 
-namespace TrustgraphCore.Service
+namespace TrustgraphCore.Services
 {
-    public class GraphExport : IGraphExport
+    public class GraphExportService : IGraphExportService
     {
-        private IGraphModelService Context;
+        public IGraphModelService ModelService { get; }
 
-        public GraphExport(IGraphModelService context)
+        public GraphExportService(IGraphModelService modelService)
         {
-            Context = context;
+            ModelService = modelService;
         }
 
         public PackageModel GetFullGraph()
@@ -18,7 +18,7 @@ namespace TrustgraphCore.Service
             var package = new PackageModel();
             package.Trust = new List<TrustModel>();
 
-            foreach (var address in Context.Graph.Address)
+            foreach (var address in ModelService.Graph.Address)
             {
                 var issuer = new IssuerModel();
                 issuer.Id = address.Id;
@@ -29,7 +29,7 @@ namespace TrustgraphCore.Service
                     foreach (var edge in address.Edges)
                     {
                         var child = new SubjectModel();
-                        Context.InitSubjectModel(child, edge);
+                        ModelService.InitSubjectModel(child, edge);
                         subjects.Add(child);
                     }
                 }

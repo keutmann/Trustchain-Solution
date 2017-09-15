@@ -7,23 +7,23 @@ using TrustchainCore.Extensions;
 
 namespace TrustgraphCore.Services
 {
-    public class GraphBuilder : IGraphBuilder
+    public class GraphTrustService : IGraphTrustService
     {
-        public IGraphModelService ModelService { get; set; }
+        public IGraphModelService ModelService { get; }
 
-        public GraphBuilder(IGraphModelService service)
+        public GraphTrustService(IGraphModelService modelService)
         {
-            ModelService = service;
+            ModelService = modelService;
         }
 
-        public IGraphBuilder Append(PackageModel package)
+        public IGraphTrustService Add(PackageModel package)
         {
-            Build(package.Trust);
+            Add(package.Trust);
 
             return this;
         }
 
-        public IGraphBuilder Build(IEnumerable<TrustModel> trusts)
+        public IGraphTrustService Add(IEnumerable<TrustModel> trusts)
         {
             long unixTime = DateTime.Now.ToUnixTime();
             foreach (var trust in trusts)

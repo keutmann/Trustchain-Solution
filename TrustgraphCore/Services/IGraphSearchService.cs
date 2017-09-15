@@ -1,11 +1,11 @@
 ﻿using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 
-namespace TrustgraphCore.Service
+namespace TrustgraphCore.Services
 {
-    public interface IGraphSearch
+    public interface IGraphSearchService
     {
-        IGraphModelService GraphService { get; set; }
+        IGraphModelService ModelService { get; }
 
         QueryContext Query(RequestQuery query);
     }

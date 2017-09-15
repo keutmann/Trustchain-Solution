@@ -4,7 +4,7 @@ namespace TrustgraphCore.Services
 {
     public interface ITrustLoader
     {
-        IGraphBuilder Builder { get; set; }
+        IGraphTrustService Builder { get; set; }
 
         void LoadFile(string filename);
     }

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using TrustchainCore.Business;
 using TrustgraphCore.Model;
-using TrustgraphCore.Service;
+using TrustgraphCore.Services;
 
 namespace TrustgraphCore.Controllers
 {
@@ -11,11 +11,11 @@ namespace TrustgraphCore.Controllers
     public class QueryController : Controller
     {
 
-        public IGraphSearch Service { get; set; }
+        public IGraphSearchService SearchService { get; set; }
 
-        public QueryController(IGraphSearch service)
+        public QueryController(IGraphSearchService service)
         {
-            Service = service;
+            SearchService = service;
         }
 
         //        public IHttpActionResult Get(string issuer, string subject, string subjectType = "", string? scope, bool? trust, bool? confirm, bool? rating)
@@ -43,7 +43,7 @@ namespace TrustgraphCore.Controllers
         {
             //try
             //{
-                var result = Service.Query(query);
+                var result = SearchService.Query(query);
 
                 return Ok(result);
             //}

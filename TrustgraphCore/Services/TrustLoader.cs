@@ -7,9 +7,9 @@ namespace TrustgraphCore.Services
 {
     public class TrustLoader : ITrustLoader
     {
-        public IGraphBuilder Builder { get; set; }
+        public IGraphTrustService Builder { get; set; }
 
-        public TrustLoader(IGraphBuilder builder)
+        public TrustLoader(IGraphTrustService builder)
         {
             Builder = builder;
         }
@@ -26,7 +26,7 @@ namespace TrustgraphCore.Services
                 if(".db".EqualsIgnoreCase(info.Extension))
                 trusts = LoadSQLite(info);
 
-            Builder.Build(trusts);
+            Builder.Add(trusts);
         }
 
         private IEnumerable<TrustModel> LoadSQLite(FileInfo info)

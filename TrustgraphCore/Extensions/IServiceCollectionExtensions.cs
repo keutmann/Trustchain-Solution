@@ -11,7 +11,11 @@ namespace TrustgraphCore.Extensions
             services.AddSingleton(new GraphModel());
 
             services.AddTransient<IGraphModelService, GraphModelService>();
-            services.AddTransient<IGraphBuilder, GraphBuilder>();
+            services.AddTransient<IGraphTrustService, GraphTrustService>();
+            services.AddTransient<IGraphSearchService, GraphSearchService>();
+            services.AddTransient<IGraphExportService, GraphExportService>();
+            services.AddTransient<ITrustLoader, TrustLoader>();
+
         }
 
     }

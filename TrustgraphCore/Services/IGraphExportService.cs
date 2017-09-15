@@ -1,8 +1,8 @@
 ﻿using TrustchainCore.Model;
 
-namespace TrustgraphCore.Service
+namespace TrustgraphCore.Services
 {
-    public interface IGraphExport
+    public interface IGraphExportService
     {
         PackageModel GetFullGraph();
     }

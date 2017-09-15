@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
-using TrustgraphCore.Services;
 
-namespace TrustgraphCore.Service
+namespace TrustgraphCore.Services
 {
-    public class GraphSearch : IGraphSearch
+    public class GraphSearchService : IGraphSearchService
     {
-        public IGraphModelService GraphService { get; set; }
+        public IGraphModelService ModelService { get; }
         public long UnixTime { get; set; } 
 
-        public GraphSearch(IGraphModelService data)
+        public GraphSearchService(IGraphModelService modelService)
         {
-            this.GraphService = data;
+            this.ModelService = modelService;
             UnixTime = DateTime.Now.ToUnixTime();
         }
 
@@ -21,7 +20,7 @@ namespace TrustgraphCore.Service
         {
             Verify(query);
 
-            var context = new QueryContext(GraphService, query);
+            var context = new QueryContext(ModelService, query);
             
             if(context.IssuerIndex.Count > 0 && context.TargetIndex.Count > 0)
                 ExecuteQuery(context);
@@ -55,7 +54,7 @@ namespace TrustgraphCore.Service
                 var visited = context.Visited[item.NodeIndex];
 
                 tn.EdgeIndex = new Int64Container(item.NodeIndex, visited.EdgeIndex);
-                GraphService.InitSubjectModel(tn, item.Edge);
+                ModelService.InitSubjectModel(tn, item.Edge);
 
                 subjectNodes.Add(tn);
             }
@@ -79,13 +78,13 @@ namespace TrustgraphCore.Service
                         continue;
                     }
 
-                    var address = GraphService.Graph.Address[parentNode.NodeIndex];
+                    var address = ModelService.Graph.Address[parentNode.NodeIndex];
                     parentNode.Id = address.Id;
 
                     if (visited.EdgeIndex >= 0)
                     {
                         var edge = address.Edges[visited.EdgeIndex];
-                        GraphService.InitSubjectModel(parentNode, edge);
+                        ModelService.InitSubjectModel(parentNode, edge);
                     }
                     parentNode.Nodes = new List<SubjectNode>();
                     parentNode.Nodes.Add(subject);
@@ -141,7 +140,7 @@ namespace TrustgraphCore.Service
         {
             int found = 0;
             context.SetVisitItemSafely(item.Index, new VisitItem(item.ParentIndex, item.EdgeIndex)); // Makes sure that we do not run this block again.
-            var edges = GraphService.Graph.Address[item.Index].Edges;
+            var edges = ModelService.Graph.Address[item.Index].Edges;
             if (edges == null)
                 return false;
 
@@ -183,7 +182,7 @@ namespace TrustgraphCore.Service
         public List<QueueItem> Enqueue(QueueItem item, QueryContext context)
         {
             var list = new List<QueueItem>();
-            var address = GraphService.Graph.Address[item.Index];
+            var address = ModelService.Graph.Address[item.Index];
 
             var edges = address.Edges;
             if (edges == null)
@@ -206,7 +205,7 @@ namespace TrustgraphCore.Service
                 var visited = context.GetVisitItemSafely(edges[i].SubjectId);
                 if(visited.ParentIndex > -1) // If parentIndex is -1 then it has not been used yet!
                 {
-                    var parentAddress = GraphService.Graph.Address[visited.ParentIndex];
+                    var parentAddress = ModelService.Graph.Address[visited.ParentIndex];
                     var visitedEdge = parentAddress.Edges[visited.EdgeIndex];
                     if (visitedEdge.Cost > edges[i].Cost) // If the current cost is lower then its a better route.
                         context.Visited[edges[i].SubjectId] = new VisitItem(item.Index, i); // Overwrite the old visit with the new because of lower cost

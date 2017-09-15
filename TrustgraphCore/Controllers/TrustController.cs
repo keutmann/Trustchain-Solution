@@ -1,6 +1,4 @@
-﻿using TrustchainCore.Business;
-using TrustgraphCore.Service;
-using TrustchainCore.Model;
+﻿using TrustchainCore.Model;
 using Microsoft.AspNetCore.Mvc;
 using TrustgraphCore.Services;
 
@@ -11,11 +9,11 @@ namespace TrustgraphCore.Controllers
     {
         public const string Path = "/api/trust/";
 
-        private IGraphBuilder graphBuilder;
+        private IGraphTrustService _graphTrustService;
 
-        public TrustController(IGraphBuilder builder)
+        public TrustController(IGraphTrustService trustService)
         {
-            graphBuilder = builder;
+            _graphTrustService = trustService;
         }
 
         [HttpGet]
@@ -27,12 +25,10 @@ namespace TrustgraphCore.Controllers
         [HttpPost]
         public ActionResult Add([FromBody]PackageModel package)
         {
-            //try
-            //{
-                var trustBuilder = new TrustBuilder(package);
-                trustBuilder.Verify();
+            _graphTrustService.Add(package);
+            // Add to DB
+            // Add to Timestamp
 
-                graphBuilder.Append(package);
 //#if RELEASE
 //                var buildserverUrl = App.Config["buildserver"].ToStringValue("http://127.0.01:12601");
 //                if (!string.IsNullOrEmpty(buildserverUrl))
@@ -50,12 +46,7 @@ namespace TrustgraphCore.Controllers
 //                }
 //#endif
 
-                return Ok(new { status = "succes" });
-            //}
-            //catch (Exception ex)
-            //{
-            //    return new ExceptionResult(ex, this);
-            //}
+            return Ok(new { status = "succes" });
         }
     }
 }

@@ -1,24 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TrustgraphCore.Service;
+using TrustgraphCore.Services;
 
 namespace TrustgraphCore.Controllers
 {
     [Route("api/[controller]")]
     public class GraphController : Controller
     {
-        public const string Path = "/api/graph/";
+        public IGraphExportService ExportService { get; set; }
 
-        public IGraphExport Service { get; set; }
-
-        public GraphController(IGraphExport service)
+        public GraphController(IGraphExportService service)
         {
-            Service = service;
+            ExportService = service;
         }
 
         [HttpGet]
         public ActionResult Get()
         {
-            var result = Service.GetFullGraph();
+            var result = ExportService.GetFullGraph();
 
             return Ok(result);
         }
