@@ -4,17 +4,16 @@ using System.Collections.Generic;
 using TrustchainCore.Model;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
-using TrustgraphCore.Data;
 
-namespace TrustgraphCore.Service
+namespace TrustgraphCore.Services
 {
     public class GraphBuilder : IGraphBuilder
     {
-        public IGraphContext Context { get; set; }
+        public IGraphModelService ModelService { get; set; }
 
-        public GraphBuilder(IGraphContext context)
+        public GraphBuilder(IGraphModelService service)
         {
-            Context = context;
+            ModelService = service;
         }
 
         public IGraphBuilder Append(PackageModel package)
@@ -29,8 +28,8 @@ namespace TrustgraphCore.Service
             long unixTime = DateTime.Now.ToUnixTime();
             foreach (var trust in trusts)
             {
-                var issuerIndex = Context.EnsureNode(trust.Issuer.Id);
-                var issuerNode = Context.Graph.Address[issuerIndex];
+                var issuerIndex = ModelService.EnsureNode(trust.Issuer.Id);
+                var issuerNode = ModelService.Graph.Address[issuerIndex];
                 var issuerEdges = new List<EdgeModel>(issuerNode.Edges != null ? issuerNode.Edges : new EdgeModel[0]);
 
                 foreach (var subject in trust.Issuer.Subjects)
@@ -42,14 +41,14 @@ namespace TrustgraphCore.Service
                 issuerEdges.RemoveAll(e => e.Expire > 0 && e.Expire < unixTime);
 
                 issuerNode.Edges = issuerEdges.ToArray();
-                Context.Graph.Address[issuerIndex] = issuerNode;
+                ModelService.Graph.Address[issuerIndex] = issuerNode;
             }
             return this;
         }
 
         private void BuildSubject(TrustModel trust, List<EdgeModel> issuerEdges, SubjectModel subject)
         {
-            var subjectEdge = Context.CreateEdgeModel(subject, (int)trust.Issuer.Timestamp);
+            var subjectEdge = ModelService.CreateEdgeModel(subject, (int)trust.Issuer.Timestamp);
             var ids = new List<int>();
             // Find all edges that matchs
             for (var i = 0 ; i < issuerEdges.Count; i++)

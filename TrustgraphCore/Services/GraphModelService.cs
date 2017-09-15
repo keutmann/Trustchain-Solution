@@ -1,26 +1,20 @@
-﻿using System.Collections.Generic;
-using TrustchainCore.Model;
+﻿using TrustchainCore.Model;
 using TrustgraphCore.Model;
-using TrustchainCore.IOC;
 
-namespace TrustgraphCore.Data
+namespace TrustgraphCore.Services
 {
-    [IOC(LifeCycle = IOCLifeCycleType.Singleton)]
-    public class GraphContext : IGraphContext
+    public class GraphModelService : IGraphModelService
     {
-        private GraphModel _graph;
         public GraphModel Graph
         {
-            get { return _graph; }
-            set { _graph = value; }
+            get;
+            set;
         }
 
-        public HashSet<string> FilesLoaded  { get; set; }
-
-        public GraphContext()
+        
+        public GraphModelService(GraphModel model)
         {
-            Graph = new GraphModel();
-            FilesLoaded = new HashSet<string>();
+            Graph = model;
         }
 
         public EdgeModel CreateEdgeModel(SubjectModel subject, int timestamp)

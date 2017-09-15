@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using TrustchainCore.Model;
-using TrustgraphCore.Data;
 
-namespace TrustgraphCore.Service
+
+namespace TrustgraphCore.Services
 {
     public interface IGraphBuilder
     {
-        IGraphContext Context { get; set; }
+        IGraphModelService ModelService { get; set; }
 
         IGraphBuilder Append(PackageModel package);
         IGraphBuilder Build(IEnumerable<TrustModel> trusts);

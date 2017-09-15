@@ -1,4 +1,6 @@
-﻿namespace TrustgraphCore.Service
+﻿using TrustgraphCore.Services;
+
+namespace TrustgraphCore.Services
 {
     public interface ITrustLoader
     {

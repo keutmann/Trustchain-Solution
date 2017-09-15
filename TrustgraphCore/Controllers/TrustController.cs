@@ -2,6 +2,7 @@
 using TrustgraphCore.Service;
 using TrustchainCore.Model;
 using Microsoft.AspNetCore.Mvc;
+using TrustgraphCore.Services;
 
 namespace TrustgraphCore.Controllers
 {
@@ -17,6 +18,12 @@ namespace TrustgraphCore.Controllers
             graphBuilder = builder;
         }
 
+        [HttpGet]
+        public ActionResult Get()
+        {
+            return Ok("OK");
+        }
+
         [HttpPost]
         public ActionResult Add([FromBody]PackageModel package)
         {
@@ -26,22 +33,22 @@ namespace TrustgraphCore.Controllers
                 trustBuilder.Verify();
 
                 graphBuilder.Append(package);
-#if RELEASE
-                var buildserverUrl = App.Config["buildserver"].ToStringValue("http://127.0.01:12601");
-                if (!string.IsNullOrEmpty(buildserverUrl))
-                {
-                    var fullUrl = new UriBuilder(buildserverUrl);
-                    fullUrl.Path = Path;
-                    using (var client = new HttpClient())
-                    {
-                        var response = client.PostAsJsonAsync(fullUrl.ToString(), package);
-                        Task.WaitAll(response);
-                        var result = response.Result;
-                        if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                            return InternalServerError();
-                    }
-                }
-#endif
+//#if RELEASE
+//                var buildserverUrl = App.Config["buildserver"].ToStringValue("http://127.0.01:12601");
+//                if (!string.IsNullOrEmpty(buildserverUrl))
+//                {
+//                    var fullUrl = new UriBuilder(buildserverUrl);
+//                    fullUrl.Path = Path;
+//                    using (var client = new HttpClient())
+//                    {
+//                        var response = client.PostAsJsonAsync(fullUrl.ToString(), package);
+//                        Task.WaitAll(response);
+//                        var result = response.Result;
+//                        if (result.StatusCode != System.Net.HttpStatusCode.OK)
+//                            return InternalServerError();
+//                    }
+//                }
+//#endif
 
                 return Ok(new { status = "succes" });
             //}

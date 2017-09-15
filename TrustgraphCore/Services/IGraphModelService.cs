@@ -1,9 +1,9 @@
 ﻿using TrustchainCore.Model;
 using TrustgraphCore.Model;
 
-namespace TrustgraphCore.Data
+namespace TrustgraphCore.Services
 {
-    public interface IGraphContext
+    public interface IGraphModelService
     {
         GraphModel Graph { get; set; }
 

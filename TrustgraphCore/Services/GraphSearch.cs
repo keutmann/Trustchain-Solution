@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using TrustgraphCore.Data;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
+using TrustgraphCore.Services;
 
 namespace TrustgraphCore.Service
 {
     public class GraphSearch : IGraphSearch
     {
-        public IGraphContext GraphService { get; set; }
+        public IGraphModelService GraphService { get; set; }
         public long UnixTime { get; set; } 
 
-        public GraphSearch(IGraphContext data)
+        public GraphSearch(IGraphModelService data)
         {
             this.GraphService = data;
             UnixTime = DateTime.Now.ToUnixTime();

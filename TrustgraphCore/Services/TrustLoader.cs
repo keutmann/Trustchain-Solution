@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using TrustchainCore.Data;
 using TrustchainCore.Extensions;
 using TrustchainCore.Model;
 
-namespace TrustgraphCore.Service
+namespace TrustgraphCore.Services
 {
     public class TrustLoader : ITrustLoader
     {
@@ -33,15 +31,16 @@ namespace TrustgraphCore.Service
 
         private IEnumerable<TrustModel> LoadSQLite(FileInfo info)
         {
-            using (var db = TrustchainDatabase.Open(info.FullName))
-            {
-                var trusts = db.Trust.Select();
-                foreach (var trust in trusts)
-                {
-                    trust.Issuer.Subjects = db.Subject.Select(trust.TrustId).ToArray();
-                }
-                return trusts;
-            }
+            //using (var db = TrustchainDatabase.Open(info.FullName))
+            //{
+            //    var trusts = db.Trust.Select();
+            //    foreach (var trust in trusts)
+            //    {
+            //        trust.Issuer.Subjects = db.Subject.Select(trust.TrustId).ToArray();
+            //    }
+            //    return trusts;
+            //}
+            return null;
         }
 
         private IEnumerable<TrustModel> LoadJson(FileInfo info)

@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using TrustchainCore.Model;
-using TrustgraphCore.Data;
-using TrustgraphCore.Model;
+using TrustgraphCore.Services;
 
 namespace TrustgraphCore.Service
 {
     public class GraphExport : IGraphExport
     {
-        private IGraphContext Context;
+        private IGraphModelService Context;
 
-        public GraphExport(IGraphContext context)
+        public GraphExport(IGraphModelService context)
         {
             Context = context;
         }

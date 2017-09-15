@@ -5,29 +5,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrustchainCore.Configuration;
-using TrustchainCore.Data;
 using TrustchainCore.Model;
 
 namespace TrustchainCore.Business
 {
     public class TrustManager
     {
-        public int AddTrust(TrustModel trust, TrustchainDatabase db)
-        {
-            var result = db.Trust.Add(trust);
-            if (result < 1)
-                return result;
+        //public int AddTrust(TrustModel trust, TrustchainDatabase db)
+        //{
+        //    var result = db.Trust.Add(trust);
+        //    if (result < 1)
+        //        return result;
 
-            foreach (var subject in trust.Issuer.Subjects)
-            {
-                subject.IssuerId = trust.Issuer.Id;
-                subject.TrustId = trust.TrustId;
-                result = db.Subject.Add(subject);
-                if (result < 1)
-                    break;
-            }
-            return result;
-        }
+        //    foreach (var subject in trust.Issuer.Subjects)
+        //    {
+        //        subject.IssuerId = trust.Issuer.Id;
+        //        subject.TrustId = trust.TrustId;
+        //        result = db.Subject.Add(subject);
+        //        if (result < 1)
+        //            break;
+        //    }
+        //    return result;
+        //}
 
         public static TrustModel Deserialize(string content)
         {

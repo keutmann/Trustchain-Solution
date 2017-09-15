@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using TrustgraphCore.Data;
 using TrustchainCore.Extensions;
 using Newtonsoft.Json;
+using TrustgraphCore.Services;
 
 namespace TrustgraphCore.Model
 {
@@ -10,7 +10,7 @@ namespace TrustgraphCore.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class QueryContext
     {
-        public IGraphContext GraphService { get; set; }
+        public IGraphModelService GraphService { get; set; }
 
         public List<int> IssuerIndex { get; set; }
         public List<TargetIndex> TargetIndex { get; set; }
@@ -55,7 +55,7 @@ namespace TrustgraphCore.Model
             MaxLevel = 7;
         }
 
-        public QueryContext(IGraphContext graphService, RequestQuery query) : this(graphService.Graph.Address.Count)
+        public QueryContext(IGraphModelService graphService, RequestQuery query) : this(graphService.Graph.Address.Count)
         {
             GraphService = graphService;
             if(query.Issuers == null || query.Issuers.Count == 0)
