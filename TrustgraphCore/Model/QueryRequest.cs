@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace TrustgraphCore.Model
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class RequestQuery
+    public class QueryRequest
     {
         [JsonProperty(PropertyName = "issuers")]
         public List<byte[]> Issuers;

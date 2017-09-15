@@ -16,11 +16,9 @@ namespace TrustgraphCore.Services
             UnixTime = DateTime.Now.ToUnixTime();
         }
 
-        public QueryContext Query(RequestQuery query)
+        public SearchContext Query(QueryRequest query)
         {
-            Verify(query);
-
-            var context = new QueryContext(ModelService, query);
+            var context = new SearchContext(ModelService, query);
             
             if(context.IssuerIndex.Count > 0 && context.TargetIndex.Count > 0)
                 ExecuteQuery(context);
@@ -31,17 +29,7 @@ namespace TrustgraphCore.Services
             return context;
         }
 
-        public void Verify(RequestQuery query)
-        {
-            //if (query.Issuer.Length != 20)
-            //    throw new ApplicationException("Invalid byte length on Issuer");
-
-            // Script definition specifies this
-            //if (query.Subjects.Length != 20)
-            //    throw new ApplicationException("Invalid byte length on Issuer");
-        }
-
-        public List<SubjectNode> BuildResultNode(QueryContext context)
+        public List<SubjectNode> BuildResultNode(SearchContext context)
         {
             var results = new List<SubjectNode>();
             var nodelist = new Dictionary<Int64Container, SubjectNode>();
@@ -107,7 +95,7 @@ namespace TrustgraphCore.Services
 
 
 
-        public void ExecuteQuery(QueryContext context)
+        public void ExecuteQuery(SearchContext context)
         {
             List<QueueItem> queue = new List<QueueItem>();
             foreach (var index in context.IssuerIndex)
@@ -136,7 +124,7 @@ namespace TrustgraphCore.Services
             }
         }
 
-        private bool PeekNode(QueueItem item, QueryContext context)
+        private bool PeekNode(QueueItem item, SearchContext context)
         {
             int found = 0;
             context.SetVisitItemSafely(item.Index, new VisitItem(item.ParentIndex, item.EdgeIndex)); // Makes sure that we do not run this block again.
@@ -179,7 +167,7 @@ namespace TrustgraphCore.Services
             return found != 0;
         }
 
-        public List<QueueItem> Enqueue(QueueItem item, QueryContext context)
+        public List<QueueItem> Enqueue(QueueItem item, SearchContext context)
         {
             var list = new List<QueueItem>();
             var address = ModelService.Graph.Address[item.Index];

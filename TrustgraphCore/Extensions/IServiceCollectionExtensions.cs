@@ -9,6 +9,7 @@ namespace TrustgraphCore.Extensions
         public static void AddTrustgraphCoreServices(this IServiceCollection services)
         {
             services.AddSingleton(new GraphModel());
+            services.AddScoped<ICryptoAlgoService, SHA256Service>();
 
             services.AddTransient<IGraphModelService, GraphModelService>();
             services.AddTransient<IGraphTrustService, GraphTrustService>();
@@ -16,6 +17,8 @@ namespace TrustgraphCore.Extensions
             services.AddTransient<IGraphExportService, GraphExportService>();
             services.AddTransient<ITrustLoader, TrustLoader>();
 
+            services.AddTransient<IQueryRequestService, QueryRequestService>();
+            
         }
 
     }

@@ -7,6 +7,6 @@ namespace TrustgraphCore.Services
     {
         IGraphModelService ModelService { get; }
 
-        QueryContext Query(RequestQuery query);
+        SearchContext Query(QueryRequest query);
     }
 }

@@ -8,7 +8,7 @@ namespace TrustgraphCore.Model
 {
 
     [JsonObject(MemberSerialization.OptIn)]
-    public class QueryContext
+    public class SearchContext
     {
         public IGraphModelService GraphService { get; set; }
 
@@ -43,7 +43,7 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "nodes", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
         public List<SubjectNode> Nodes { get; set; }
 
-        public QueryContext(int addressCount)
+        public SearchContext(int addressCount)
         {
             IssuerIndex = new List<int>();
             TargetIndex = new List<TargetIndex>();
@@ -55,12 +55,9 @@ namespace TrustgraphCore.Model
             MaxLevel = 7;
         }
 
-        public QueryContext(IGraphModelService graphService, RequestQuery query) : this(graphService.Graph.Address.Count)
+        public SearchContext(IGraphModelService graphService, QueryRequest query) : this(graphService.Graph.Address.Count)
         {
             GraphService = graphService;
-            if(query.Issuers == null || query.Issuers.Count == 0)
-                throw new ApplicationException("Missing issuers");
-
             foreach (var issuer in query.Issuers)
             {
                 var index = GraphService.Graph.AddressIndex.ContainsKey(issuer) ? GraphService.Graph.AddressIndex[issuer] : -1;

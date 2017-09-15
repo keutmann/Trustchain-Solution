@@ -12,10 +12,12 @@ namespace TrustgraphCore.Controllers
     {
 
         public IGraphSearchService SearchService { get; set; }
+        private IQueryRequestService _queryRequestService;
 
-        public QueryController(IGraphSearchService service)
+        public QueryController(IGraphSearchService service, IQueryRequestService queryRequestService)
         {
             SearchService = service;
+            _queryRequestService = queryRequestService;
         }
 
         //        public IHttpActionResult Get(string issuer, string subject, string subjectType = "", string? scope, bool? trust, bool? confirm, bool? rating)
@@ -24,7 +26,7 @@ namespace TrustgraphCore.Controllers
         [HttpGet]
         public ActionResult Get(string issuer, string subject, bool trust = true)
         {
-            var query = new RequestQuery();
+            var query = new QueryRequest();
             query.Issuers = new List<Byte[]>();
             query.Issuers.Add(Convert.FromBase64String(issuer));
 
@@ -33,19 +35,23 @@ namespace TrustgraphCore.Controllers
 
             query.Claim = TrustBuilder.CreateTrustTrue();
             query.Scope = string.Empty; // Global
-            
+
+            _queryRequestService.Verify(query);
+
             return ResolvePost(query);
         }
 
         // Post api/
         [HttpPost]
-        public ActionResult ResolvePost([FromBody]RequestQuery query)
+        public ActionResult ResolvePost([FromBody]QueryRequest query)
         {
             //try
             //{
-                var result = SearchService.Query(query);
+            _queryRequestService.Verify(query);
 
-                return Ok(result);
+            var result = SearchService.Query(query);
+
+            return Ok(result);
             //}
             //catch (Exception ex)
             //{
