@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TrustchainCore.Services;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 

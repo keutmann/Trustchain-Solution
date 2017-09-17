@@ -4,7 +4,7 @@ using TrustgraphCore.Services;
 
 namespace TrustgraphCore.Controllers
 {
-    [Route("api/graph/[controller]")]
+    [Route("api/[controller]")]
     public class TrustController : Controller
     {
         private IGraphTrustService _graphTrustService;
