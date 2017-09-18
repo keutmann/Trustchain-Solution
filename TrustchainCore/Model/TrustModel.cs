@@ -12,7 +12,7 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]
         public IssuerModel Issuer { get; set; }
 
-        [JsonIgnore]
-        public string DatabaseName { get; set; }
+        //[JsonIgnore]
+        //public string DatabaseName { get; set; }
     }
 }

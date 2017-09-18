@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Strategy;
+using TrustgraphCore.Interfaces;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 

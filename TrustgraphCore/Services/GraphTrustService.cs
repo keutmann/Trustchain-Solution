@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TrustchainCore.Model;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
+using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Services
 {

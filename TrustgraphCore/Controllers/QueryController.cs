@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using TrustchainCore.Builders;
 using TrustgraphCore.Model;
-using TrustgraphCore.Services;
+using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Controllers
 {

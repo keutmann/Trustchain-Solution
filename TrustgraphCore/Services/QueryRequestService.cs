@@ -2,6 +2,7 @@
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
 using TrustchainCore.Interfaces;
+using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Services
 {

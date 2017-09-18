@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using TrustchainCore.Extensions;
 using Newtonsoft.Json;
-using TrustgraphCore.Services;
+using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Model
 {

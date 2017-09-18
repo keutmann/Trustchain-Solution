@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TrustgraphCore.Services;
+using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Controllers
 {

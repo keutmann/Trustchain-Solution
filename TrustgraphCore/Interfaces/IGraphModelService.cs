@@ -1,7 +1,7 @@
 ﻿using TrustchainCore.Model;
 using TrustgraphCore.Model;
 
-namespace TrustgraphCore.Services
+namespace TrustgraphCore.Interfaces
 {
     public interface IGraphModelService
     {

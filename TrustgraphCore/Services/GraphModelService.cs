@@ -1,4 +1,5 @@
 ﻿using TrustchainCore.Model;
+using TrustgraphCore.Interfaces;
 using TrustgraphCore.Model;
 
 namespace TrustgraphCore.Services

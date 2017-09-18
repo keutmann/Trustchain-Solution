@@ -8,8 +8,5 @@ namespace TrustchainCore.Model
     {
         [JsonProperty(PropertyName = "trust")]
         public List<TrustModel> Trust { get; set; }
-
-        [JsonIgnore]
-        public string DatabaseName { get; set; }
     }
 }

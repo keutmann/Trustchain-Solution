@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using TrustchainCore.Model;
-using TrustgraphCore.Services;
+using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Services
 {

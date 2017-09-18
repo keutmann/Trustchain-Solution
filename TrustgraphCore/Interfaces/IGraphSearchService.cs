@@ -1,7 +1,7 @@
 ﻿using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 
-namespace TrustgraphCore.Services
+namespace TrustgraphCore.Interfaces
 {
     public interface IGraphSearchService
     {

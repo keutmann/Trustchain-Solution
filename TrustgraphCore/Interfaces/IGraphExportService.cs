@@ -1,6 +1,6 @@
 ﻿using TrustchainCore.Model;
 
-namespace TrustgraphCore.Services
+namespace TrustgraphCore.Interfaces
 {
     public interface IGraphExportService
     {
