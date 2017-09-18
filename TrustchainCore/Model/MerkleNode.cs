@@ -1,28 +1,24 @@
-﻿using Newtonsoft.Json.Linq;
-using TrustchainCore.Extensions;
-
-
-namespace TrustchainCore.Model
+﻿namespace TrustchainCore.Model
 {
-    public class MerkleNodeModel
+    public class MerkleNode
     {
         public byte[] Source { get; set; }
         public byte[] Hash { get; set; }
         public byte[] Path { get; set; }
 
-        public MerkleNodeModel Left { get; set; }
-        public MerkleNodeModel Right { get; set; }
-        public MerkleNodeModel Parent { get; set; }
+        public MerkleNode Left { get; set; }
+        public MerkleNode Right { get; set; }
+        public MerkleNode Parent { get; set; }
 
         public object Tag { get; set; }
 
-        public MerkleNodeModel(byte[] hash, object tag = null)
+        public MerkleNode(byte[] hash, object tag = null)
         {
             Hash = hash;
             Tag = tag;
         }
 
-        public MerkleNodeModel(byte[] hash, MerkleNodeModel left, MerkleNodeModel right)
+        public MerkleNode(byte[] hash, MerkleNode left, MerkleNode right)
         {
             Hash = hash;
 
@@ -35,5 +31,4 @@ namespace TrustchainCore.Model
         }
 
     }
-
 }

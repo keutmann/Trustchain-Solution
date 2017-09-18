@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
-using TrustchainCore.Services;
+using TrustchainCore.Interfaces;
 
 namespace TrustgraphCore.Services
 {

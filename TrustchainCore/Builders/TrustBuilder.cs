@@ -4,34 +4,50 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Text;
-using TrustchainCore.Business;
 using TrustchainCore.Configuration;
+using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 
-namespace TrustchainCore.Business
+namespace TrustchainCore.Builders
 {
     public class TrustBuilder
     {
         public PackageModel Package { get; set; }
+        private ICryptoAlgoService _cryptoAlgoService;
+        private ITrustBinary _trustBinary;
+        private byte[] _ownerKey;
 
-        public TrustBuilder()
+        public TrustBuilder(ICryptoAlgoService cryptoAlgoService, ITrustBinary trustBinary)
         {
             Package = new PackageModel();
+
+            _cryptoAlgoService = cryptoAlgoService;
+            _trustBinary = trustBinary;
+
         }
 
-        public TrustBuilder(string content)
+
+        public TrustBuilder Load(string content)
         {
             Package = JsonConvert.DeserializeObject<PackageModel>(content);
+            return this;
         }
 
-        public TrustBuilder(PackageModel package)
+        public TrustBuilder Load(PackageModel package)
         {
             Package = package;
+            return this;
         }
 
         public string Serialize(Formatting format)
         {
             return JsonConvert.SerializeObject(Package, format);
+        }
+
+        public TrustBuilder SetOwnerKey(byte[] key)
+        {
+            _ownerKey = key;
+            return this;
         }
 
         public override string ToString()
@@ -56,10 +72,10 @@ namespace TrustchainCore.Business
             return this;
         }
 
-        public static TrustModel CreateTrust(string issuerName, string subjectName, JObject claim)
+        public TrustBuilder AddTrust(string issuerName, string subjectName, JObject claim)
         {
-            var issuerKey = new Key(Hashes.SHA256(Encoding.UTF8.GetBytes(issuerName)));
-            var subjectKey = new Key(Hashes.SHA256(Encoding.UTF8.GetBytes(subjectName)));
+            var issuerKey = _cryptoAlgoService.GetKey(Encoding.UTF8.GetBytes(issuerName));
+            var subjectKey = _cryptoAlgoService.GetKey(Encoding.UTF8.GetBytes(subjectName));
 
             var trust = new TrustModel();
             trust.Head = new HeadModel
@@ -68,13 +84,12 @@ namespace TrustchainCore.Business
                 Script = "btc-pkh"
             };
             trust.Server = new ServerModel();
-            trust.Server.Id = ServerID();
             trust.Issuer = new IssuerModel();
-            trust.Issuer.Id = issuerKey.PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes();
+            trust.Issuer.Id = _cryptoAlgoService.GetAddress(issuerKey);
             var subjects = new List<SubjectModel>();
             subjects.Add(new SubjectModel
             {
-                Id = subjectKey.PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes(),
+                Id = _cryptoAlgoService.GetAddress(subjectKey),
                 IdType = "person",
                 Claim = (claim != null) ? claim : new JObject(
                     new JProperty("trust", "true")
@@ -83,18 +98,36 @@ namespace TrustchainCore.Business
             });
             trust.Issuer.Subjects = subjects.ToArray();
 
-            var binary = new TrustBinary(trust);
-            trust.TrustId = TrustECDSASignature.GetHashOfBinary(binary.GetIssuerBinary());
-            var trustHash = new uint256(trust.TrustId);
-            trust.Issuer.Signature = issuerKey.SignCompact(trustHash);
+            Package.Trust.Add(trust);
 
-            return trust;
+            return this;
         }
 
-        public static byte[] ServerID()
+        public PackageModel Build()
         {
-            var serverKey = new Key(Hashes.SHA256(Encoding.UTF8.GetBytes("server")));
-            return serverKey.PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes();
+            if(_ownerKey != null)
+            {
+                SignID(_ownerKey);
+            }
+            return Package;
+        }
+
+        public TrustBuilder SignID(byte[] key)
+        {
+            foreach (var trust in Package.Trust)
+            {
+                trust.TrustId = _cryptoAlgoService.HashOf(_trustBinary.GetIssuerBinary(trust));
+                trust.Issuer.Signature = _cryptoAlgoService.Sign(key, trust.TrustId);
+            }
+            return this;
+        }
+
+        public TrustBuilder ServerID(byte[] serverKey)
+        {
+            Package.Server.Id = _cryptoAlgoService.GetAddress(serverKey);
+            //var serverKey = new Key(Hashes.SHA256(Encoding.UTF8.GetBytes("server")));
+            //return serverKey.PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes();
+            return this;
         }
 
         public static JObject CreateTrustTrue()

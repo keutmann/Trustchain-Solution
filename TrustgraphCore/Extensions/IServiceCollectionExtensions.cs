@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TrustchainCore.Services;
+using TrustchainCore.Interfaces;
+using TrustchainCore.Strategy;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 
@@ -7,7 +8,7 @@ namespace TrustgraphCore.Extensions
 {
     public static class IServiceCollectionExtensions
     {
-        public static void AddTrustgraphCoreServices(this IServiceCollection services)
+        public static void TrustgraphCore(this IServiceCollection services)
         {
             services.AddSingleton(new GraphModel());
             services.AddScoped<ICryptoAlgoService, SHA256Service>();

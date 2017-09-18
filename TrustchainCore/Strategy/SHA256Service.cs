@@ -3,8 +3,10 @@ using NBitcoin;
 using NBitcoin.Crypto;
 using NBitcoin.DataEncoders;
 using TrustchainCore.Extensions;
+using TrustchainCore.Interfaces;
+using TrustchainCore.Configuration;
 
-namespace TrustchainCore.Services
+namespace TrustchainCore.Strategy
 {
     public class SHA256Service : ICryptoAlgoService
     {
@@ -12,18 +14,28 @@ namespace TrustchainCore.Services
 
         public SHA256Service()
         {
-            Length = 20;
+            Length = 32; // SHA 256 = 32 bytes
         }
 
-        public byte[] GetHashOfBinary(byte[] data)
+        public byte[] HashOf(byte[] data)
         {
             return Hashes.SHA256(Hashes.SHA256(data));
+        }
+
+        public byte[] GetKey(byte[] seed)
+        {
+            return new Key(HashOf(seed)).ToBytes();
+        }
+
+        public byte[] GetAddress(byte[] key)
+        {
+            return new Key(key).PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes();
         }
 
         public byte[] Sign(byte[] key, byte[] data)
         {
             var ecdsaKey = new Key(key);
-            return ecdsaKey.SignCompact(new uint256(GetHashOfBinary(data)));
+            return ecdsaKey.SignCompact(new uint256(HashOf(data)));
         }
 
         public byte[] SignMessage(byte[] key, byte[] data)

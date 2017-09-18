@@ -13,6 +13,7 @@
     <Compile Remove="Diagnostics\ErrorEventLoggerTextWriter.cs" />
     <Compile Remove="Diagnostics\EventLoggerTextWriter.cs" />
     <Compile Remove="Extensions\SQLiteDataReaderExtensions.cs" />
+    <Compile Remove="Trust\TrustManager.cs" />
   </ItemGroup>
 
   <ItemGroup>

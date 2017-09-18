@@ -1,29 +1,23 @@
-﻿using NBitcoin.Crypto;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using Newtonsoft.Json.Linq;
 using System.Linq;
-using System.Collections;
 using System.IO;
 using TrustchainCore.Extensions;
 using TrustchainCore.Model;
-using TrustchainCore.Security.Cryptography;
+using TrustchainCore.Interfaces;
 
-namespace TrustchainCore.Business
+namespace TrustchainCore.Strategy
 {
     public class TrustBinary : ITrustBinary
     {
-        protected TrustModel Trust { get; set; }
-
-        public TrustBinary(TrustModel trust)
+        public TrustBinary()
         {
-            this.Trust = trust;
         }
 
-        public byte[] GetIssuerBinary()
+        public byte[] GetIssuerBinary(TrustModel trust)
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                var issuer = Trust.Issuer;
+                var issuer = trust.Issuer;
                 ms.WriteBytes(issuer.Id);
                 foreach (var subject in issuer.Subjects)
                 {

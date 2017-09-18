@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using TrustchainCore.Extensions;
 using TrustchainCore.Model;
 
-namespace TrustchainCore.Business
+namespace TrustchainCore.Trust
 {
     public class TrustECDSASignature
     {

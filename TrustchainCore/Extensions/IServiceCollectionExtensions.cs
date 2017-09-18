@@ -4,7 +4,7 @@ namespace TrustchainCore.Extensions
 {
     public static class IServiceCollectionExtensions
     {
-        public static void AddTrustchainCoreServices(this IServiceCollection services)
+        public static void TrustchainCore(this IServiceCollection services)
         {
             
         }

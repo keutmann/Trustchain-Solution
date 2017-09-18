@@ -1,28 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 using TrustchainCore.Model;
 using TrustchainCore.Extensions;
-using NBitcoin.Crypto;
 using TrustchainCore.Security.Cryptography;
+using TrustchainCore.Interfaces;
 
-namespace TrustchainCore.Business
+namespace TrustchainCore.Strategy
 {
-    public class MerkleTree 
+    public class MerkleTreeSorted : IMerkleTree
     {
-        public static int HashBytelength = 20;
-        public static Func<byte[], byte[]> HashStrategy = Crypto.HashStrategy; //(i) => Hashes.RIPEMD160(Hashes.Hash256(i).ToBytes(),0,32);
+        private IEnumerable<MerkleNode> LeafNodes { get; }
+        private ICryptoAlgoService CryptoService { get; }
 
-        public IEnumerable<MerkleNodeModel> LeafNodes { get; }
-
-        public MerkleTree(IEnumerable<MerkleNodeModel> leafNodes)
+        public MerkleTreeSorted(ICryptoAlgoService cryptoService)
         {
-            LeafNodes = leafNodes;
+            CryptoService = cryptoService;
         }
 
-        public MerkleNodeModel Build()
+        public MerkleNode Build(IEnumerable<Byte[]> hashs)
+        {
+            var leafs = new List<MerkleNode>();
+            foreach (var hash in hashs)
+            {
+                leafs.Add(new MerkleNode(hash));
+            }
+            return null;
+        }
+
+        public MerkleNode Build(IEnumerable<MerkleNode> leafNodes)
         {
             var rootNode = BuildTree(LeafNodes);
             ComputeMerkleTree(rootNode);
@@ -30,12 +36,12 @@ namespace TrustchainCore.Business
             return rootNode;
         }
 
-        private MerkleNodeModel BuildTree(IEnumerable<MerkleNodeModel> leafNodes)
+        private MerkleNode BuildTree(IEnumerable<MerkleNode> leafNodes)
         {
-            var nodes = new Queue<MerkleNodeModel>(leafNodes);
+            var nodes = new Queue<MerkleNode>(leafNodes);
             while (nodes.Count > 1)
             {
-                var parents = new Queue<MerkleNodeModel>();
+                var parents = new Queue<MerkleNode>();
                 while (nodes.Count > 0)
                 {
                     var first = nodes.Dequeue();
@@ -43,13 +49,13 @@ namespace TrustchainCore.Business
 
                     if (first.Hash.Compare(second.Hash) > 0)
                     {
-                        var hash = HashStrategy(first.Hash.Combine(second.Hash));
-                        parents.Enqueue(new MerkleNodeModel(hash, first, second));
+                        var hash = CryptoService.HashOf(first.Hash.Combine(second.Hash));
+                        parents.Enqueue(new MerkleNode(hash, first, second));
                     }
                     else
                     {
-                        var hash = HashStrategy(second.Hash.Combine(first.Hash));
-                        parents.Enqueue(new MerkleNodeModel(hash, second, first));
+                        var hash = CryptoService.HashOf(second.Hash.Combine(first.Hash));
+                        parents.Enqueue(new MerkleNode(hash, second, first));
                     }
                 }
                 nodes = parents;
@@ -57,13 +63,13 @@ namespace TrustchainCore.Business
             return nodes.FirstOrDefault(); // root
         }
 
-        private void ComputeMerkleTree(MerkleNodeModel root)
+        private void ComputeMerkleTree(MerkleNode root)
         {
             var merkle = new Stack<byte[]>();
             ComputeMerkleTree(root, merkle);
         }
 
-        private void ComputeMerkleTree(MerkleNodeModel node, Stack<byte[]> merkle)
+        private void ComputeMerkleTree(MerkleNode node, Stack<byte[]> merkle)
         {
             if (node == null)
                 return;
@@ -95,16 +101,16 @@ namespace TrustchainCore.Business
             return;
         }
 
-        public static byte[] ComputeRoot(byte[] hash, byte[] path, int hashLength)
+        public byte[] ComputeRoot(byte[] hash, byte[] path, int hashLength)
         {
             for (var i = 0; i < path.Length; i += hashLength)
             {
                 var merkle = new byte[hashLength];
                 Array.Copy(path, i, merkle, 0, hashLength);
                 if (hash.Compare(merkle) > 0)
-                    hash = HashStrategy(hash.Combine(merkle));
+                    hash = CryptoService.HashOf(hash.Combine(merkle));
                 else
-                    hash = HashStrategy(merkle.Combine(hash));
+                    hash = CryptoService.HashOf(merkle.Combine(hash));
             }
             return hash;
         }

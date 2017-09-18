@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using TrustchainCore.Business;
+using TrustchainCore.Builders;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 
