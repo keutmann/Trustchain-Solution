@@ -28,7 +28,7 @@ namespace Trustchain
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<TrustDBContext>(options =>
-                options.UseSqlite("Filename=./blog.db")); //(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite("Filename=./trust.db")); //(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc();
             services.AddSwaggerGen(c =>

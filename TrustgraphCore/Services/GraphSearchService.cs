@@ -68,7 +68,7 @@ namespace TrustgraphCore.Services
                     }
 
                     var address = ModelService.Graph.Address[parentNode.NodeIndex];
-                    parentNode.Id = address.Id;
+                    parentNode.SubjectId = address.Id;
 
                     if (visited.EdgeIndex >= 0)
                     {

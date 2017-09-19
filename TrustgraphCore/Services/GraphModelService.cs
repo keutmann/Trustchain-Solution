@@ -1,4 +1,6 @@
-﻿using TrustchainCore.Model;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using TrustchainCore.Model;
 using TrustgraphCore.Interfaces;
 using TrustgraphCore.Model;
 
@@ -21,28 +23,28 @@ namespace TrustgraphCore.Services
         public EdgeModel CreateEdgeModel(SubjectModel subject, int timestamp)
         {
             var edge = new EdgeModel();
-            edge.SubjectId = EnsureNode(subject.Id);
+            edge.SubjectId = EnsureNode(subject.SubjectId);
             edge.SubjectType = EnsureSubjectType(subject.IdType);
             edge.Scope = EnsureScopeIndex(subject.Scope);
             edge.Activate = subject.Activate;
             edge.Expire = subject.Expire;
             edge.Cost = (short)subject.Cost;
             edge.Timestamp = timestamp;
-            edge.Claim = ClaimStandardModel.Parse(subject.Claim);
+            edge.Claim = ClaimStandardModel.Parse((JObject)JsonConvert.DeserializeObject(subject.Claim));
 
             return edge;
         }
 
         public void InitSubjectModel(SubjectModel node, EdgeModel edge)
         {
-            node.Id = Graph.Address[edge.SubjectId].Id;
+            node.SubjectId = Graph.Address[edge.SubjectId].Id;
             node.IdType = Graph.SubjectTypesIndexReverse[edge.SubjectType];
             node.Scope = Graph.ScopeIndexReverse[edge.Scope];
             node.Activate = edge.Activate;
             node.Expire = edge.Expire;
             node.Cost = edge.Cost;
             node.Timestamp = edge.Timestamp;
-            node.Claim = edge.Claim.ConvertToJObject();
+            node.Claim = edge.Claim.ConvertToJObject().ToString(Formatting.None);
         }
 
         public int EnsureNode(byte[] id)

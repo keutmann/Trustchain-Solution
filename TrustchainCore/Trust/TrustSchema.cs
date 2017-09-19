@@ -32,7 +32,7 @@ namespace TrustchainCore.Trust
             if (trust.Issuer == null)
                 Errors.Add("Missing Issuer");
 
-            if (trust.Issuer.Id == null || trust.Issuer.Id.Length == 0)
+            if (trust.Issuer.IssuerId == null || trust.Issuer.IssuerId.Length == 0)
                 Errors.Add("Missing issuer id");
 
             //if (trust.Issuer.Signature == null)
@@ -44,7 +44,7 @@ namespace TrustchainCore.Trust
             var index = 0;
             foreach (var subject in trust.Issuer.Subjects)
             {
-                if (subject.Id == null || subject.Id.Length == 0)
+                if (subject.SubjectId == null || subject.SubjectId.Length == 0)
                     Errors.Add("Missing subject id at index: "+index);
                 index++;
             }

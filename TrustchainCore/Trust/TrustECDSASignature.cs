@@ -33,7 +33,7 @@ namespace TrustchainCore.Trust
 
             var trustHash = new uint256(Trust.TrustId);
 
-            if (!VerifySignature(trustHash, Trust.Issuer.Signature, Trust.Issuer.Id))
+            if (!VerifySignature(trustHash, Trust.Issuer.Signature, Trust.Issuer.IssuerId))
             {
                 Errors.Add("Invalid issuer signature");
                 return Errors;
@@ -45,7 +45,7 @@ namespace TrustchainCore.Trust
                 if (subject.Signature == null || subject.Signature.Length == 0)
                     continue;
 
-                if (!VerifySignature(trustHash, subject.Signature, subject.Id))
+                if (!VerifySignature(trustHash, subject.Signature, subject.SubjectId))
                 {
                     Errors.Add("Invalid issuer signature");
                     return Errors;
@@ -65,7 +65,7 @@ namespace TrustchainCore.Trust
                 return Errors;
             }
 
-            if (!VerifySignatureMessage(Trust.TrustId, Trust.Issuer.Signature, Trust.Issuer.Id))
+            if (!VerifySignatureMessage(Trust.TrustId, Trust.Issuer.Signature, Trust.Issuer.IssuerId))
             {
                 Errors.Add("Invalid issuer signature");
                 return Errors;
@@ -77,7 +77,7 @@ namespace TrustchainCore.Trust
                 if (subject.Signature == null || subject.Signature.Length == 0)
                     continue;
 
-                if (!VerifySignatureMessage(Trust.TrustId, subject.Signature, subject.Id))
+                if (!VerifySignatureMessage(Trust.TrustId, subject.Signature, subject.SubjectId))
                 {
                     Errors.Add("Invalid issuer signature");
                     return Errors;

@@ -4,8 +4,11 @@ using System.Collections.Generic;
 namespace TrustchainCore.Model
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class CoreModel
+    public abstract class CoreModel
     {
+        [JsonIgnore]
+        public int ID { get; set; }
+
         [JsonProperty(PropertyName = "head", NullValueHandling = NullValueHandling.Ignore)]
         public HeadModel Head { get; set; }
 
@@ -13,6 +16,6 @@ namespace TrustchainCore.Model
         public ServerModel Server { get; set; }
 
         [JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]
-        public TimestampCollection Timestamp { get; set; }
+        public List<TimestampModel> Timestamp { get; set; }
     }
 }

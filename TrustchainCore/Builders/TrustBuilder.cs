@@ -85,15 +85,15 @@ namespace TrustchainCore.Builders
             };
             trust.Server = new ServerModel();
             trust.Issuer = new IssuerModel();
-            trust.Issuer.Id = _cryptoAlgoService.GetAddress(issuerKey);
+            trust.Issuer.IssuerId = _cryptoAlgoService.GetAddress(issuerKey);
             var subjects = new List<SubjectModel>();
             subjects.Add(new SubjectModel
             {
-                Id = _cryptoAlgoService.GetAddress(subjectKey),
+                SubjectId = _cryptoAlgoService.GetAddress(subjectKey),
                 IdType = "person",
-                Claim = (claim != null) ? claim : new JObject(
+                Claim = JsonConvert.SerializeObject((claim != null) ? claim : new JObject(
                     new JProperty("trust", "true")
-                    ),
+                    ), Formatting.None),
                 Scope = "global"
             });
             trust.Issuer.Subjects = subjects.ToArray();

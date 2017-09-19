@@ -6,11 +6,21 @@ namespace TrustchainCore.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class SubjectModel
     {
+        [JsonIgnore]
+        public int ID { get; set; }
+
+        /// <summary>
+        /// Not included in the Binary payload for signature verification!
+        /// Non serializeable
+        /// </summary>
+        [JsonIgnore]
+        public int IssuerModelID { get; set; }
+
         /// <summary>
         /// Subject target id
         /// </summary>
         [JsonProperty(PropertyName = "id")]
-        public byte[] Id { get; set; }
+        public byte[] SubjectId { get; set; }
 
         [JsonProperty(PropertyName = "idtype", NullValueHandling = NullValueHandling.Ignore)]
         public string IdType { get; set; }
@@ -22,7 +32,7 @@ namespace TrustchainCore.Model
         public byte[] Signature { get; set; }
 
         [JsonProperty(PropertyName = "claim", NullValueHandling = NullValueHandling.Ignore)]
-        public JObject Claim { get; set; }
+        public string Claim { get; set; }
 
         [JsonProperty(PropertyName = "cost", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int Cost { get; set; }
@@ -42,22 +52,10 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "timestamp", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int Timestamp { get; set; }
 
-        /// <summary>
-        /// Not included in the Binary payload for signature verification!
-        /// Non serializeable
-        /// </summary>
-        public byte[] IssuerId { get; set; }
-
-        /// <summary>
-        /// FOREIGN KEY to a Trust
-        /// Non serializeable
-        /// </summary>
-        public byte[] TrustId { get; set; }
-
-
-        public SubjectModel()
-        {
-            Claim = null;
-        }
+        ///// <summary>
+        ///// FOREIGN KEY to a Trust
+        ///// Non serializeable
+        ///// </summary>
+        //public byte[] TrustId { get; set; }
     }
 }

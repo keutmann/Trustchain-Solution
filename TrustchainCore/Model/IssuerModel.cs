@@ -10,8 +10,14 @@ namespace TrustchainCore.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class IssuerModel
     {
+        [JsonIgnore]
+        public int ID { get; set; }
+
+        [JsonIgnore]
+        public int TrustModelID { get; set; }
+
         [JsonProperty(PropertyName = "id")]
-        public byte[] Id { get; set; }
+        public byte[] IssuerId { get; set; }
 
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }

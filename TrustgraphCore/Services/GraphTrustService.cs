@@ -29,7 +29,7 @@ namespace TrustgraphCore.Services
             long unixTime = DateTime.Now.ToUnixTime();
             foreach (var trust in trusts)
             {
-                var issuerIndex = ModelService.EnsureNode(trust.Issuer.Id);
+                var issuerIndex = ModelService.EnsureNode(trust.Issuer.IssuerId);
                 var issuerNode = ModelService.Graph.Address[issuerIndex];
                 var issuerEdges = new List<EdgeModel>(issuerNode.Edges != null ? issuerNode.Edges : new EdgeModel[0]);
 

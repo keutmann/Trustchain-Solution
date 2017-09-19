@@ -16,14 +16,14 @@ namespace TrustchainCore.Repository
         {
         }
 
-        protected TrustDBContext()
-        {
-        }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //protected TrustDBContext()
         //{
-        //    //optionsBuilder.UseSqlite("Filename=./blog.db");
         //}
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //optionsBuilder.UseSqlite("Filename=./blog.db");
+        }
 
 
 

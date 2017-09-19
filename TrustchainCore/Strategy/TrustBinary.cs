@@ -18,17 +18,18 @@ namespace TrustchainCore.Strategy
             using (MemoryStream ms = new MemoryStream())
             {
                 var issuer = trust.Issuer;
-                ms.WriteBytes(issuer.Id);
+                ms.WriteBytes(issuer.IssuerId);
                 foreach (var subject in issuer.Subjects)
                 {
-                    ms.WriteBytes(subject.Id);
+                    ms.WriteBytes(subject.SubjectId);
                     ms.WriteString(subject.IdType);
 
-                    foreach (JProperty prop in subject.Claim.Children().OfType<JProperty>())
-                    {
-                        ms.WriteString(prop.Name.ToLower());
-                        ms.WriteString(prop.Value.ToStringValue());
-                    }
+                    ms.WriteString(subject.Claim);
+                    //foreach (JProperty prop in subject.Claim.Children().OfType<JProperty>())
+                    //{
+                    //    ms.WriteString(prop.Name.ToLower());
+                    //    ms.WriteString(prop.Value.ToStringValue());
+                    //}
                     //foreach (DictionaryEntry claim in subject.Claim)
                     //{
                     //    ms.WriteString(claim.Key);

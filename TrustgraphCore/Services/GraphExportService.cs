@@ -21,7 +21,7 @@ namespace TrustgraphCore.Services
             foreach (var address in ModelService.Graph.Address)
             {
                 var issuer = new IssuerModel();
-                issuer.Id = address.Id;
+                issuer.IssuerId = address.Id;
                 
                 var subjects = new List<SubjectModel>();
                 if (address.Edges != null)
