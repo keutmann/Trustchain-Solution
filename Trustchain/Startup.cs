@@ -9,6 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using TrustchainCore.Extensions;
 using TrustgraphCore.Extensions;
+using TrustchainCore.Repository;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Trustchain
 {
@@ -24,8 +27,8 @@ namespace Trustchain
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<TrustDBContext>(options =>
+                options.UseSqlite("Filename=./blog.db")); //(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc();
             services.AddSwaggerGen(c =>
@@ -35,6 +38,7 @@ namespace Trustchain
 
             services.TrustchainCore();
             services.TrustgraphCore();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
