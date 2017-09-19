@@ -34,7 +34,7 @@ namespace TrustgraphCore.Services
                     }
                 }
                 if(subjects.Count > 0)
-                    issuer.Subjects = subjects.ToArray();
+                    issuer.Subjects = subjects;
 
                 var trust = new TrustModel();
                 trust.Issuer = issuer;

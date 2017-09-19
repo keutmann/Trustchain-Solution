@@ -7,6 +7,6 @@ namespace TrustchainCore.Model
     public class PackageModel : CoreModel
     {
         [JsonProperty(PropertyName = "trust")]
-        public List<TrustModel> Trust { get; set; }
+        public IList<TrustModel> Trust { get; set; }
     }
 }

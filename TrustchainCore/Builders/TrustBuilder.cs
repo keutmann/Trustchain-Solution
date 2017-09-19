@@ -96,7 +96,7 @@ namespace TrustchainCore.Builders
                     ), Formatting.None),
                 Scope = "global"
             });
-            trust.Issuer.Subjects = subjects.ToArray();
+            trust.Issuer.Subjects = subjects;
 
             Package.Trust.Add(trust);
 

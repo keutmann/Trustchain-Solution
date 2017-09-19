@@ -16,6 +16,6 @@ namespace TrustchainCore.Model
         public ServerModel Server { get; set; }
 
         [JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]
-        public List<TimestampModel> Timestamp { get; set; }
+        public IList<TimestampModel> Timestamp { get; set; }
     }
 }

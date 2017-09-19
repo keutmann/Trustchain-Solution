@@ -38,7 +38,7 @@ namespace TrustchainCore.Trust
             //if (trust.Issuer.Signature == null)
             //    Errors.Add("Missing issuer signature");
 
-            if (trust.Issuer.Subjects == null || trust.Issuer.Subjects.Length == 0)
+            if (trust.Issuer.Subjects == null || trust.Issuer.Subjects.Count == 0)
                 Errors.Add("Missing subject");
 
             var index = 0;

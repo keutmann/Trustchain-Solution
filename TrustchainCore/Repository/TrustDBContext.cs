@@ -9,7 +9,7 @@ namespace TrustchainCore.Repository
     public class TrustDBContext : DbContext
     {
         public DbSet<PackageModel> Package { get; set; }
-        public DbSet<TrustModel> Trust { get; set; }
+        public DbSet<TrustModel> Trusts { get; set; }
         public DbSet<SubjectModel> Subject { get; set; }
 
         public TrustDBContext(DbContextOptions options) : base(options)
