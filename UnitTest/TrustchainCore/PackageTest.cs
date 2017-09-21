@@ -15,7 +15,7 @@ namespace UnitTest.TrustchainCore
         [TestMethod]
         public void Serialize()
         {
-            var cryptoService = new SHA256Service();
+            var cryptoService = new BTCPKHService();
             var serverKey = cryptoService.GetKey(Encoding.UTF8.GetBytes("testserver"));
 
             //var key = new Key()

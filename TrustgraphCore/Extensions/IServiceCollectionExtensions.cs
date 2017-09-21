@@ -12,7 +12,7 @@ namespace TrustgraphCore.Extensions
         public static void TrustgraphCore(this IServiceCollection services)
         {
             services.AddSingleton(new GraphModel());
-            services.AddScoped<ICryptoAlgoService, SHA256Service>();
+            services.AddScoped<ICryptoService, BTCPKHService>();
 
             services.AddTransient<IGraphModelService, GraphModelService>();
             services.AddTransient<IGraphTrustService, GraphTrustService>();

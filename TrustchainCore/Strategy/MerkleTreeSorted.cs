@@ -11,9 +11,9 @@ namespace TrustchainCore.Strategy
     public class MerkleTreeSorted : IMerkleTree
     {
         private IEnumerable<MerkleNode> LeafNodes { get; }
-        private ICryptoAlgoService CryptoService { get; }
+        private ICryptoService CryptoService { get; }
 
-        public MerkleTreeSorted(ICryptoAlgoService cryptoService)
+        public MerkleTreeSorted(ICryptoService cryptoService)
         {
             CryptoService = cryptoService;
         }

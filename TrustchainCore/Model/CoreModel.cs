@@ -7,7 +7,7 @@ namespace TrustchainCore.Model
     public abstract class CoreModel
     {
         [JsonIgnore]
-        public int ID { get; set; }
+        public int ID { get; set; } // Database row key
 
         [JsonProperty(PropertyName = "head", NullValueHandling = NullValueHandling.Ignore)]
         public HeadModel Head { get; set; }

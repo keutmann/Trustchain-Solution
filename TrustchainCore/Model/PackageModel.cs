@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace TrustchainCore.Model
 {
@@ -7,7 +8,8 @@ namespace TrustchainCore.Model
     public class PackageModel : CoreModel
     {
         [JsonProperty(PropertyName = "id")]
-        public byte[] PackageId { get; set; }
+        [Key]
+        public byte[] PackageId { get; set; }   // Package id from combined hashed trust id's
 
         [JsonProperty(PropertyName = "trust")]
         public IList<TrustModel> Trust { get; set; }

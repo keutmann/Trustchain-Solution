@@ -1,6 +1,8 @@
 ﻿using TrustchainCore.Model;
 using Microsoft.AspNetCore.Mvc;
 using TrustgraphCore.Interfaces;
+using TrustchainCore.Repository;
+using TrustchainCore.Interfaces;
 
 namespace TrustgraphCore.Controllers
 {
@@ -8,10 +10,15 @@ namespace TrustgraphCore.Controllers
     public class TrustController : Controller
     {
         private IGraphTrustService _graphTrustService;
+        private ITrustSchemaService _trustSchemaService;
+        private ITrustDBService _trustDBService;
 
-        public TrustController(IGraphTrustService trustService)
+
+        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService)
         {
-            _graphTrustService = trustService;
+            _graphTrustService = graphTrustService;
+            _trustSchemaService = trustSchemaService;
+            _trustDBService = trustDBService;
         }
 
         [HttpGet]
@@ -23,27 +30,13 @@ namespace TrustgraphCore.Controllers
         [HttpPost]
         public ActionResult Add([FromBody]PackageModel package)
         {
+            var validaionResult = _trustSchemaService.Validate(package);
+            if(validaionResult.ErrorsFound > 0)
+                return BadRequest(validaionResult);
+
             _graphTrustService.Add(package);
-            // Add to DB
-            // Add to Timestamp
-
-//#if RELEASE
-//                var buildserverUrl = App.Config["buildserver"].ToStringValue("http://127.0.01:12601");
-//                if (!string.IsNullOrEmpty(buildserverUrl))
-//                {
-//                    var fullUrl = new UriBuilder(buildserverUrl);
-//                    fullUrl.Path = Path;
-//                    using (var client = new HttpClient())
-//                    {
-//                        var response = client.PostAsJsonAsync(fullUrl.ToString(), package);
-//                        Task.WaitAll(response);
-//                        var result = response.Result;
-//                        if (result.StatusCode != System.Net.HttpStatusCode.OK)
-//                            return InternalServerError();
-//                    }
-//                }
-//#endif
-
+            _trustDBService.Add(package);
+            
             return Ok(new { status = "succes" });
         }
     }

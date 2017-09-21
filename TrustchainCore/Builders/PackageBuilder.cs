@@ -15,14 +15,14 @@ namespace TrustchainCore.Builders
     public class PackageBuilder
     {
         public PackageModel Package { get; set; }
-        private ICryptoAlgoService _cryptoAlgoService;
+        private ICryptoService _cryptoAlgoService;
         private ITrustBinary _trustBinary;
         private byte[] _issuerKey;
         private byte[] _serverKey;
 
         private TrustModel _currentTrust;
 
-        public PackageBuilder(ICryptoAlgoService cryptoAlgoService, ITrustBinary trustBinary)
+        public PackageBuilder(ICryptoService cryptoAlgoService, ITrustBinary trustBinary)
         {
             Package = new PackageModel();
             Package.Trust = new List<TrustModel>();
