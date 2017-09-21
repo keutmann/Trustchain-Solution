@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TrustchainCore.Builders;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Services;
@@ -19,97 +20,110 @@ namespace TrustchainCore.Trust
 
         public SchemaValidationResult Validate(PackageModel package)
         {
-            var result = new SchemaValidationResult();
-            if (package.PackageId == null)
-                result.Errors.Add("Package.PackageID is missing");
-
-            ValidateHead(package.Head, result);
-
-            var script = "btc-pkh";
-            if (package.Head != null)
-                script = package.Head.Script;
-
-            var cryptoService = _cryptoServiceFactory.Create(script);
-            var engine = new ValidationEngine(cryptoService, result);
-            engine.Validate(package);
-
-            return result;
+            package = PackageBuilder.EnsureHead(package);
+            var cryptoService = _cryptoServiceFactory.Create(package.Head.Script);
+            var engine = new ValidationEngine(cryptoService);
+            return engine.Validate(package);
         }
 
-
-        private void ValidateHead(HeadModel head, SchemaValidationResult result)
-        {
-            if (head == null)
-                return;
-
-            if (string.IsNullOrEmpty(head.Script))
-                result.Errors.Add("Missing Head Script");
-
-            if (string.IsNullOrEmpty(head.Version))
-                result.Errors.Add("Missing Head Version");
-
-        }
 
         private class ValidationEngine
         {
-            private SchemaValidationResult result;
+            private SchemaValidationResult result = new SchemaValidationResult();
             private ICryptoService _cryptoService;
 
-            public ValidationEngine(ICryptoService cryptoService, SchemaValidationResult r)
+            public ValidationEngine(ICryptoService cryptoService)
             {
                 _cryptoService = cryptoService;
-                result = r;
             }
 
             public SchemaValidationResult Validate(PackageModel package)
             {
+                if (package.PackageId == null)
+                    result.Errors.Add("Package.PackageID is missing");
 
+                ValidateHead(package.Head, result);
+
+                var trustIndex = 0;
                 foreach (var trust in package.Trust)
                 {
-                    ValidateTrust(trust, result);
+                    ValidateTrust(trustIndex++, trust, result);
                 }
             
                 return result;
             }
 
-
-
-            private void ValidateTrust(TrustModel trust, SchemaValidationResult result)
+            private void ValidateHead(HeadModel head, SchemaValidationResult result)
             {
-                if (trust.TrustId == null)
-                    result.Errors.Add("Missing trust id");
 
-                ValidateIssuer(trust.Issuer, result);
+                if (head == null)
+                    return;
+
+                if (string.IsNullOrEmpty(head.Script))
+                    result.Errors.Add("Missing Head Script");
+
+                if (string.IsNullOrEmpty(head.Version))
+                    result.Errors.Add("Missing Head Version");
 
             }
 
-            private void ValidateIssuer(IssuerModel issuer, SchemaValidationResult result)
+            private void ValidateTrust(int trustIndex, TrustModel trust, SchemaValidationResult result)
             {
+                var location = $"Trust Index: {trustIndex} - ";
+
+                if (trust.TrustId == null)
+                    result.Errors.Add(location+"Missing trust id");
+
+                ValidateIssuer(trustIndex, trust, result);
+            }
+
+            private void ValidateIssuer(int trustIndex, TrustModel trust, SchemaValidationResult result)
+            {
+                IssuerModel issuer = trust.Issuer;
+                var location = $"Trust Index: {trustIndex} - ";
                 if (issuer == null)
-                    result.Errors.Add("Missing Issuer");
+                    result.Errors.Add(location+"Missing Issuer");
 
                 if (issuer.IssuerId == null || issuer.IssuerId.Length == 0)
-                    result.Errors.Add("Missing issuer id");
+                    result.Errors.Add(location+"Missing issuer id");
 
-                if (issuer.Signature == null)
-                    result.Errors.Add("Missing issuer signature");
+                if (issuer.Signature == null || issuer.Signature.Length == 0)
+                    result.Errors.Add(location+"Missing issuer signature");
+                else
+                {
+                    if (!_cryptoService.VerifySignatureMessage(trust.TrustId, issuer.Signature, issuer.IssuerId))
+                    {
+                        result.Errors.Add(location + "Invalid issuer signature");
+                    }
+                }
 
                 if (issuer.Subjects == null || issuer.Subjects.Count == 0)
-                    result.Errors.Add("Missing subject");
+                    result.Errors.Add(location+"Missing subject");
 
-                var index = 0;
+                var subjectIndex = 0;
                 foreach (var subject in issuer.Subjects)
                 {
-                    ValidateSubject(subject, result);
-                    index++;
+                    ValidateSubject(trustIndex, subjectIndex++, trust, subject, result);
                 }
 
             }
 
-            private void ValidateSubject(SubjectModel subject, SchemaValidationResult result)
+            private void ValidateSubject(int trustIndex, int subjectIndex, TrustModel trust, SubjectModel subject, SchemaValidationResult result)
             {
+                var location = $"Trust Index: {trustIndex} -> Subject Index: {subjectIndex} - ";
                 if (subject.SubjectId == null || subject.SubjectId.Length == 0)
-                    result.Errors.Add("Missing subject id");
+                    result.Errors.Add(location+"Missing subject id");
+
+                if (subject.Signature != null && subject.Signature.Length > 0)
+                {
+                    if (!_cryptoService.VerifySignatureMessage(trust.TrustId, subject.Signature, subject.SubjectId))
+                    {
+                        result.Errors.Add(location+"Invalid subject signature");
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(subject.Claim))
+                    result.Errors.Add(location + "Missing Claim");
             }
         }
     }

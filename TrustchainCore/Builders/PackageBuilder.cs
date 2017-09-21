@@ -26,16 +26,11 @@ namespace TrustchainCore.Builders
         {
             Package = new PackageModel();
             Package.Trust = new List<TrustModel>();
-            Package.Head = new HeadModel
-            {
-                Version = "standard 0.1.0",
-                Script = cryptoAlgoService.ScriptName
-            };
+            EnsureHead(Package);
             _cryptoAlgoService = cryptoAlgoService;
             _trustBinary = trustBinary;
 
         }
-
 
         public PackageBuilder Load(string content)
         {
@@ -43,10 +38,24 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public PackageBuilder Load(PackageModel package)
+        //public static PackageBuilder Load(PackageModel package)
+        //{
+        //    var builder = new PackageBuilder();
+        //    builder.Package = package;
+        //    return builder;
+        //}
+
+        public static PackageModel EnsureHead(PackageModel package, string version = "standard 0.1.0", string script = "btc-pkh")
         {
-            Package = package;
-            return this;
+            if(package.Head == null)
+            {
+                package.Head = new HeadModel
+                {
+                    Version = version,
+                    Script = script
+                };
+            }
+            return package;
         }
 
         public string Serialize(Formatting format)
