@@ -15,8 +15,8 @@ namespace TrustchainCore.Model
         [JsonIgnore]
         public int IssuerModelID { get; set; }
 
-        [JsonIgnore]
-        public int TrustModelID { get; set; }
+        //[JsonIgnore]
+        //public int TrustModelID { get; set; }
 
         [JsonProperty(PropertyName = "id")]
         public byte[] IssuerId { get; set; }

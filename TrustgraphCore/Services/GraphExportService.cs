@@ -20,8 +20,8 @@ namespace TrustgraphCore.Services
 
             foreach (var address in ModelService.Graph.Address)
             {
-                var issuer = new IssuerModel();
-                issuer.IssuerId = address.Id;
+                var trust = new TrustModel();
+                trust.IssuerId = address.Id;
                 
                 var subjects = new List<SubjectModel>();
                 if (address.Edges != null)
@@ -34,10 +34,8 @@ namespace TrustgraphCore.Services
                     }
                 }
                 if(subjects.Count > 0)
-                    issuer.Subjects = subjects;
+                    trust.Subjects = subjects;
 
-                var trust = new TrustModel();
-                trust.Issuer = issuer;
                 package.Trust.Add(trust);
             }
             return package;

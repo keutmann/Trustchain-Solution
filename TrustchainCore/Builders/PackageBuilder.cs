@@ -107,10 +107,9 @@ namespace TrustchainCore.Builders
         public PackageBuilder AddTrust(byte[] issuerKey, string issuerName = null)
         {
             _currentTrust = new TrustModel();
-            _currentTrust.Issuer = new IssuerModel();
-            _currentTrust.Issuer.IssuerId = _cryptoService.GetAddress(issuerKey);
-            _currentTrust.Issuer.IssuerKey = issuerKey;
-            _currentTrust.Issuer.Name = issuerName;
+            _currentTrust.IssuerId = _cryptoService.GetAddress(issuerKey);
+            _currentTrust.IssuerKey = issuerKey;
+            _currentTrust.Name = issuerName;
             Package.Trust.Add(_currentTrust);
 
             return this;
@@ -134,7 +133,7 @@ namespace TrustchainCore.Builders
                 trust = _currentTrust;
 
             trust.TrustId = _cryptoService.HashOf(_trustBinary.GetIssuerBinary(trust));
-            trust.Issuer.Signature = _cryptoService.SignMessage(trust.Issuer.IssuerKey, trust.TrustId);
+            trust.Signature = _cryptoService.SignMessage(trust.IssuerKey, trust.TrustId);
 
             return this;
         }
@@ -155,10 +154,10 @@ namespace TrustchainCore.Builders
         }
         public PackageBuilder AddSubject(byte[] subjectKey, JObject claim)
         {
-            if(_currentTrust.Issuer.Subjects == null)
-                _currentTrust.Issuer.Subjects = new List<SubjectModel>();
+            if(_currentTrust.Subjects == null)
+                _currentTrust.Subjects = new List<SubjectModel>();
 
-            _currentTrust.Issuer.Subjects.Add(new SubjectModel
+            _currentTrust.Subjects.Add(new SubjectModel
             {
                 SubjectId = _cryptoService.GetAddress(subjectKey),
                 SubjectType = "person",

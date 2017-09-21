@@ -25,7 +25,7 @@ namespace TrustchainCore.Trust
         {
             var Errors = new List<string>();
 
-            if (Trust.Issuer.Signature == null || Trust.Issuer.Signature.Length == 0)
+            if (Trust.Signature == null || Trust.Signature.Length == 0)
             {
                 Errors.Add("Missing issuer signature");
                 return Errors;
@@ -33,7 +33,7 @@ namespace TrustchainCore.Trust
 
             var trustHash = new uint256(Trust.TrustId);
 
-            if (!VerifySignature(trustHash, Trust.Issuer.Signature, Trust.Issuer.IssuerId))
+            if (!VerifySignature(trustHash, Trust.Signature, Trust.IssuerId))
             {
                 Errors.Add("Invalid issuer signature");
                 return Errors;

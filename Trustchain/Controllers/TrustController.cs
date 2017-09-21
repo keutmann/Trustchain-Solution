@@ -34,8 +34,8 @@ namespace TrustgraphCore.Controllers
             if(validaionResult.ErrorsFound > 0)
                 return BadRequest(validaionResult);
 
-            _graphTrustService.Add(package);
             _trustDBService.Add(package);
+            _graphTrustService.Add(package);
             
             return Ok(new { status = "succes" });
         }

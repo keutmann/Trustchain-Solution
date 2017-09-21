@@ -17,10 +17,10 @@ namespace TrustchainCore.Strategy
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                var issuer = trust.Issuer;
-                ms.WriteBytes(issuer.IssuerId);
+                //var issuer = trust.Issuer;
+                ms.WriteBytes(trust.IssuerId);
                 //ms.WriteString(issuer.Name); // UTF8 - Not sure that name should be included in trust ID.
-                foreach (var subject in issuer.Subjects)
+                foreach (var subject in trust.Subjects)
                 {
                     ms.WriteBytes(subject.SubjectId);
                     ms.WriteString(subject.SubjectType);

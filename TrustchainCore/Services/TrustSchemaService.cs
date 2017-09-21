@@ -74,34 +74,24 @@ namespace TrustchainCore.Services
                 if (trust.TrustId == null)
                     result.Errors.Add(location+"Missing trust id");
 
-                ValidateIssuer(trustIndex, trust, result);
-            }
-
-            private void ValidateIssuer(int trustIndex, TrustModel trust, SchemaValidationResult result)
-            {
-                IssuerModel issuer = trust.Issuer;
-                var location = $"Trust Index: {trustIndex} - ";
-                if (issuer == null)
-                    result.Errors.Add(location+"Missing Issuer");
-
-                if (issuer.IssuerId == null || issuer.IssuerId.Length == 0)
+                if (trust.IssuerId == null || trust.IssuerId.Length == 0)
                     result.Errors.Add(location+"Missing issuer id");
 
-                if (issuer.Signature == null || issuer.Signature.Length == 0)
+                if (trust.Signature == null || trust.Signature.Length == 0)
                     result.Errors.Add(location+"Missing issuer signature");
                 else
                 {
-                    if (!_cryptoService.VerifySignatureMessage(trust.TrustId, issuer.Signature, issuer.IssuerId))
+                    if (!_cryptoService.VerifySignatureMessage(trust.TrustId, trust.Signature, trust.IssuerId))
                     {
                         result.Errors.Add(location + "Invalid issuer signature");
                     }
                 }
 
-                if (issuer.Subjects == null || issuer.Subjects.Count == 0)
+                if (trust.Subjects == null || trust.Subjects.Count == 0)
                     result.Errors.Add(location+"Missing subject");
 
                 var subjectIndex = 0;
-                foreach (var subject in issuer.Subjects)
+                foreach (var subject in trust.Subjects)
                 {
                     ValidateSubject(trustIndex, subjectIndex++, trust, subject, result);
                 }

@@ -22,17 +22,31 @@ namespace TrustchainCore.Repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlite("Filename=./blog.db");
+            //optionsBuilder.UseSqlite("Filename=./trust.db");
         }
-
+        
 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            //builder.Entity<TrustModel>().HasKey(m => m.TrustId);
-            //builder.Entity<SubjectModel>().HasKey(m => m.Id);
-            //builder.Entity<SubjectModel>().HasKey(m => m.TrustId);
-            
+            builder.Entity<PackageModel>().HasIndex("PackageId");
+
+            builder.Entity<PackageModel>()
+                .OwnsOne(c => c.Head);
+
+            builder.Entity<PackageModel>()
+                .OwnsOne(c => c.Server);
+
+            builder.Entity<TrustModel>().HasIndex("TrustId");
+
+            builder.Entity<TrustModel>()
+                .OwnsOne(c => c.Head);
+
+            builder.Entity<TrustModel>()
+                .OwnsOne(c => c.Server);
+
+            builder.Entity<SubjectModel>().HasIndex("SubjectId");
+
             base.OnModelCreating(builder);
         }
 

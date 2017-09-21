@@ -9,12 +9,12 @@ namespace TrustchainCore.Model
         [JsonIgnore]
         public int ID { get; set; }
 
-        /// <summary>
-        /// Not included in the Binary payload for signature verification!
-        /// Non serializeable
-        /// </summary>
+        ///// <summary>
+        ///// Not included in the Binary payload for signature verification!
+        ///// Non serializeable
+        ///// </summary>
         [JsonIgnore]
-        public int IssuerModelID { get; set; }
+        public int TrustModelID { get; set; }
 
         /// <summary>
         /// Subject target id

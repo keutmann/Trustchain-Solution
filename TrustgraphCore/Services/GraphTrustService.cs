@@ -29,11 +29,11 @@ namespace TrustgraphCore.Services
             long unixTime = DateTime.Now.ToUnixTime();
             foreach (var trust in trusts)
             {
-                var issuerIndex = ModelService.EnsureNode(trust.Issuer.IssuerId);
+                var issuerIndex = ModelService.EnsureNode(trust.IssuerId);
                 var issuerNode = ModelService.Graph.Address[issuerIndex];
                 var issuerEdges = new List<EdgeModel>(issuerNode.Edges != null ? issuerNode.Edges : new EdgeModel[0]);
 
-                foreach (var subject in trust.Issuer.Subjects)
+                foreach (var subject in trust.Subjects)
                 {
                     BuildSubject(trust, issuerEdges, subject);
                 }
@@ -49,7 +49,7 @@ namespace TrustgraphCore.Services
 
         private void BuildSubject(TrustModel trust, List<EdgeModel> issuerEdges, SubjectModel subject)
         {
-            var subjectEdge = ModelService.CreateEdgeModel(subject, (int)trust.Issuer.Timestamp);
+            var subjectEdge = ModelService.CreateEdgeModel(subject, (int)trust.Timestamp2);
             var ids = new List<int>();
             // Find all edges that matchs
             for (var i = 0 ; i < issuerEdges.Count; i++)

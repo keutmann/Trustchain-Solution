@@ -2,6 +2,8 @@
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace TrustchainCore.Services
 {
@@ -16,7 +18,12 @@ namespace TrustchainCore.Services
 
         public void Add(PackageModel package)
         {
+            var task = DBContext.Package.SingleOrDefaultAsync(f => f.PackageId == package.PackageId);
+            task.Wait();
+            if (task.Result != null)
+                return;
 
+            DBContext.Package.Add(package);
         }
     }
 }

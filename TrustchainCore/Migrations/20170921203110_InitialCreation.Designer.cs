@@ -10,8 +10,8 @@ using TrustchainCore.Repository;
 namespace TrustchainCore.Migrations
 {
     [DbContext(typeof(TrustDBContext))]
-    [Migration("20170919174652_Create0.1")]
-    partial class Create01
+    [Migration("20170921203110_InitialCreation")]
+    partial class InitialCreation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -19,71 +19,18 @@ namespace TrustchainCore.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.0-rtm-26452");
 
-            modelBuilder.Entity("TrustchainCore.Model.HeadModel", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Script");
-
-                    b.Property<string>("Version");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("HeadModel");
-                });
-
-            modelBuilder.Entity("TrustchainCore.Model.IssuerModel", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<byte[]>("IssuerId");
-
-                    b.Property<string>("Name");
-
-                    b.Property<byte[]>("Signature");
-
-                    b.Property<long>("Timestamp");
-
-                    b.Property<int>("TrustModelID");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("TrustModelID")
-                        .IsUnique();
-
-                    b.ToTable("IssuerModel");
-                });
-
             modelBuilder.Entity("TrustchainCore.Model.PackageModel", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("HeadID");
-
-                    b.Property<byte[]>("ServerId");
+                    b.Property<byte[]>("PackageId");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("HeadID");
-
-                    b.HasIndex("ServerId");
+                    b.HasIndex("PackageId");
 
                     b.ToTable("Package");
-                });
-
-            modelBuilder.Entity("TrustchainCore.Model.ServerModel", b =>
-                {
-                    b.Property<byte[]>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<byte[]>("Signature");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServerModel");
                 });
 
             modelBuilder.Entity("TrustchainCore.Model.SubjectModel", b =>
@@ -99,21 +46,23 @@ namespace TrustchainCore.Migrations
 
                     b.Property<uint>("Expire");
 
-                    b.Property<string>("IdType");
-
-                    b.Property<int>("IssuerModelID");
-
                     b.Property<string>("Scope");
 
                     b.Property<byte[]>("Signature");
 
                     b.Property<byte[]>("SubjectId");
 
+                    b.Property<string>("SubjectType");
+
                     b.Property<int>("Timestamp");
+
+                    b.Property<int>("TrustModelID");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("IssuerModelID");
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("TrustModelID");
 
                     b.ToTable("Subject");
                 });
@@ -145,49 +94,68 @@ namespace TrustchainCore.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("HeadID");
+                    b.Property<byte[]>("IssuerId");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(100);
 
                     b.Property<int>("PackageModelID");
 
-                    b.Property<byte[]>("ServerId");
+                    b.Property<byte[]>("Signature");
+
+                    b.Property<long>("Timestamp2");
 
                     b.Property<byte[]>("TrustId");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("HeadID");
-
                     b.HasIndex("PackageModelID");
 
-                    b.HasIndex("ServerId");
+                    b.HasIndex("TrustId");
 
-                    b.ToTable("Trust");
-                });
-
-            modelBuilder.Entity("TrustchainCore.Model.IssuerModel", b =>
-                {
-                    b.HasOne("TrustchainCore.Model.TrustModel")
-                        .WithOne("Issuer")
-                        .HasForeignKey("TrustchainCore.Model.IssuerModel", "TrustModelID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.ToTable("Trusts");
                 });
 
             modelBuilder.Entity("TrustchainCore.Model.PackageModel", b =>
                 {
-                    b.HasOne("TrustchainCore.Model.HeadModel", "Head")
-                        .WithMany()
-                        .HasForeignKey("HeadID");
+                    b.OwnsOne("TrustchainCore.Model.HeadModel", "Head", b1 =>
+                        {
+                            b1.Property<int>("ID");
 
-                    b.HasOne("TrustchainCore.Model.ServerModel", "Server")
-                        .WithMany()
-                        .HasForeignKey("ServerId");
+                            b1.Property<string>("Script");
+
+                            b1.Property<string>("Version");
+
+                            b1.ToTable("Package");
+
+                            b1.HasOne("TrustchainCore.Model.PackageModel")
+                                .WithOne("Head")
+                                .HasForeignKey("TrustchainCore.Model.HeadModel", "ID")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("TrustchainCore.Model.ServerModel", "Server", b1 =>
+                        {
+                            b1.Property<int>("PackageModelID");
+
+                            b1.Property<byte[]>("Id");
+
+                            b1.Property<byte[]>("Signature");
+
+                            b1.ToTable("Package");
+
+                            b1.HasOne("TrustchainCore.Model.PackageModel")
+                                .WithOne("Server")
+                                .HasForeignKey("TrustchainCore.Model.ServerModel", "PackageModelID")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
                 });
 
             modelBuilder.Entity("TrustchainCore.Model.SubjectModel", b =>
                 {
-                    b.HasOne("TrustchainCore.Model.IssuerModel")
+                    b.HasOne("TrustchainCore.Model.TrustModel")
                         .WithMany("Subjects")
-                        .HasForeignKey("IssuerModelID")
+                        .HasForeignKey("TrustModelID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -204,18 +172,42 @@ namespace TrustchainCore.Migrations
 
             modelBuilder.Entity("TrustchainCore.Model.TrustModel", b =>
                 {
-                    b.HasOne("TrustchainCore.Model.HeadModel", "Head")
-                        .WithMany()
-                        .HasForeignKey("HeadID");
-
                     b.HasOne("TrustchainCore.Model.PackageModel")
                         .WithMany("Trust")
                         .HasForeignKey("PackageModelID")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("TrustchainCore.Model.ServerModel", "Server")
-                        .WithMany()
-                        .HasForeignKey("ServerId");
+                    b.OwnsOne("TrustchainCore.Model.HeadModel", "Head", b1 =>
+                        {
+                            b1.Property<int>("ID");
+
+                            b1.Property<string>("Script");
+
+                            b1.Property<string>("Version");
+
+                            b1.ToTable("Trusts");
+
+                            b1.HasOne("TrustchainCore.Model.TrustModel")
+                                .WithOne("Head")
+                                .HasForeignKey("TrustchainCore.Model.HeadModel", "ID")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("TrustchainCore.Model.ServerModel", "Server", b1 =>
+                        {
+                            b1.Property<int?>("TrustModelID");
+
+                            b1.Property<byte[]>("Id");
+
+                            b1.Property<byte[]>("Signature");
+
+                            b1.ToTable("Trusts");
+
+                            b1.HasOne("TrustchainCore.Model.TrustModel")
+                                .WithOne("Server")
+                                .HasForeignKey("TrustchainCore.Model.ServerModel", "TrustModelID")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
                 });
 #pragma warning restore 612, 618
         }

@@ -26,8 +26,7 @@ namespace UnitTest
                 var package = new PackageModel();
                 package.Trust = new List<TrustModel>();
                 var trust = new TrustModel();
-                trust.Issuer = new IssuerModel();
-                trust.Issuer.Subjects = new List<SubjectModel>()  {
+                trust.Subjects = new List<SubjectModel>()  {
                     new SubjectModel {
                         Scope = "Test"
                     }
@@ -46,9 +45,7 @@ namespace UnitTest
             {
                 var task = context.Package
                     .Include(c => c.Trust)
-                        .ThenInclude(c => c.Issuer)
-                            .ThenInclude(c=> c.Subjects)
-                    .Include(c => c.Head)
+                        .ThenInclude(c=> c.Subjects)
                     .AsNoTracking().ToListAsync();
                 
                 task.Wait();
@@ -56,9 +53,8 @@ namespace UnitTest
                 Assert.AreEqual(1, task.Result.Count);
                 Assert.IsNotNull(task.Result[0].Trust);
                 Assert.IsNotNull(task.Result[0].Trust[0]);
-                Assert.IsNotNull(task.Result[0].Trust[0].Issuer);
-                Assert.IsNotNull(task.Result[0].Trust[0].Issuer.Subjects[0]);
-                Assert.AreEqual("Test", task.Result[0].Trust[0].Issuer.Subjects[0].Scope);
+                Assert.IsNotNull(task.Result[0].Trust[0].Subjects[0]);
+                Assert.AreEqual("Test", task.Result[0].Trust[0].Subjects[0].Scope);
             }
         }
     }

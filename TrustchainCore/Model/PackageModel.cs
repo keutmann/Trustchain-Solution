@@ -8,7 +8,6 @@ namespace TrustchainCore.Model
     public class PackageModel : CoreModel
     {
         [JsonProperty(PropertyName = "id")]
-        [Key]
         public byte[] PackageId { get; set; }   // Package id from combined hashed trust id's
 
         [JsonProperty(PropertyName = "trust")]
