@@ -4,7 +4,7 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Services;
 
-namespace TrustchainCore.Trust
+namespace TrustchainCore.Services
 {
 
     public class TrustSchemaService : ITrustSchemaService

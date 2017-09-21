@@ -1,19 +1,18 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NBitcoin;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using TrustchainCore.Builders;
+using TrustchainCore.Services;
 using TrustchainCore.Strategy;
 
-namespace UnitTest.TrustchainCore
+namespace UnitTest.TrustchainCore.Builders
 {
     [TestClass]
     public class PackageTest
     {
         [TestMethod]
-        public void Serialize()
+        public void Build()
         {
             var cryptoService = new BTCPKHService();
             var serverKey = cryptoService.GetKey(Encoding.UTF8.GetBytes("testserver"));
@@ -26,10 +25,18 @@ namespace UnitTest.TrustchainCore
                 .AddSubject("testsubject2", PackageBuilder.CreateTrustTrue("The subject trusted person"));
             builder.AddTrust("testissuer2", "testsubject1", PackageBuilder.CreateTrustTrue("The subject trusted person"));
             builder.Sign();
-            
-            Assert.IsTrue(builder.Package.Trust.Count > 0);
-            var content = JsonConvert.SerializeObject(builder.Package, Formatting.Indented);
 
+            var schemaService = new TrustSchemaService(new CryptoServiceFactory());
+
+            var result = schemaService.Validate(builder.Package);
+
+            Console.WriteLine(result.ToString());
+
+            Assert.IsTrue(builder.Package.Trust.Count > 0);
+            Assert.AreEqual(0, result.Errors.Count);
+            Assert.AreEqual(0, result.Warnings.Count);
+
+            var content = JsonConvert.SerializeObject(builder.Package, Formatting.Indented);
             Console.WriteLine(content);
         }
     }

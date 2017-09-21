@@ -10,7 +10,7 @@ namespace TrustchainCore.Services
         {
         }
 
-        public ICryptoService Create(string name)
+        public ICryptoService Create(string name = "btc-pkh")
         {
             if("btc-pkh".EqualsIgnoreCase(name))
                 return new BTCPKHService();

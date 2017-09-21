@@ -15,7 +15,7 @@ namespace TrustchainCore.Builders
     public class PackageBuilder
     {
         public PackageModel Package { get; set; }
-        private ICryptoService _cryptoAlgoService;
+        private ICryptoService _cryptoService;
         private ITrustBinary _trustBinary;
         private byte[] _issuerKey;
         private byte[] _serverKey;
@@ -27,7 +27,7 @@ namespace TrustchainCore.Builders
             Package = new PackageModel();
             Package.Trust = new List<TrustModel>();
             EnsureHead(Package);
-            _cryptoAlgoService = cryptoAlgoService;
+            _cryptoService = cryptoAlgoService;
             _trustBinary = trustBinary;
 
         }
@@ -99,7 +99,7 @@ namespace TrustchainCore.Builders
 
         public PackageBuilder AddTrust(string issuerName)
         {
-            var issuerKey = _cryptoAlgoService.GetKey(Encoding.UTF8.GetBytes(issuerName));
+            var issuerKey = _cryptoService.GetKey(Encoding.UTF8.GetBytes(issuerName));
             AddTrust(issuerKey, issuerName);
             return this;
         }
@@ -108,7 +108,7 @@ namespace TrustchainCore.Builders
         {
             _currentTrust = new TrustModel();
             _currentTrust.Issuer = new IssuerModel();
-            _currentTrust.Issuer.IssuerId = _cryptoAlgoService.GetAddress(issuerKey);
+            _currentTrust.Issuer.IssuerId = _cryptoService.GetAddress(issuerKey);
             _currentTrust.Issuer.IssuerKey = issuerKey;
             _currentTrust.Issuer.Name = issuerName;
             Package.Trust.Add(_currentTrust);
@@ -133,8 +133,8 @@ namespace TrustchainCore.Builders
             if (trust == null)
                 trust = _currentTrust;
 
-            trust.TrustId = _cryptoAlgoService.HashOf(_trustBinary.GetIssuerBinary(trust));
-            trust.Issuer.Signature = _cryptoAlgoService.Sign(trust.Issuer.IssuerKey, trust.TrustId);
+            trust.TrustId = _cryptoService.HashOf(_trustBinary.GetIssuerBinary(trust));
+            trust.Issuer.Signature = _cryptoService.SignMessage(trust.Issuer.IssuerKey, trust.TrustId);
 
             return this;
         }
@@ -149,7 +149,7 @@ namespace TrustchainCore.Builders
 
         public PackageBuilder AddSubject(string subjectName, JObject claim)
         {
-            var subjectKey = _cryptoAlgoService.GetKey(Encoding.UTF8.GetBytes(subjectName));
+            var subjectKey = _cryptoService.GetKey(Encoding.UTF8.GetBytes(subjectName));
             AddSubject(subjectKey, claim);
             return this;
         }
@@ -160,7 +160,7 @@ namespace TrustchainCore.Builders
 
             _currentTrust.Issuer.Subjects.Add(new SubjectModel
             {
-                SubjectId = _cryptoAlgoService.GetAddress(subjectKey),
+                SubjectId = _cryptoService.GetAddress(subjectKey),
                 SubjectType = "person",
                 Claim = JsonConvert.SerializeObject((claim != null) ? claim : new JObject(
                     new JProperty("trust", "true")
@@ -187,7 +187,7 @@ namespace TrustchainCore.Builders
             var hash = new byte[0];
             foreach (var id in ids)
             {
-                hash = _cryptoAlgoService.HashOf(hash.Combine(id));
+                hash = _cryptoService.HashOf(hash.Combine(id));
             }
 
             Package.PackageId = hash;
@@ -204,8 +204,8 @@ namespace TrustchainCore.Builders
 
             Package.Server = new ServerModel
             {
-                Id = _cryptoAlgoService.GetAddress(serverKey),
-                Signature = _cryptoAlgoService.Sign(serverKey, Package.PackageId)
+                Id = _cryptoService.GetAddress(serverKey),
+                Signature = _cryptoService.Sign(serverKey, Package.PackageId)
             };
 
             return this;
@@ -216,7 +216,7 @@ namespace TrustchainCore.Builders
 
         public PackageBuilder ServerID(byte[] serverKey)
         {
-            Package.Server.Id = _cryptoAlgoService.GetAddress(serverKey);
+            Package.Server.Id = _cryptoService.GetAddress(serverKey);
             //var serverKey = new Key(Hashes.SHA256(Encoding.UTF8.GetBytes("server")));
             //return serverKey.PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes();
             return this;
