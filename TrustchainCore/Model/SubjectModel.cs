@@ -22,8 +22,8 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "id")]
         public byte[] SubjectId { get; set; }
 
-        [JsonProperty(PropertyName = "idtype", NullValueHandling = NullValueHandling.Ignore)]
-        public string IdType { get; set; }
+        [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
+        public string SubjectType { get; set; }
 
         /// <summary>
         /// Not included in the Binary payload for signature verification!

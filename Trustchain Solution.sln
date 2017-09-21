@@ -12,9 +12,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{95FAF109-6E49-4E5F-AF99-97FC18CE0842}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\Database.txt = Documentation\Database.txt
+		Documentation\PackageSchema.json = Documentation\PackageSchema.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrustgraphCore", "TrustgraphCore\TrustgraphCore.csproj", "{3676F0C1-4021-4FA7-8720-160631761ED4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrustgraphCore", "TrustgraphCore\TrustgraphCore.csproj", "{3676F0C1-4021-4FA7-8720-160631761ED4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

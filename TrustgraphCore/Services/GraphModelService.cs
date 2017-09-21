@@ -24,7 +24,7 @@ namespace TrustgraphCore.Services
         {
             var edge = new EdgeModel();
             edge.SubjectId = EnsureNode(subject.SubjectId);
-            edge.SubjectType = EnsureSubjectType(subject.IdType);
+            edge.SubjectType = EnsureSubjectType(subject.SubjectType);
             edge.Scope = EnsureScopeIndex(subject.Scope);
             edge.Activate = subject.Activate;
             edge.Expire = subject.Expire;
@@ -38,7 +38,7 @@ namespace TrustgraphCore.Services
         public void InitSubjectModel(SubjectModel node, EdgeModel edge)
         {
             node.SubjectId = Graph.Address[edge.SubjectId].Id;
-            node.IdType = Graph.SubjectTypesIndexReverse[edge.SubjectType];
+            node.SubjectType = Graph.SubjectTypesIndexReverse[edge.SubjectType];
             node.Scope = Graph.ScopeIndexReverse[edge.Scope];
             node.Activate = edge.Activate;
             node.Expire = edge.Expire;

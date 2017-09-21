@@ -19,22 +19,13 @@ namespace TrustchainCore.Strategy
             {
                 var issuer = trust.Issuer;
                 ms.WriteBytes(issuer.IssuerId);
+                //ms.WriteString(issuer.Name); // UTF8 - Not sure that name should be included in trust ID.
                 foreach (var subject in issuer.Subjects)
                 {
                     ms.WriteBytes(subject.SubjectId);
-                    ms.WriteString(subject.IdType);
+                    ms.WriteString(subject.SubjectType);
 
-                    ms.WriteString(subject.Claim);
-                    //foreach (JProperty prop in subject.Claim.Children().OfType<JProperty>())
-                    //{
-                    //    ms.WriteString(prop.Name.ToLower());
-                    //    ms.WriteString(prop.Value.ToStringValue());
-                    //}
-                    //foreach (DictionaryEntry claim in subject.Claim)
-                    //{
-                    //    ms.WriteString(claim.Key);
-                    //    ms.WriteString(claim.Value);
-                    //}
+                    ms.WriteString(subject.Claim); // UTF8
                     ms.WriteInteger(subject.Cost);
                     ms.WriteInteger(subject.Activate);
                     ms.WriteInteger(subject.Expire);

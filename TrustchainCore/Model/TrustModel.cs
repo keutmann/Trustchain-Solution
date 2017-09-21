@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace TrustchainCore.Model
 {
@@ -9,7 +10,8 @@ namespace TrustchainCore.Model
         [JsonIgnore]
         public int PackageModelID { get; set; }
 
-        [JsonProperty(PropertyName = "trustid", NullValueHandling = NullValueHandling.Ignore)]
+        [Key]
+        [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public byte[] TrustId { get; set; }
 
         [JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]

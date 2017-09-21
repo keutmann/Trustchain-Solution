@@ -11,10 +11,12 @@ namespace TrustchainCore.Strategy
     public class SHA256Service : ICryptoAlgoService
     {
         public int Length { get; }
+        public string ScriptName { get; }
 
         public SHA256Service()
         {
             Length = 32; // SHA 256 = 32 bytes
+            ScriptName = "btc-pkh";
         }
 
         public byte[] HashOf(byte[] data)

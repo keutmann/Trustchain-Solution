@@ -1,0 +1,35 @@
+{
+  "head": {
+    "version": "standard 0.1.0",
+    "script": "btc-pkh"
+  },
+  "server": {
+    "id": null,
+    "signature": null
+  },
+  "trust": [
+    {
+      "head": {
+        "version": "standard 0.1.0",
+        "script": "btc-pkh"
+      },
+      "server": {
+        "id": null,
+        "signature": null
+      },
+      "trustid": "i/Pd9j9fDh0GGt5pPhAQfq2RsI8mcYmM/vfNhm1Qql0=",
+      "issuer": {
+        "id": "F2u5DwkfJUjVDy7gCDp68hbQUDM=",
+        "signature": "H/hqGOZwZNz2/rz0udzyx4eHLzTMvx67ASmp0whBbjq0JAoJokrRnDAWsHNgBQtlYifoH3SG5pjbgS/9+H4Ukuc=",
+        "subject": [
+          {
+            "id": "2j1/Fk2UyY2TAIBozVImC3OGQxM=",
+            "idtype": "person",
+            "claim": "{\"trust\":true}",
+            "scope": "global"
+          }
+        ]
+      }
+    }
+  ]
+}

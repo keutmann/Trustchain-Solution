@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TrustchainCore.Interfaces
+﻿namespace TrustchainCore.Interfaces
 {
     public interface ICryptoAlgoService
     {
         int Length { get; }
+        string ScriptName { get; }
 
         byte[] HashOf(byte[] data);
         byte[] GetKey(byte[] seed);
@@ -15,6 +12,5 @@ namespace TrustchainCore.Interfaces
         byte[] Sign(byte[] key, byte[] data);
         bool VerifySignature(byte[] hashkeyid, byte[] signature, byte[] address);
         bool VerifySignatureMessage(byte[] data, byte[] signature, byte[] address);
-
     }
 }

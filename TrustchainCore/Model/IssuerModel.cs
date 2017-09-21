@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,13 +13,17 @@ namespace TrustchainCore.Model
     public class IssuerModel
     {
         [JsonIgnore]
-        public int ID { get; set; }
+        public int IssuerModelID { get; set; }
 
         [JsonIgnore]
         public int TrustModelID { get; set; }
 
         [JsonProperty(PropertyName = "id")]
         public byte[] IssuerId { get; set; }
+
+        [JsonIgnore]
+        [NotMapped]
+        public byte[] IssuerKey { get; set; }
 
         [MaxLength(100)]
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore)]
