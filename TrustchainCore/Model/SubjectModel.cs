@@ -52,10 +52,14 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "timestamp", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int Timestamp { get; set; }
 
-        ///// <summary>
-        ///// FOREIGN KEY to a Trust
-        ///// Non serializeable
-        ///// </summary>
-        //public byte[] TrustId { get; set; }
+        public bool ShouldSerializeSubjectId()
+        {
+            return SubjectId != null && SubjectId.Length > 0;
+        }
+
+        public bool ShouldSerializeSignature()
+        {
+            return Signature != null && Signature.Length > 0;
+        }
     }
 }

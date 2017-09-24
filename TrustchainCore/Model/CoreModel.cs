@@ -17,5 +17,10 @@ namespace TrustchainCore.Model
 
         [JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]
         public IList<TimestampModel> Timestamp { get; set; }
+
+        public bool ShouldSerializeTimestamp()
+        {
+            return Timestamp != null && Timestamp.Count > 0;
+        }
     }
 }

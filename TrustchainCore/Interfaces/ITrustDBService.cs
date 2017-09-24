@@ -4,6 +4,7 @@ namespace TrustchainCore.Interfaces
 {
     public interface ITrustDBService
     {
-        void Add(PackageModel package);
+        bool Add(PackageModel package);
+        PackageModel GetPackage(byte[] packageId);
     }
 }

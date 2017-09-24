@@ -12,7 +12,7 @@ using TrustchainCore.Extensions;
 
 namespace TrustchainCore.Builders
 {
-    public class PackageBuilder
+    public class TrustBuilder
     {
         public PackageModel Package { get; set; }
         private ICryptoService _cryptoService;
@@ -22,7 +22,7 @@ namespace TrustchainCore.Builders
 
         private TrustModel _currentTrust;
 
-        public PackageBuilder(ICryptoService cryptoAlgoService, ITrustBinary trustBinary)
+        public TrustBuilder(ICryptoService cryptoAlgoService, ITrustBinary trustBinary)
         {
             Package = new PackageModel();
             Package.Trust = new List<TrustModel>();
@@ -32,7 +32,7 @@ namespace TrustchainCore.Builders
 
         }
 
-        public PackageBuilder Load(string content)
+        public TrustBuilder Load(string content)
         {
             Package = JsonConvert.DeserializeObject<PackageModel>(content);
             return this;
@@ -63,13 +63,13 @@ namespace TrustchainCore.Builders
             return JsonConvert.SerializeObject(Package, format);
         }
 
-        public PackageBuilder SetIssuerKey(byte[] key)
+        public TrustBuilder SetIssuerKey(byte[] key)
         {
             _issuerKey = key;
             return this;
         }
 
-        public PackageBuilder SetServerKey(byte[] key)
+        public TrustBuilder SetServerKey(byte[] key)
         {
             _serverKey = key;
             return this;
@@ -80,7 +80,7 @@ namespace TrustchainCore.Builders
             return Serialize(Formatting.Indented);
         }
 
-        public PackageBuilder Verify()
+        public TrustBuilder Verify()
         {
             //var schema = new PackageSchema(Package);
             //if (!schema.Validate())
@@ -97,14 +97,14 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public PackageBuilder AddTrust(string issuerName)
+        public TrustBuilder AddTrust(string issuerName)
         {
             var issuerKey = _cryptoService.GetKey(Encoding.UTF8.GetBytes(issuerName));
             AddTrust(issuerKey, issuerName);
             return this;
         }
 
-        public PackageBuilder AddTrust(byte[] issuerKey, string issuerName = null)
+        public TrustBuilder AddTrust(byte[] issuerKey, string issuerName = null)
         {
             _currentTrust = new TrustModel();
             _currentTrust.IssuerId = _cryptoService.GetAddress(issuerKey);
@@ -127,7 +127,7 @@ namespace TrustchainCore.Builders
             return Package;
         }
 
-        public PackageBuilder SignTrust(TrustModel trust = null)
+        public TrustBuilder SignTrust(TrustModel trust = null)
         {
             if (trust == null)
                 trust = _currentTrust;
@@ -139,20 +139,20 @@ namespace TrustchainCore.Builders
         }
 
 
-        public PackageBuilder AddTrust(string issuerName, string subjectName, JObject claim)
+        public TrustBuilder AddTrust(string issuerName, string subjectName, JObject claim)
         {
             AddTrust(issuerName);
             AddSubject(subjectName, claim);
             return this;
         }
 
-        public PackageBuilder AddSubject(string subjectName, JObject claim)
+        public TrustBuilder AddSubject(string subjectName, JObject claim)
         {
             var subjectKey = _cryptoService.GetKey(Encoding.UTF8.GetBytes(subjectName));
             AddSubject(subjectKey, claim);
             return this;
         }
-        public PackageBuilder AddSubject(byte[] subjectKey, JObject claim)
+        public TrustBuilder AddSubject(byte[] subjectKey, JObject claim)
         {
             if(_currentTrust.Subjects == null)
                 _currentTrust.Subjects = new List<SubjectModel>();
@@ -173,20 +173,12 @@ namespace TrustchainCore.Builders
 
 
 
-        public PackageBuilder BuildPackageID()
+        public TrustBuilder BuildPackageID()
         {
-            var ids = new SortedSet<byte[]>(ByteComparer.Compare);
-
+            var hash = new byte[0];
             foreach (var trust in Package.Trust)
             {
-                if (trust.TrustId != null)
-                    ids.Add(trust.TrustId);
-            }
-
-            var hash = new byte[0];
-            foreach (var id in ids)
-            {
-                hash = _cryptoService.HashOf(hash.Combine(id));
+                hash = _cryptoService.HashOf(hash.Combine(trust.TrustId));
             }
 
             Package.PackageId = hash;
@@ -194,7 +186,7 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public PackageBuilder SignPackageServerID(byte[] serverKey = null)
+        public TrustBuilder SignPackageServerID(byte[] serverKey = null)
         {
             if (serverKey == null)
                 serverKey = _serverKey;
@@ -213,7 +205,7 @@ namespace TrustchainCore.Builders
 
 
 
-        public PackageBuilder ServerID(byte[] serverKey)
+        public TrustBuilder ServerID(byte[] serverKey)
         {
             Package.Server.Id = _cryptoService.GetAddress(serverKey);
             //var serverKey = new Key(Hashes.SHA256(Encoding.UTF8.GetBytes("server")));

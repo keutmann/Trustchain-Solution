@@ -16,14 +16,31 @@ namespace TrustchainCore.Services
             DBContext = trustDBContext;
         }
 
-        public void Add(PackageModel package)
+        public bool Add(PackageModel package)
         {
             var task = DBContext.Package.SingleOrDefaultAsync(f => f.PackageId == package.PackageId);
             task.Wait();
             if (task.Result != null)
-                return;
+                return false;
 
             DBContext.Package.Add(package);
+            DBContext.SaveChanges();
+            return true;
+        }
+
+        public PackageModel GetPackage(byte[] packageId)
+        {
+            var task = DBContext.Package
+            .Include(c => c.Timestamp)
+            .Include(c => c.Trust)
+                .ThenInclude(c => c.Subjects)
+            .Include(c => c.Trust)
+                .ThenInclude(c => c.Timestamp)
+                .AsNoTracking().SingleOrDefaultAsync(f => f.PackageId == packageId); 
+
+            task.Wait();
+
+            return task.Result;
         }
     }
 }

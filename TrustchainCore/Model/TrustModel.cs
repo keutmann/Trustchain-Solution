@@ -43,5 +43,30 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "timestamp", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public long Timestamp2 { get; set; }
 
+        public bool ShouldSerializeTrustId()
+        {
+            return TrustId != null && TrustId.Length > 0;
+        }
+
+        public bool ShouldSerializeIssuerId()
+        {
+            return IssuerId != null && IssuerId.Length > 0;
+        }
+
+        public bool ShouldSerializeIssuerKey()
+        {
+            return IssuerKey != null && IssuerKey.Length > 0;
+        }
+
+        public bool ShouldSerializeSignature()
+        {
+            return Signature != null && Signature.Length > 0;
+        }
+
+
+        public bool ShouldSerializeSubjects()
+        {
+            return Subjects != null && Subjects.Count > 0;
+        }
     }
 }

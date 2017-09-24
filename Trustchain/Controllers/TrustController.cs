@@ -4,7 +4,7 @@ using TrustgraphCore.Interfaces;
 using TrustchainCore.Repository;
 using TrustchainCore.Interfaces;
 
-namespace TrustgraphCore.Controllers
+namespace TrustchainCore.Controllers
 {
     [Route("api/[controller]")]
     public class TrustController : Controller
@@ -34,10 +34,12 @@ namespace TrustgraphCore.Controllers
             if(validaionResult.ErrorsFound > 0)
                 return BadRequest(validaionResult);
 
-            _trustDBService.Add(package);
-            _graphTrustService.Add(package);
-            
-            return Ok(new { status = "succes" });
+            if(_trustDBService.Add(package))
+                _graphTrustService.Add(package);
+            else
+                return Ok(new { status = "succes", message = "Package already exist" });
+
+            return Ok(new { status = "succes", message = "Package added" });
         }
     }
 }
