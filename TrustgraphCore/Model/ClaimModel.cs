@@ -13,6 +13,12 @@ namespace TrustgraphCore.Model
         public ClaimType Flags; // Collection of claims that are boolean
         public byte Rating;     // Used for trust that use rating
 
+        public static ClaimStandardModel Parse(string claim)
+        {
+            return Parse((JObject)JsonConvert.DeserializeObject(claim));
+        }
+
+
         public static ClaimStandardModel Parse(JObject claim)
         {
             var result = new ClaimStandardModel();

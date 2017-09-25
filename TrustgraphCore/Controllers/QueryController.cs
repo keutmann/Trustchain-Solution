@@ -11,10 +11,10 @@ namespace TrustgraphCore.Controllers
     public class QueryController : Controller
     {
 
-        public IGraphSearchService SearchService { get; set; }
+        public IGraphQueryService SearchService { get; set; }
         private IQueryRequestService _queryRequestService;
 
-        public QueryController(IGraphSearchService service, IQueryRequestService queryRequestService)
+        public QueryController(IGraphQueryService service, IQueryRequestService queryRequestService)
         {
             SearchService = service;
             _queryRequestService = queryRequestService;
@@ -33,7 +33,7 @@ namespace TrustgraphCore.Controllers
             query.Subjects = new List<SubjectQuery>();
             query.Subjects.Add(new SubjectQuery { Id = Convert.FromBase64String(subject), Type = "" });
 
-            query.Claim = TrustBuilder.CreateTrustTrue();
+            query.Claim = TrustBuilder.CreateTrustTrue().ToString();
             query.Scope = string.Empty; // Global
 
             _queryRequestService.Verify(query);
@@ -49,7 +49,7 @@ namespace TrustgraphCore.Controllers
             //{
             _queryRequestService.Verify(query);
 
-            var result = SearchService.Query(query);
+            var result = SearchService.Execute(query);
 
             return Ok(result);
             //}

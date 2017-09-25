@@ -3,10 +3,10 @@ using TrustgraphCore.Services;
 
 namespace TrustgraphCore.Interfaces
 {
-    public interface IGraphSearchService
+    public interface IGraphQueryService
     {
         IGraphModelService ModelService { get; }
 
-        SearchContext Query(QueryRequest query);
+        QueryContext Execute(QueryRequest query);
     }
 }

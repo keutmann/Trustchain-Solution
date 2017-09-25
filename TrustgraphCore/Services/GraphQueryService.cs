@@ -6,23 +6,23 @@ using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Services
 {
-    public class GraphSearchService : IGraphSearchService
+    public class GraphQueryService : IGraphQueryService
     {
         public IGraphModelService ModelService { get; }
         public long UnixTime { get; set; } 
 
-        public GraphSearchService(IGraphModelService modelService)
+        public GraphQueryService(IGraphModelService modelService)
         {
             this.ModelService = modelService;
             UnixTime = DateTime.Now.ToUnixTime();
         }
 
-        public SearchContext Query(QueryRequest query)
+        public QueryContext Execute(QueryRequest query)
         {
-            var context = new SearchContext(ModelService, query);
+            var context = new QueryContext(ModelService, query);
             
             if(context.IssuerIndex.Count > 0 && context.TargetIndex.Count > 0)
-                ExecuteQuery(context);
+                ExecuteQueryContext(context);
 
             if (context.Results.Count > 0)
                 context.Nodes = BuildResultNode(context);//result.Node = BuildResultTree(context);
@@ -30,7 +30,7 @@ namespace TrustgraphCore.Services
             return context;
         }
 
-        public List<SubjectNode> BuildResultNode(SearchContext context)
+        public List<SubjectNode> BuildResultNode(QueryContext context)
         {
             var results = new List<SubjectNode>();
             var nodelist = new Dictionary<Int64Container, SubjectNode>();
@@ -96,7 +96,7 @@ namespace TrustgraphCore.Services
 
 
 
-        public void ExecuteQuery(SearchContext context)
+        private void ExecuteQueryContext(QueryContext context)
         {
             List<QueueItem> queue = new List<QueueItem>();
             foreach (var index in context.IssuerIndex)
@@ -125,7 +125,7 @@ namespace TrustgraphCore.Services
             }
         }
 
-        private bool PeekNode(QueueItem item, SearchContext context)
+        private bool PeekNode(QueueItem item, QueryContext context)
         {
             int found = 0;
             context.SetVisitItemSafely(item.Index, new VisitItem(item.ParentIndex, item.EdgeIndex)); // Makes sure that we do not run this block again.
@@ -168,7 +168,7 @@ namespace TrustgraphCore.Services
             return found != 0;
         }
 
-        public List<QueueItem> Enqueue(QueueItem item, SearchContext context)
+        public List<QueueItem> Enqueue(QueueItem item, QueryContext context)
         {
             var list = new List<QueueItem>();
             var address = ModelService.Graph.Address[item.Index];

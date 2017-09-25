@@ -17,7 +17,7 @@ namespace TrustgraphCore.Extensions
             services.AddScoped<IGraphModelService, GraphModelService>();
             services.AddScoped<IGraphTrustService, GraphTrustService>();
 
-            services.AddTransient<IGraphSearchService, GraphSearchService>();
+            services.AddTransient<IGraphQueryService, GraphQueryService>();
             services.AddTransient<IGraphExportService, GraphExportService>();
             services.AddTransient<IQueryRequestService, QueryRequestService>();
             

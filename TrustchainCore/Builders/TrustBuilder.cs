@@ -22,12 +22,12 @@ namespace TrustchainCore.Builders
 
         private TrustModel _currentTrust;
 
-        public TrustBuilder(ICryptoService cryptoAlgoService, ITrustBinary trustBinary)
+        public TrustBuilder(ICryptoService cryptoService, ITrustBinary trustBinary)
         {
             Package = new PackageModel();
             Package.Trust = new List<TrustModel>();
             EnsureHead(Package);
-            _cryptoService = cryptoAlgoService;
+            _cryptoService = cryptoService;
             _trustBinary = trustBinary;
 
         }

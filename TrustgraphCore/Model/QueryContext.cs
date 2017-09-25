@@ -8,7 +8,7 @@ namespace TrustgraphCore.Model
 {
 
     [JsonObject(MemberSerialization.OptIn)]
-    public class SearchContext
+    public class QueryContext
     {
         public IGraphModelService GraphService { get; set; }
 
@@ -43,7 +43,7 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "nodes", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
         public List<SubjectNode> Nodes { get; set; }
 
-        public SearchContext(int addressCount)
+        public QueryContext(int addressCount)
         {
             IssuerIndex = new List<int>();
             TargetIndex = new List<TargetIndex>();
@@ -55,7 +55,7 @@ namespace TrustgraphCore.Model
             MaxLevel = 7;
         }
 
-        public SearchContext(IGraphModelService graphService, QueryRequest query) : this(graphService.Graph.Address.Count)
+        public QueryContext(IGraphModelService graphService, QueryRequest query) : this(graphService.Graph.Address.Count)
         {
             GraphService = graphService;
             foreach (var issuer in query.Issuers)

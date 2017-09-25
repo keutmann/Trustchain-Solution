@@ -20,6 +20,6 @@ namespace TrustgraphCore.Model
         public string Scope;
 
         [JsonProperty(PropertyName = "claim")]
-        public JObject Claim;
+        public string Claim;
     }
 }
