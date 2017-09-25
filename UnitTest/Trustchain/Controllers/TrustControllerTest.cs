@@ -16,7 +16,7 @@ namespace UnitTest.TrustchainCore.Builders
     public class TrustControllerTest
     {
         [TestMethod]
-        public void Add()
+        public void TrustController_Add()
         {
             var cryptoService = new BTCPKHService();
             var serverKey = cryptoService.GetKey(Encoding.UTF8.GetBytes("testserver"));

@@ -3,13 +3,27 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq;
 
 namespace TrustchainCore.Services
 {
     public class TrustDBService : ITrustDBService
     {
         public TrustDBContext DBContext { get; }
+
+        public IQueryable<PackageModel> Packages
+        {
+            get
+            {
+                return DBContext.Package
+                .Include(c => c.Timestamp)
+                .Include(c => c.Trust)
+                    .ThenInclude(c => c.Subjects)
+                .Include(c => c.Trust)
+                    .ThenInclude(c => c.Timestamp)
+                .AsNoTracking();
+            }
+        }
 
         public TrustDBService(TrustDBContext trustDBContext)
         {
@@ -30,17 +44,24 @@ namespace TrustchainCore.Services
 
         public PackageModel GetPackage(byte[] packageId)
         {
-            var task = DBContext.Package
-            .Include(c => c.Timestamp)
-            .Include(c => c.Trust)
-                .ThenInclude(c => c.Subjects)
-            .Include(c => c.Trust)
-                .ThenInclude(c => c.Timestamp)
-                .AsNoTracking().SingleOrDefaultAsync(f => f.PackageId == packageId); 
+            var task = Packages.SingleOrDefaultAsync(f => f.PackageId == packageId); 
 
             task.Wait();
 
             return task.Result;
         }
+
+        //public PackageModel ReadAllPackages()
+        //{
+        //    var query = Packages.Select(p => p);
+
+        //    //var data = from p in query where p.
+                       
+
+        //    //task.Wait();
+
+        //    return //task.Result;
+        //}
+
     }
 }
