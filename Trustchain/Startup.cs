@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -71,6 +67,9 @@ namespace Trustchain
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
             });
+
+
+            app.LoadGraph(); // Load the Trust Graph from Database
         }
     }
 }

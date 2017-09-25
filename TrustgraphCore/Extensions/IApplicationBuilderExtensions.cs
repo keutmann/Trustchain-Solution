@@ -1,15 +1,19 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Extensions
 {
     public static class IApplicationBuilderExtensions
     {
-        public static void LoadGraph(IApplicationBuilder builder)
+        public static void LoadGraph(this IApplicationBuilder app)
         {
-            var graphTrustService = (IGraphTrustService)builder.ApplicationServices.GetService(typeof(IGraphTrustService));
-            //var graphTrustService = (IGraphTrustService)builder.ApplicationServices.GetService(typeof(IGraphTrustService));
-
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using (var scope = scopeFactory.CreateScope())
+            {
+                var trustLoadService = scope.ServiceProvider.GetRequiredService<ITrustLoadService>();
+                trustLoadService.LoadDatabase();
+            }
         }
     }
 }

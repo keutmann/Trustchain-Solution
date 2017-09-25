@@ -17,34 +17,40 @@ namespace TrustgraphCore.Services
             ModelService = modelService;
         }
 
-        public IGraphTrustService Add(PackageModel package)
+        public void Add(PackageModel package)
         {
             Add(package.Trust);
-
-            return this;
         }
 
-        public IGraphTrustService Add(IEnumerable<TrustModel> trusts)
+        public void Add(IEnumerable<TrustModel> trusts)
         {
             long unixTime = DateTime.Now.ToUnixTime();
             foreach (var trust in trusts)
             {
-                var issuerIndex = ModelService.EnsureNode(trust.IssuerId);
-                var issuerNode = ModelService.Graph.Address[issuerIndex];
-                var issuerEdges = new List<EdgeModel>(issuerNode.Edges != null ? issuerNode.Edges : new EdgeModel[0]);
-
-                foreach (var subject in trust.Subjects)
-                {
-                    BuildSubject(trust, issuerEdges, subject);
-                }
-
-                // Remove old edges!
-                issuerEdges.RemoveAll(e => e.Expire > 0 && e.Expire < unixTime);
-
-                issuerNode.Edges = issuerEdges.ToArray();
-                ModelService.Graph.Address[issuerIndex] = issuerNode;
+                Add(trust, unixTime);
             }
-            return this;
+        }
+
+        public void Add(TrustModel trust, long unixTime = 0)
+        {
+            if (unixTime == 0)
+                unixTime = DateTime.Now.ToUnixTime();
+
+            var issuerIndex = ModelService.EnsureNode(trust.IssuerId);
+            var issuerNode = ModelService.Graph.Address[issuerIndex];
+            var issuerEdges = new List<EdgeModel>(issuerNode.Edges != null ? issuerNode.Edges : new EdgeModel[0]);
+
+            foreach (var subject in trust.Subjects)
+            {
+                BuildSubject(trust, issuerEdges, subject);
+            }
+
+            // Remove old edges!
+            issuerEdges.RemoveAll(e => e.Expire > 0 && e.Expire < unixTime);
+
+            issuerNode.Edges = issuerEdges.ToArray();
+            ModelService.Graph.Address[issuerIndex] = issuerNode;
+
         }
 
         private void BuildSubject(TrustModel trust, List<EdgeModel> issuerEdges, SubjectModel subject)

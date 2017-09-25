@@ -13,13 +13,12 @@ namespace TrustgraphCore.Extensions
         {
             services.AddSingleton(new GraphModel());
             services.AddScoped<ICryptoService, BTCPKHService>();
+            services.AddScoped<ITrustLoadService, TrustLoadService>();
+            services.AddScoped<IGraphModelService, GraphModelService>();
+            services.AddScoped<IGraphTrustService, GraphTrustService>();
 
-            services.AddTransient<IGraphModelService, GraphModelService>();
-            services.AddTransient<IGraphTrustService, GraphTrustService>();
             services.AddTransient<IGraphSearchService, GraphSearchService>();
             services.AddTransient<IGraphExportService, GraphExportService>();
-            services.AddTransient<ITrustLoader, TrustLoader>();
-
             services.AddTransient<IQueryRequestService, QueryRequestService>();
             
         }

@@ -1,9 +1,8 @@
 ﻿namespace TrustgraphCore.Interfaces
 {
-    public interface ITrustLoader
+    public interface ITrustLoadService
     {
-        IGraphTrustService Builder { get; set; }
-
         void LoadFile(string filename);
+        void LoadDatabase();
     }
 }

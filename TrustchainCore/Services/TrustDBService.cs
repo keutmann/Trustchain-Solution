@@ -1,5 +1,4 @@
-﻿using System;
-using TrustchainCore.Interfaces;
+﻿using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +23,18 @@ namespace TrustchainCore.Services
                 .AsNoTracking();
             }
         }
+
+        public IQueryable<TrustModel> Trusts
+        {
+            get
+            {
+                return DBContext.Trusts
+                    .Include(c => c.Timestamp)
+                    .Include(c => c.Subjects)
+                    .AsNoTracking();
+            }
+        }
+
 
         public TrustDBService(TrustDBContext trustDBContext)
         {
