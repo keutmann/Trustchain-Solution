@@ -10,6 +10,9 @@ namespace TrustgraphCore.Model
         public string Name { get; set; }
 
         [JsonIgnore]
+        public ClaimStandardModel ClaimModel {get;set;}
+
+        [JsonIgnore]
         public int SubjectIndex { get; set; }
 
         [JsonIgnore]

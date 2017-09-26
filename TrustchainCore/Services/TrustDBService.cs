@@ -39,8 +39,7 @@ namespace TrustchainCore.Services
         {
             get
             {
-                return DBContext.Subject
-                    .AsNoTracking();
+                return DBContext.Subject.AsNoTracking();
             }
         }
 

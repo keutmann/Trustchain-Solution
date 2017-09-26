@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace TrustgraphCore.Model
+namespace TrustgraphCore.Enumerations
 {
     [Flags]
     public enum ClaimType : byte
     {
         Trust = 1,
         Confirm = 2,
-        Rating = 4,
-        Reason = 8
+        Rating = 4
     }
 }

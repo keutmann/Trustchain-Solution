@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Runtime.InteropServices;
 using TrustchainCore.Extensions;
+using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Model
 {
@@ -12,6 +13,7 @@ namespace TrustgraphCore.Model
         public ClaimType Types; // What claims has been made
         public ClaimType Flags; // Collection of claims that are boolean
         public byte Rating;     // Used for trust that use rating
+        public ClaimMetadata Metadata;
 
         public static ClaimStandardModel Parse(string claim)
         {
@@ -45,6 +47,21 @@ namespace TrustgraphCore.Model
 
                 if (ct == ClaimType.Rating && token.Type == JTokenType.Integer)
                     result.Rating = (byte)token.ToInteger();
+            }
+
+            var metaDataType = typeof(ClaimMetadata);
+            var metaDataNames = Enum.GetNames(metaDataType);
+            foreach (var name in metaDataNames)
+            {
+                var token = claim.GetValue(name, StringComparison.OrdinalIgnoreCase);
+                if (token == null)
+                    continue;
+
+                if (token.Type == JTokenType.Null)
+                    continue;
+
+                var ct = (ClaimMetadata)Enum.Parse(metaDataType, name);
+                result.Metadata |= ct; // The Metadata has been defined
             }
 
             return result;

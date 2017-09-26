@@ -5,6 +5,7 @@ namespace TrustchainCore.Interfaces
 {
     public interface ITrustDBService
     {
+        
         IQueryable<PackageModel> Packages { get; }
         IQueryable<TrustModel> Trusts { get; }
         IQueryable<SubjectModel> Subjects { get; }

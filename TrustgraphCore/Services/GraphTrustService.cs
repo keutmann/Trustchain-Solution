@@ -5,6 +5,7 @@ using TrustchainCore.Model;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
+using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Services
 {
@@ -54,23 +55,23 @@ namespace TrustgraphCore.Services
 
         }
 
-        private void BuildSubject(TrustModel trust, List<GraphSubject> graphSubjects, SubjectModel subjectModel, int nameIndex = 0)
+        private void BuildSubject(TrustModel trust, List<GraphSubject> existingItems, SubjectModel subjectModel, int nameIndex = 0)
         {
             var graphSubject = ModelService.CreateGraphSubject(subjectModel, nameIndex, (int)trust.Timestamp2);
             var ids = new List<int>();
             // Find all edges that matchs
-            for (var i = 0 ; i < graphSubjects.Count; i++)
+            for (var i = 0 ; i < existingItems.Count; i++)
             {
-                if (graphSubjects[i].SubjectId != graphSubject.SubjectId)
+                if (existingItems[i].SubjectId != graphSubject.SubjectId)
                     continue;
 
-                if (graphSubjects[i].SubjectType != graphSubject.SubjectType)
+                if (existingItems[i].SubjectType != graphSubject.SubjectType)
                     continue;
 
-                if (graphSubjects[i].Scope != graphSubject.Scope)
+                if (existingItems[i].Scope != graphSubject.Scope)
                     continue;
 
-                if ((graphSubjects[i].Claim.Types & graphSubject.Claim.Types) == 0)
+                if ((existingItems[i].Claim.Types & graphSubject.Claim.Types) == 0)
                     continue;
 
                 // Subject to be updated!
@@ -83,8 +84,8 @@ namespace TrustgraphCore.Services
                 var i = -1;
                 if (ids.Count > 0)
                 {
-                    i = ids.FirstOrDefault(p => (graphSubjects[p].Claim.Types & flagtype) > 0);
-                    if (graphSubjects[i].Timestamp > graphSubject.Timestamp) // Make sure that we cannot overwrite with old data
+                    i = ids.FirstOrDefault(p => (existingItems[p].Claim.Types & flagtype) > 0);
+                    if (existingItems[i].Timestamp > graphSubject.Timestamp) // Make sure that we cannot overwrite with old data
                         continue;
                 }
 
@@ -93,10 +94,10 @@ namespace TrustgraphCore.Services
                 nodeEdge.Claim.Flags = graphSubject.Claim.Flags & flagtype; // overwrite the flags
                 nodeEdge.Claim.Rating = (flagtype == ClaimType.Rating) ? graphSubject.Claim.Rating : (byte)0;
 
-                if (i >= 0 && i < graphSubjects.Count)
-                    graphSubjects[i] = nodeEdge;
+                if (i >= 0 && i < existingItems.Count)
+                    existingItems[i] = nodeEdge;
                 else
-                    graphSubjects.Add(nodeEdge);
+                    existingItems.Add(nodeEdge);
             }
         }
     }

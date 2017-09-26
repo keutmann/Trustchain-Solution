@@ -9,6 +9,7 @@ using TrustchainCore.Strategy;
 using TrustgraphCore.Interfaces;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
+using TrustgraphCore.Enumerations;
 
 namespace UnitTest.TrustgraphCore
 {

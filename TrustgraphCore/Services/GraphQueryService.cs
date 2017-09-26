@@ -5,6 +5,7 @@ using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
 using TrustchainCore.Interfaces;
+using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Services
 {
@@ -47,9 +48,12 @@ namespace TrustgraphCore.Services
                     if (item.SubjectIndex != target.Id)
                         continue;
 
-                    var dbItem = _trustDBService.Subjects.FirstOrDefault(p => p.SubjectId == item.SubjectId);
-                    if(dbItem != null)
-                        item.Claim = dbItem.Claim;
+                    if ((item.ClaimModel.Metadata & ClaimMetadata.Reason) > 0) // A reason property exist on this subject
+                    {
+                        var dbItem = _trustDBService.Subjects.FirstOrDefault(w => w.SubjectId == item.SubjectId);
+                        if (dbItem != null)
+                            item.Claim = dbItem.Claim;
+                    }
                 }
             });
         }
@@ -81,6 +85,7 @@ namespace TrustgraphCore.Services
                 tn.GraphSubjectIndex = new Int64Container(item.IssuerIndex, visited.SubjectIndex);
                 ModelService.InitSubjectModel(tn, item.Subject);
                 tn.Name = ModelService.Graph.NameIndexReverse[item.Subject.NameIndex]; // Ensure that the name of the issuer is returned
+                tn.ClaimModel = item.Subject.Claim;
 
                 subjectNodes.Add(tn);
             }

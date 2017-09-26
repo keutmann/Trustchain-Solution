@@ -215,14 +215,14 @@ namespace TrustchainCore.Builders
                     new JProperty("trust", true)
                     );
             if (!string.IsNullOrWhiteSpace(message))
-                obj.Add(new JProperty("message", message));
+                obj.Add(new JProperty("reason", message));
             return obj;
         }
 
         public static JObject CreateRating(byte value)
         {
             return new JObject(
-                    new JProperty("Rating", value)
+                    new JProperty("rating", value)
                     );
         }
 

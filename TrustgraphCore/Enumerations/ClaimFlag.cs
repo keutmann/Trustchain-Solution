@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TrustgraphCore.Model
+namespace TrustgraphCore.Enumerations
 {
     [Flags]
     public enum ClaimFlag : byte
