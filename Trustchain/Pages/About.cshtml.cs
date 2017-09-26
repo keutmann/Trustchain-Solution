@@ -12,7 +12,7 @@ namespace Trustchain.Pages
 
         public void OnGet()
         {
-            Message = "Your application description page.";
+            Message = "The team of the Trustchain project";
         }
     }
 }

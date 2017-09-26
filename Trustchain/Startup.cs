@@ -24,13 +24,27 @@ namespace Trustchain
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<TrustDBContext>(options =>
-                //options.UseSqlite(Configuration.GetConnectionString("TrustDB"))); 
-                options.UseSqlite("Filename=./trust.db", b => b.MigrationsAssembly("TrustchainCore"))); //(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite(Configuration.GetConnectionString("TrustDB"), b => b.MigrationsAssembly("TrustchainCore"))); 
+                //options.UseSqlite("Filename=./trust.db", b => b.MigrationsAssembly("TrustchainCore"))); 
 
             services.AddMvc();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Trustchain API", Version = "v1" });
+                c.SwaggerDoc("v1", new Info
+                {
+                    Title = "Trustchain API",
+                    Version = "v1",
+                    //Contact = new Contact
+                    //{
+                    //    Name = "Trustchain website",
+                    //    Url = "/"
+                    //},
+                    //License = new License
+                    //{
+                    //    Name = "MIT License",
+                    //    Url = "https://opensource.org/licenses/MIT"
+                    //}
+                });
             });
 
             services.TrustchainCore();
@@ -51,6 +65,8 @@ namespace Trustchain
                 app.UseExceptionHandler("/Error");
             }
 
+            app.UseStaticFiles();
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
@@ -58,9 +74,7 @@ namespace Trustchain
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
-
-            app.UseStaticFiles();
-
+ 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

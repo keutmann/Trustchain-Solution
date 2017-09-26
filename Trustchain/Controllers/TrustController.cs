@@ -20,13 +20,14 @@ namespace TrustchainCore.Controllers
             _trustSchemaService = trustSchemaService;
             _trustDBService = trustDBService;
         }
-
+        
         [HttpGet]
         public ActionResult Get()
         {
             return Ok("OK");
         }
 
+        [Produces("application/json")]
         [HttpPost]
         public ActionResult Add([FromBody]PackageModel package)
         {
