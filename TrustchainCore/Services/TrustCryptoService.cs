@@ -7,9 +7,9 @@ namespace TrustchainCore.Services
 {
     public class TrustCryptoService
     {
-        public ICryptoService Crypto { get; }
+        public ICryptoStrategy Crypto { get; }
 
-        public TrustCryptoService(ICryptoService cryptoService)
+        public TrustCryptoService(ICryptoStrategy cryptoService)
         {
             Crypto = cryptoService;
         }

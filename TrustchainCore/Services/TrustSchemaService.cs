@@ -9,9 +9,9 @@ namespace TrustchainCore.Services
 
     public class TrustSchemaService : ITrustSchemaService
     {
-        private ICryptoServiceFactory _cryptoServiceFactory;
+        private ICryptoStrategyFactory _cryptoServiceFactory;
 
-        public TrustSchemaService(ICryptoServiceFactory cryptoServiceFactory)
+        public TrustSchemaService(ICryptoStrategyFactory cryptoServiceFactory)
         {
             _cryptoServiceFactory = cryptoServiceFactory;
         }
@@ -30,9 +30,9 @@ namespace TrustchainCore.Services
         private class ValidationEngine
         {
             private SchemaValidationResult result = new SchemaValidationResult();
-            private ICryptoService _cryptoService;
+            private ICryptoStrategy _cryptoService;
 
-            public ValidationEngine(ICryptoService cryptoService)
+            public ValidationEngine(ICryptoStrategy cryptoService)
             {
                 _cryptoService = cryptoService;
             }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TrustchainCore.Model;
 using TrustchainCore.Extensions;
-using TrustchainCore.Security.Cryptography;
 using TrustchainCore.Interfaces;
 
 namespace TrustchainCore.Strategy
@@ -11,9 +10,9 @@ namespace TrustchainCore.Strategy
     public class MerkleTreeSorted : IMerkleTree
     {
         private IEnumerable<MerkleNode> LeafNodes { get; }
-        private ICryptoService CryptoService { get; }
+        private ICryptoStrategy CryptoService { get; }
 
-        public MerkleTreeSorted(ICryptoService cryptoService)
+        public MerkleTreeSorted(ICryptoStrategy cryptoService)
         {
             CryptoService = cryptoService;
         }

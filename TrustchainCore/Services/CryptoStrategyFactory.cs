@@ -4,16 +4,16 @@ using TrustchainCore.Strategy;
 
 namespace TrustchainCore.Services
 {
-    public class CryptoServiceFactory : ICryptoServiceFactory
+    public class CryptoStrategyFactory : ICryptoStrategyFactory
     {
-        public CryptoServiceFactory()
+        public CryptoStrategyFactory()
         {
         }
 
-        public ICryptoService Create(string name = "btc-pkh")
+        public ICryptoStrategy Create(string name = "btc-pkh")
         {
             if("btc-pkh".EqualsIgnoreCase(name))
-                return new BTCPKHService();
+                return new CryptoBTCPKH();
 
             return null;
         }

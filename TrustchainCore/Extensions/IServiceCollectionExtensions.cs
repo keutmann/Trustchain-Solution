@@ -12,7 +12,7 @@ namespace TrustchainCore.Extensions
             services.AddScoped<ITrustBinary, TrustBinary>();
             services.AddScoped<ITrustDBService, TrustDBService>();
             
-            services.AddTransient<ICryptoServiceFactory, CryptoServiceFactory>();
+            services.AddTransient<ICryptoStrategyFactory, CryptoStrategyFactory>();
             services.AddTransient<ITrustSchemaService, TrustSchemaService>();
             services.AddTransient<IMerkleTree, MerkleTreeSorted>();
         }

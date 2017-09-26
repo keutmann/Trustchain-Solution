@@ -8,9 +8,9 @@ namespace TrustgraphCore.Services
 {
     public class QueryRequestService : IQueryRequestService
     {
-        private ICryptoService _cryptoService;
+        private ICryptoStrategy _cryptoService;
 
-        public QueryRequestService(ICryptoService cryptoService)
+        public QueryRequestService(ICryptoStrategy cryptoService)
         {
             _cryptoService = cryptoService;
         }

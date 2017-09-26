@@ -8,12 +8,12 @@ using TrustchainCore.Configuration;
 
 namespace TrustchainCore.Strategy
 {
-    public class BTCPKHService : ICryptoService
+    public class CryptoBTCPKH : ICryptoStrategy
     {
         public int Length { get; }
         public string ScriptName { get; }
 
-        public BTCPKHService()
+        public CryptoBTCPKH()
         {
             Length = 32; // SHA 256 = 32 bytes
             ScriptName = "btc-pkh";

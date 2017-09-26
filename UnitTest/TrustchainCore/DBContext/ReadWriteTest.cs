@@ -17,7 +17,7 @@ namespace UnitTest.TrustchainCore.Builders
         [TestMethod]
         public void ReadWritePackage()
         {
-            var cryptoService = new BTCPKHService();
+            var cryptoService = new CryptoBTCPKH();
             var serverKey = cryptoService.GetKey(Encoding.UTF8.GetBytes("testserver"));
 
             //var key = new Key()
@@ -29,7 +29,7 @@ namespace UnitTest.TrustchainCore.Builders
             builder.AddTrust("testissuer2", "testsubject1", TrustBuilder.CreateTrustTrue("The subject trusted person"));
             builder.Sign();
 
-            var schemaService = new TrustSchemaService(new CryptoServiceFactory());
+            var schemaService = new TrustSchemaService(new CryptoStrategyFactory());
             var result = schemaService.Validate(builder.Package);
 
             Console.WriteLine(result.ToString());

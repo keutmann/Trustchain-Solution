@@ -1,6 +1,6 @@
 ﻿namespace TrustchainCore.Interfaces
 {
-    public interface ICryptoService
+    public interface ICryptoStrategy
     {
         int Length { get; }
         string ScriptName { get; }

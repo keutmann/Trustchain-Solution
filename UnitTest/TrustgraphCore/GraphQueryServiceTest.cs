@@ -22,13 +22,13 @@ namespace UnitTest.TrustgraphCore
         private IGraphModelService _graphModelService;
         private IGraphTrustService _graphTrustService;
         private TrustBuilder _trustBuilder;
-        private ICryptoService _cryptoService;
+        private ICryptoStrategy _cryptoService;
         private GraphQueryService _graphQueryService;
 
         [TestInitialize]
         public void Init()
         {
-            _cryptoService = new BTCPKHService();
+            _cryptoService = new CryptoBTCPKH();
             _trustCryptoService = new TrustCryptoService(_cryptoService);
             _graphModelService = new GraphModelService(new GraphModel());
             _graphTrustService = new GraphTrustService(_graphModelService);
