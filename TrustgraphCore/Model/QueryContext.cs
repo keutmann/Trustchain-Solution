@@ -22,14 +22,14 @@ namespace TrustgraphCore.Model
         public int Level { get; set; }
         public int MaxLevel { get; set; }
 
-        [JsonProperty(PropertyName = "TotalNodeCount")]
-        public int TotalNodeCount = 0;
+        [JsonProperty(PropertyName = "TotalIssuerCount")]
+        public int TotalIssuerCount = 0;
 
-        [JsonProperty(PropertyName = "TotalEdgeCount")]
-        public int TotalEdgeCount = 0;
+        [JsonProperty(PropertyName = "TotalSubjectCount")]
+        public int TotalSubjectCount = 0;
 
-        [JsonProperty(PropertyName = "MatchEdgeCount")]
-        public int MatchEdgeCount = 0;
+        [JsonProperty(PropertyName = "MatchSubjectCount")]
+        public int MatchSubjectCount = 0;
 
         [JsonProperty(PropertyName = "unknownissuers", NullValueHandling = NullValueHandling.Ignore, Order = 80)]
         public List<byte[]> UnknownIssuers = new List<byte[]>();
@@ -40,8 +40,8 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "unknownsubjecttypes", NullValueHandling = NullValueHandling.Ignore, Order = 90)]
         public List<string> UnknownSubjectTypes = new List<string>();
 
-        [JsonProperty(PropertyName = "nodes", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
-        public List<SubjectNode> Nodes { get; set; }
+        [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
+        public List<SubjectResult> Subjects { get; set; }
 
         public QueryContext(int addressCount)
         {
@@ -50,17 +50,17 @@ namespace TrustgraphCore.Model
 
             InitializeVisited(addressCount);
 
-            MaxCost = 600; // About 6 levels down
+            MaxCost = 500; 
             Results = new List<ResultNode>();
-            MaxLevel = 7;
+            MaxLevel = 5; // About 5 levels down, nobody known people 5 levels down.
         }
 
-        public QueryContext(IGraphModelService graphService, QueryRequest query) : this(graphService.Graph.Address.Count)
+        public QueryContext(IGraphModelService graphService, QueryRequest query) : this(graphService.Graph.Issuers.Count)
         {
             GraphService = graphService;
             foreach (var issuer in query.Issuers)
             {
-                var index = GraphService.Graph.AddressIndex.ContainsKey(issuer) ? GraphService.Graph.AddressIndex[issuer] : -1;
+                var index = GraphService.Graph.IssuersIndex.ContainsKey(issuer) ? GraphService.Graph.IssuersIndex[issuer] : -1;
                 if (index > -1)
                     IssuerIndex.Add(index);
                 else
@@ -69,7 +69,7 @@ namespace TrustgraphCore.Model
 
             foreach (var subject in query.Subjects)
             {
-                var index = GraphService.Graph.AddressIndex.ContainsKey(subject.Id) ? GraphService.Graph.AddressIndex[subject.Id] : -1;
+                var index = GraphService.Graph.IssuersIndex.ContainsKey(subject.Id) ? GraphService.Graph.IssuersIndex[subject.Id] : -1;
                 if (index == -1)
                     UnknownSubjects.Add(subject.Id);
                     //throw new ApplicationException("Unknown subject id " + subject.Id.ConvertToHex());

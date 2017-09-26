@@ -8,5 +8,6 @@ namespace TrustgraphCore.Model
         Trust = 1,
         Confirm = 2,
         Rating = 4,
+        Reason = 8
     }
 }

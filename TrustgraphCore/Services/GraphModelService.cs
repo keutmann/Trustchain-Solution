@@ -20,24 +20,27 @@ namespace TrustgraphCore.Services
             Graph = model;
         }
 
-        public EdgeModel CreateEdgeModel(SubjectModel subject, int timestamp)
+        public GraphSubject CreateGraphSubject(SubjectModel subject, int nameIndex, int timestamp)
         {
-            var edge = new EdgeModel();
-            edge.SubjectId = EnsureNode(subject.SubjectId);
-            edge.SubjectType = EnsureSubjectType(subject.SubjectType);
-            edge.Scope = EnsureScopeIndex(subject.Scope);
-            edge.Activate = subject.Activate;
-            edge.Expire = subject.Expire;
-            edge.Cost = (short)subject.Cost;
-            edge.Timestamp = timestamp;
-            edge.Claim = ClaimStandardModel.Parse((JObject)JsonConvert.DeserializeObject(subject.Claim));
+            var edge = new GraphSubject
+            {
+                SubjectId = EnsureId(subject.SubjectId),
+                SubjectType = EnsureSubjectType(subject.SubjectType),
+                NameIndex = nameIndex,
+                Scope = EnsureScopeIndex(subject.Scope),
+                Activate = subject.Activate,
+                Expire = subject.Expire,
+                Cost = (short)subject.Cost,
+                Timestamp = timestamp,
+                Claim = ClaimStandardModel.Parse((JObject)JsonConvert.DeserializeObject(subject.Claim))
+            };
 
             return edge;
         }
 
-        public void InitSubjectModel(SubjectModel node, EdgeModel edge)
+        public void InitSubjectModel(SubjectModel node, GraphSubject edge)
         {
-            node.SubjectId = Graph.Address[edge.SubjectId].Id;
+            node.SubjectId = Graph.Issuers[edge.SubjectId].Id;
             node.SubjectType = Graph.SubjectTypesIndexReverse[edge.SubjectType];
             node.Scope = Graph.ScopeIndexReverse[edge.Scope];
             node.Activate = edge.Activate;
@@ -47,14 +50,29 @@ namespace TrustgraphCore.Services
             node.Claim = edge.Claim.ConvertToJObject().ToString(Formatting.None);
         }
 
-        public int EnsureNode(byte[] id)
+        public int EnsureId(byte[] id)
         {
-            if (Graph.AddressIndex.ContainsKey(id))
-                return Graph.AddressIndex[id];
+            if (Graph.IssuersIndex.ContainsKey(id))
+                return Graph.IssuersIndex[id];
 
-            var index = Graph.Address.Count;
-            Graph.AddressIndex.Add(id, index);
-            Graph.Address.Add(new AddressModel { Id = id });
+            var index = Graph.Issuers.Count;
+            Graph.IssuersIndex.Add(id, index);
+            Graph.Issuers.Add(new GraphIssuer { Id = id });
+
+            return index;
+        }
+
+        public int EnsureName(string name = "")
+        {
+            if (name == null)
+                name = string.Empty;
+
+            if (Graph.NameIndex.ContainsKey(name))
+                return Graph.NameIndex[name];
+
+            var index = Graph.NameIndex.Count;
+            Graph.NameIndex.Add(name, index);
+            Graph.NameIndexReverse.Add(index, name);
 
             return index;
         }

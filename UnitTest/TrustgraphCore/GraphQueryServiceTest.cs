@@ -32,7 +32,7 @@ namespace UnitTest.TrustgraphCore
             _trustCryptoService = new TrustCryptoService(_cryptoService);
             _graphModelService = new GraphModelService(new GraphModel());
             _graphTrustService = new GraphTrustService(_graphModelService);
-            _graphQueryService = new GraphQueryService(_graphModelService);
+            _graphQueryService = new GraphQueryService(_graphModelService, null);
             _trustBuilder = new TrustBuilder(_cryptoService, new TrustBinary());
         }
 
@@ -56,7 +56,7 @@ namespace UnitTest.TrustgraphCore
             Console.WriteLine(json);
 
             var result = _graphQueryService.Execute(query);
-            Assert.IsNotNull(result.Nodes);
+            Assert.IsNotNull(result.Subjects);
             //PrintResult(result.Nodes, search.GraphService, 1);
         }
 
@@ -82,7 +82,7 @@ namespace UnitTest.TrustgraphCore
             Console.WriteLine(json);
 
             var result = _graphQueryService.Execute(query);
-            Assert.IsNotNull(result.Nodes);
+            Assert.IsNotNull(result.Subjects);
 
             //Console.WriteLine("Start id: "+search.GraphService.Graph.IdIndex[0].ConvertToHex()); // A
             //PrintResult(result.Nodes, search.GraphService, 1);
@@ -118,7 +118,7 @@ namespace UnitTest.TrustgraphCore
             query.Claim = trust2.Subjects[0].Claim;
 
             var result = _graphQueryService.Execute(query);
-            Assert.IsNotNull(result.Nodes);
+            Assert.IsNotNull(result.Subjects);
             //Assert.IsTrue(result.Node.Children.Count == 1);
             //Assert.IsTrue(result.Node.Children[0].Children.Count == 1);
 

@@ -1,11 +1,7 @@
-﻿using NBitcoin;
-using NBitcoin.Crypto;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Text;
-using TrustchainCore.Collections.Generic;
-using TrustchainCore.Configuration;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Extensions;

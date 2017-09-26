@@ -6,13 +6,13 @@ namespace TrustgraphCore.Model
     public struct VisitItem
     {
         public int ParentIndex;
-        public int EdgeIndex;
+        public int SubjectIndex;
         //public int Cost;
 
-        public VisitItem(int parentIndex, int edgeIndex)
+        public VisitItem(int parentIndex, int subjectIndex)
         {
             ParentIndex = parentIndex;
-            EdgeIndex = edgeIndex;
+            SubjectIndex = subjectIndex;
             //Cost = cost;
         }
     }

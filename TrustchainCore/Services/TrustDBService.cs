@@ -35,6 +35,15 @@ namespace TrustchainCore.Services
             }
         }
 
+        public IQueryable<SubjectModel> Subjects
+        {
+            get
+            {
+                return DBContext.Subject
+                    .AsNoTracking();
+            }
+        }
+
 
         public TrustDBService(TrustDBContext trustDBContext)
         {

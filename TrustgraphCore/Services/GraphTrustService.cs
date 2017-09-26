@@ -36,66 +36,67 @@ namespace TrustgraphCore.Services
             if (unixTime == 0)
                 unixTime = DateTime.Now.ToUnixTime();
 
-            var issuerIndex = ModelService.EnsureNode(trust.IssuerId);
-            var issuerNode = ModelService.Graph.Address[issuerIndex];
-            var issuerEdges = new List<EdgeModel>(issuerNode.Edges != null ? issuerNode.Edges : new EdgeModel[0]);
+            var index = ModelService.EnsureId(trust.IssuerId);
+            var issuer = ModelService.Graph.Issuers[index]; // Remember its a copy of Issuer!
+            var nameIndex = ModelService.EnsureName(trust.Name);
+            var subjects = new List<GraphSubject>(issuer.Subjects ?? (new GraphSubject[0]));
 
             foreach (var subject in trust.Subjects)
             {
-                BuildSubject(trust, issuerEdges, subject);
+                BuildSubject(trust, subjects, subject, nameIndex);
             }
 
-            // Remove old edges!
-            issuerEdges.RemoveAll(e => e.Expire > 0 && e.Expire < unixTime);
+            // Remove old subjects thats expired!
+            subjects.RemoveAll(e => e.Expire > 0 && e.Expire < unixTime);
 
-            issuerNode.Edges = issuerEdges.ToArray();
-            ModelService.Graph.Address[issuerIndex] = issuerNode;
+            issuer.Subjects = subjects.ToArray();
+            ModelService.Graph.Issuers[index] = issuer;
 
         }
 
-        private void BuildSubject(TrustModel trust, List<EdgeModel> issuerEdges, SubjectModel subject)
+        private void BuildSubject(TrustModel trust, List<GraphSubject> graphSubjects, SubjectModel subjectModel, int nameIndex = 0)
         {
-            var subjectEdge = ModelService.CreateEdgeModel(subject, (int)trust.Timestamp2);
+            var graphSubject = ModelService.CreateGraphSubject(subjectModel, nameIndex, (int)trust.Timestamp2);
             var ids = new List<int>();
             // Find all edges that matchs
-            for (var i = 0 ; i < issuerEdges.Count; i++)
+            for (var i = 0 ; i < graphSubjects.Count; i++)
             {
-                if (issuerEdges[i].SubjectId != subjectEdge.SubjectId)
+                if (graphSubjects[i].SubjectId != graphSubject.SubjectId)
                     continue;
 
-                if (issuerEdges[i].SubjectType != subjectEdge.SubjectType)
+                if (graphSubjects[i].SubjectType != graphSubject.SubjectType)
                     continue;
 
-                if (issuerEdges[i].Scope != subjectEdge.Scope)
+                if (graphSubjects[i].Scope != graphSubject.Scope)
                     continue;
 
-                if ((issuerEdges[i].Claim.Types & subjectEdge.Claim.Types) == 0)
+                if ((graphSubjects[i].Claim.Types & graphSubject.Claim.Types) == 0)
                     continue;
 
-                // Edge to be updated!
+                // Subject to be updated!
                 ids.Add(i);
             }
 
-            var flagTypes = subjectEdge.Claim.Types.GetFlags();
+            var flagTypes = graphSubject.Claim.Types.GetFlags();
             foreach (ClaimType flagtype in flagTypes)
             {
                 var i = -1;
                 if (ids.Count > 0)
                 {
-                    i = ids.FirstOrDefault(p => (issuerEdges[p].Claim.Types & flagtype) > 0);
-                    if (issuerEdges[i].Timestamp > subjectEdge.Timestamp) // Make sure that we cannot overwrite with old data
+                    i = ids.FirstOrDefault(p => (graphSubjects[p].Claim.Types & flagtype) > 0);
+                    if (graphSubjects[i].Timestamp > graphSubject.Timestamp) // Make sure that we cannot overwrite with old data
                         continue;
                 }
 
-                var nodeEdge = subjectEdge; // Copy the subjectEdge object
+                var nodeEdge = graphSubject; // Copy the subjectEdge object
                 nodeEdge.Claim.Types = flagtype; // overwrite the flags
-                nodeEdge.Claim.Flags = subjectEdge.Claim.Flags & flagtype; // overwrite the flags
-                nodeEdge.Claim.Rating = (flagtype == ClaimType.Rating) ? subjectEdge.Claim.Rating : (byte)0;
+                nodeEdge.Claim.Flags = graphSubject.Claim.Flags & flagtype; // overwrite the flags
+                nodeEdge.Claim.Rating = (flagtype == ClaimType.Rating) ? graphSubject.Claim.Rating : (byte)0;
 
-                if (i >= 0 && i < issuerEdges.Count)
-                    issuerEdges[i] = nodeEdge;
+                if (i >= 0 && i < graphSubjects.Count)
+                    graphSubjects[i] = nodeEdge;
                 else
-                    issuerEdges.Add(nodeEdge);
+                    graphSubjects.Add(nodeEdge);
             }
         }
     }

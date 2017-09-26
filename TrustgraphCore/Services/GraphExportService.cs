@@ -18,15 +18,15 @@ namespace TrustgraphCore.Services
             var package = new PackageModel();
             package.Trust = new List<TrustModel>();
 
-            foreach (var address in ModelService.Graph.Address)
+            foreach (var address in ModelService.Graph.Issuers)
             {
                 var trust = new TrustModel();
                 trust.IssuerId = address.Id;
                 
                 var subjects = new List<SubjectModel>();
-                if (address.Edges != null)
+                if (address.Subjects != null)
                 {
-                    foreach (var edge in address.Edges)
+                    foreach (var edge in address.Subjects)
                     {
                         var child = new SubjectModel();
                         ModelService.InitSubjectModel(child, edge);

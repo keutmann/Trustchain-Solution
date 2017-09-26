@@ -7,6 +7,8 @@ namespace TrustchainCore.Interfaces
     {
         IQueryable<PackageModel> Packages { get; }
         IQueryable<TrustModel> Trusts { get; }
+        IQueryable<SubjectModel> Subjects { get; }
+
         bool Add(PackageModel package);
         PackageModel GetPackage(byte[] packageId);
     }

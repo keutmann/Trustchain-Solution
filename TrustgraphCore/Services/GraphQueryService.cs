@@ -1,19 +1,23 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
+using TrustchainCore.Interfaces;
 
 namespace TrustgraphCore.Services
 {
     public class GraphQueryService : IGraphQueryService
     {
         public IGraphModelService ModelService { get; }
-        public long UnixTime { get; set; } 
+        public long UnixTime { get; set; }
+        private ITrustDBService _trustDBService;
 
-        public GraphQueryService(IGraphModelService modelService)
+        public GraphQueryService(IGraphModelService modelService, ITrustDBService trustDBService)
         {
-            this.ModelService = modelService;
+            ModelService = modelService;
+            _trustDBService = trustDBService;
             UnixTime = DateTime.Now.ToUnixTime();
         }
 
@@ -25,63 +29,96 @@ namespace TrustgraphCore.Services
                 ExecuteQueryContext(context);
 
             if (context.Results.Count > 0)
-                context.Nodes = BuildResultNode(context);//result.Node = BuildResultTree(context);
+            {
+                context.Subjects = BuildResultNode(context);//result.Node = BuildResultTree(context);
+                if(_trustDBService != null)
+                    AddClaims(context);
+            }
 
             return context;
         }
 
-        public List<SubjectNode> BuildResultNode(QueryContext context)
+        protected void AddClaims(QueryContext context)
         {
-            var results = new List<SubjectNode>();
-            var nodelist = new Dictionary<Int64Container, SubjectNode>();
-            var subjectNodes = new List<SubjectNode>();
+            IteratedSubjects(context.Subjects, (item) => {
+
+                foreach (var target in context.TargetIndex)
+                {
+                    if (item.SubjectIndex != target.Id)
+                        continue;
+
+                    var dbItem = _trustDBService.Subjects.FirstOrDefault(p => p.SubjectId == item.SubjectId);
+                    if(dbItem != null)
+                        item.Claim = dbItem.Claim;
+                }
+            });
+        }
+
+        protected void IteratedSubjects(IList<SubjectResult> subjects, Action<SubjectResult> callback)
+        {
+            foreach (var item in subjects)
+            {
+                if(item.Subjects != null && item.Subjects.Count > 0)
+                    IteratedSubjects(item.Subjects, callback);
+                else
+                    callback(item);
+            }
+        }
+
+
+        protected List<SubjectResult> BuildResultNode(QueryContext context)
+        {
+            var results = new List<SubjectResult>();
+            var nodelist = new Dictionary<Int64Container, SubjectResult>();
+            var subjectNodes = new List<SubjectResult>();
             foreach (var item in context.Results)
             {
-                var tn = new SubjectNode();
-                tn.NodeIndex = item.Edge.SubjectId;
-                tn.ParentIndex = item.NodeIndex;
-                var visited = context.Visited[item.NodeIndex];
+                var tn = new SubjectResult();
+                tn.SubjectIndex = item.Subject.SubjectId;
+                tn.ParentIndex = item.IssuerIndex;
+                var visited = context.Visited[item.IssuerIndex];
 
-                tn.EdgeIndex = new Int64Container(item.NodeIndex, visited.EdgeIndex);
-                ModelService.InitSubjectModel(tn, item.Edge);
+                tn.GraphSubjectIndex = new Int64Container(item.IssuerIndex, visited.SubjectIndex);
+                ModelService.InitSubjectModel(tn, item.Subject);
+                tn.Name = ModelService.Graph.NameIndexReverse[item.Subject.NameIndex]; // Ensure that the name of the issuer is returned
 
                 subjectNodes.Add(tn);
             }
 
             while (results.Count == 0)
             {
-                var currentLevelNodes = new List<SubjectNode>();
+                var currentLevelNodes = new List<SubjectResult>();
                 foreach (var subject in subjectNodes)
                 {
-                    var parentNode = new SubjectNode();
-                    parentNode.NodeIndex = subject.ParentIndex;
+                    var parentNode = new SubjectResult();
+                    parentNode.SubjectIndex = subject.ParentIndex;
 
-                    var visited = context.Visited[subject.NodeIndex];
+                    var visited = context.Visited[subject.SubjectIndex];
                     parentNode.ParentIndex = context.Visited[subject.ParentIndex].ParentIndex;
-                    parentNode.EdgeIndex = new Int64Container(parentNode.NodeIndex, visited.EdgeIndex);
+                    parentNode.GraphSubjectIndex = new Int64Container(parentNode.SubjectIndex, visited.SubjectIndex);
 
-                    if (nodelist.ContainsKey(parentNode.EdgeIndex))
+                    if (nodelist.ContainsKey(parentNode.GraphSubjectIndex))
                     {
                         // A previouse node in the collection has already created this
-                        nodelist[parentNode.EdgeIndex].Nodes.Add(subject);
+                        nodelist[parentNode.GraphSubjectIndex].Subjects.Add(subject);
                         continue;
                     }
 
-                    var address = ModelService.Graph.Address[parentNode.NodeIndex];
-                    parentNode.SubjectId = address.Id;
+                    var issuer = ModelService.Graph.Issuers[parentNode.SubjectIndex];
+                    parentNode.SubjectId = issuer.Id;
 
-                    if (visited.EdgeIndex >= 0)
+                    if (visited.SubjectIndex >= 0)
                     {
-                        var edge = address.Edges[visited.EdgeIndex];
+                        var edge = issuer.Subjects[visited.SubjectIndex];
                         ModelService.InitSubjectModel(parentNode, edge);
                     }
-                    parentNode.Nodes = new List<SubjectNode>();
-                    parentNode.Nodes.Add(subject);
+                    parentNode.Subjects = new List<SubjectResult>();
+                    parentNode.Subjects.Add(subject);
 
                     currentLevelNodes.Add(parentNode);
-                    nodelist.Add(parentNode.EdgeIndex, parentNode);
+                    nodelist.Add(parentNode.GraphSubjectIndex, parentNode);
 
-                    if (context.IssuerIndex.Contains(parentNode.NodeIndex))
+                    if (context.IssuerIndex.Contains(parentNode.SubjectIndex))
                     {
                         results.Add(parentNode);
                         continue;
@@ -96,7 +133,7 @@ namespace TrustgraphCore.Services
 
 
 
-        private void ExecuteQueryContext(QueryContext context)
+        protected void ExecuteQueryContext(QueryContext context)
         {
             List<QueueItem> queue = new List<QueueItem>();
             foreach (var index in context.IssuerIndex)
@@ -104,7 +141,7 @@ namespace TrustgraphCore.Services
 
             while (queue.Count > 0 && context.Level < 4) // Do go more than 4 levels down
             {
-                context.TotalNodeCount += queue.Count;
+                context.TotalIssuerCount += queue.Count;
 
                 // Check current level for trust
                 foreach (var item in queue)
@@ -125,39 +162,39 @@ namespace TrustgraphCore.Services
             }
         }
 
-        private bool PeekNode(QueueItem item, QueryContext context)
+        protected bool PeekNode(QueueItem item, QueryContext context)
         {
             int found = 0;
             context.SetVisitItemSafely(item.Index, new VisitItem(item.ParentIndex, item.EdgeIndex)); // Makes sure that we do not run this block again.
-            var edges = ModelService.Graph.Address[item.Index].Edges;
-            if (edges == null)
+            var subjects = ModelService.Graph.Issuers[item.Index].Subjects;
+            if (subjects == null)
                 return false;
 
-            for (var i = 0; i < edges.Length; i++)
+            for (var i = 0; i < subjects.Length; i++)
             {
-                context.TotalEdgeCount++;
+                context.TotalSubjectCount++;
 
-                if (edges[i].Activate > UnixTime ||
-                   (edges[i].Expire > 0 && edges[i].Expire < UnixTime))
+                if (subjects[i].Activate > UnixTime ||
+                   (subjects[i].Expire > 0 && subjects[i].Expire < UnixTime))
                     continue;
 
-                if ((edges[i].Claim.Types & context.Claim.Types) == 0)
+                if ((subjects[i].Claim.Types & context.Claim.Types) == 0)
                     continue; 
 
                 //if (edges[i].SubjectType != context.Query.SubjectType ||
                 if(context.Scope != 0 &&
-                    edges[i].Scope != context.Scope)
+                    subjects[i].Scope != context.Scope)
                     continue; // No claims match query
 
-                context.MatchEdgeCount++;
+                context.MatchSubjectCount++;
 
                 for(var t = 0; t < context.TargetIndex.Count; t++) 
-                    if (context.TargetIndex[t].Id == edges[i].SubjectId)
+                    if (context.TargetIndex[t].Id == subjects[i].SubjectId)
                     {
                         var result = new ResultNode();
-                        result.NodeIndex = item.Index;
+                        result.IssuerIndex = item.Index;
                         result.ParentIndex = item.ParentIndex;
-                        result.Edge = edges[i];
+                        result.Subject = subjects[i];
                         context.Results.Add(result);
                         found ++;
                         if (found >= context.TargetIndex.Count) // Do not look further, because we found them all.
@@ -168,41 +205,41 @@ namespace TrustgraphCore.Services
             return found != 0;
         }
 
-        public List<QueueItem> Enqueue(QueueItem item, QueryContext context)
+        protected List<QueueItem> Enqueue(QueueItem item, QueryContext context)
         {
             var list = new List<QueueItem>();
-            var address = ModelService.Graph.Address[item.Index];
+            var address = ModelService.Graph.Issuers[item.Index];
 
-            var edges = address.Edges;
-            if (edges == null)
+            var subjects = address.Subjects;
+            if (subjects == null)
                 return list;
 
-            for (var i = 0; i < edges.Length; i++)
+            for (var i = 0; i < subjects.Length; i++)
             {
                 //if (edges[i].SubjectType != context.Query.SubjectType ||
                 if(context.Scope != 0 && 
-                    edges[i].Scope != context.Scope)
+                    subjects[i].Scope != context.Scope)
                     continue; // Do not follow when Trust do not match scope or SubjectType
 
-                if (edges[i].Activate > UnixTime ||
-                    (edges[i].Expire > 0 && edges[i].Expire < UnixTime)) 
+                if (subjects[i].Activate > UnixTime ||
+                    (subjects[i].Expire > 0 && subjects[i].Expire < UnixTime)) 
                     continue; // Do not follow when Trust has not activated or has expired
 
-                if ((edges[i].Claim.Flags & ClaimType.Trust) == 0)
+                if ((subjects[i].Claim.Flags & ClaimType.Trust) == 0)
                     continue; // Do not follow when trust is false or do not exist.
 
-                var visited = context.GetVisitItemSafely(edges[i].SubjectId);
+                var visited = context.GetVisitItemSafely(subjects[i].SubjectId);
                 if(visited.ParentIndex > -1) // If parentIndex is -1 then it has not been used yet!
                 {
-                    var parentAddress = ModelService.Graph.Address[visited.ParentIndex];
-                    var visitedEdge = parentAddress.Edges[visited.EdgeIndex];
-                    if (visitedEdge.Cost > edges[i].Cost) // If the current cost is lower then its a better route.
-                        context.Visited[edges[i].SubjectId] = new VisitItem(item.Index, i); // Overwrite the old visit with the new because of lower cost
+                    var parentAddress = ModelService.Graph.Issuers[visited.ParentIndex];
+                    var visitedEdge = parentAddress.Subjects[visited.SubjectIndex];
+                    if (visitedEdge.Cost > subjects[i].Cost) // If the current cost is lower then its a better route.
+                        context.Visited[subjects[i].SubjectId] = new VisitItem(item.Index, i); // Overwrite the old visit with the new because of lower cost
 
                     continue; // We have already done this node, so no need to reprocess.
                 }
 
-                list.Add(new QueueItem(edges[i].SubjectId, item.Index, i, edges[i].Cost));
+                list.Add(new QueueItem(subjects[i].SubjectId, item.Index, i, subjects[i].Cost));
             }
             return list;
         }

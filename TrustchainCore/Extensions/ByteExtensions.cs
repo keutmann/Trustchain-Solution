@@ -28,6 +28,10 @@ namespace TrustchainCore.Extensions
             return s.ToArray();
         }
 
+        public static bool Equals(this byte[] source, byte[] target)
+        {
+            return source.Compare(target) == 0;
+        }
 
         public static int Compare(this byte[] source, byte[] target)
         {
