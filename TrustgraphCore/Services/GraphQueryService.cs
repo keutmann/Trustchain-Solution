@@ -75,19 +75,19 @@ namespace TrustgraphCore.Services
             var results = new List<SubjectResult>();
             var nodelist = new Dictionary<Int64Container, SubjectResult>();
             var subjectNodes = new List<SubjectResult>();
-            foreach (var item in context.Results)
+            foreach (var result in context.Results)
             {
-                var tn = new SubjectResult();
-                tn.SubjectIndex = item.Subject.SubjectId;
-                tn.ParentIndex = item.IssuerIndex;
-                var visited = context.Visited[item.IssuerIndex];
+                var subject = new SubjectResult();
+                subject.SubjectIndex = result.Subject.SubjectId;
+                subject.ParentIndex = result.IssuerIndex;
+                var visited = context.Visited[result.IssuerIndex];
 
-                tn.GraphSubjectIndex = new Int64Container(item.IssuerIndex, visited.SubjectIndex);
-                ModelService.InitSubjectModel(tn, item.Subject);
-                tn.Name = ModelService.Graph.NameIndexReverse[item.Subject.NameIndex]; // Ensure that the name of the issuer is returned
-                tn.ClaimModel = item.Subject.Claim;
+                subject.GraphSubjectIndex = new Int64Container(result.IssuerIndex, visited.SubjectIndex);
+                ModelService.InitSubjectModel(subject, result.Subject);
+                subject.NametIndex = result.Subject.NameIndex;
+                subject.ClaimModel = result.Subject.Claim;
 
-                subjectNodes.Add(tn);
+                subjectNodes.Add(subject);
             }
 
             while (results.Count == 0)
@@ -97,7 +97,8 @@ namespace TrustgraphCore.Services
                 {
                     var parentNode = new SubjectResult();
                     parentNode.SubjectIndex = subject.ParentIndex;
-
+                    parentNode.Name = ModelService.Graph.NameIndexReverse[subject.NametIndex]; // Ensure that the name of the issuer is returned
+                    //subject.Name = 
                     var visited = context.Visited[subject.SubjectIndex];
                     parentNode.ParentIndex = context.Visited[subject.ParentIndex].ParentIndex;
                     parentNode.GraphSubjectIndex = new Int64Container(parentNode.SubjectIndex, visited.SubjectIndex);
@@ -117,8 +118,8 @@ namespace TrustgraphCore.Services
                         var edge = issuer.Subjects[visited.SubjectIndex];
                         ModelService.InitSubjectModel(parentNode, edge);
                     }
-                    parentNode.Subjects = new List<SubjectResult>();
-                    parentNode.Subjects.Add(subject);
+
+                    parentNode.Subjects = new List<SubjectResult> { subject };
 
                     currentLevelNodes.Add(parentNode);
                     nodelist.Add(parentNode.GraphSubjectIndex, parentNode);

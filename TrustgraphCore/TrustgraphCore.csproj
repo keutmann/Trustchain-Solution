@@ -12,4 +12,8 @@
     <ProjectReference Include="..\TrustchainCore\TrustchainCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Facade\" />
+  </ItemGroup>
+
 </Project>

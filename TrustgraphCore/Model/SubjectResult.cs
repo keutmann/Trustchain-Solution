@@ -6,6 +6,9 @@ namespace TrustgraphCore.Model
 {
     public class SubjectResult : SubjectModel
     {
+        [JsonIgnore]
+        public int NametIndex { get; set; }
+
         [JsonProperty(PropertyName = "name", NullValueHandling = NullValueHandling.Ignore, Order = 10)]
         public string Name { get; set; }
 

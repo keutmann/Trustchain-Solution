@@ -64,6 +64,7 @@ namespace UnitTest.TrustgraphCore
             _trustDBService.Add(_trustBuilder.Package);
             _graphTrustService.Add(_trustBuilder.Package);
             var trusts = _trustBuilder.Package.Trust;
+            var trust = trusts[0];
             Console.WriteLine("Trust object");
             Console.WriteLine(JsonConvert.SerializeObject(trusts[0], Formatting.Indented));
 
@@ -71,13 +72,18 @@ namespace UnitTest.TrustgraphCore
 
             Console.WriteLine("Query object");
             Console.WriteLine(JsonConvert.SerializeObject(query, Formatting.Indented));
-
             var result = _graphQueryService.Execute(query);
+            var issuer = result.Subjects[0];
             Assert.IsNotNull(result.Subjects);
             Assert.AreEqual(result.Subjects.Count, 1);
-            //Assert.IsTrue(result.Subjects[0].SubjectId.Equals(trusts[0].Subjects[0].SubjectId));
-            //Assert.AreEqual(result.Subjects[0].ClaimModel.Metadata, ClaimMetadata.Reason);
-            //Assert.IsTrue(result.Subjects[0].Claim.ContainsIgnoreCase("Test"));
+
+            Console.WriteLine("Issuer ID: " + JsonConvert.SerializeObject(trusts[0].IssuerId));
+            Console.WriteLine("result ID: " + JsonConvert.SerializeObject(issuer.Subjects[0].SubjectId) + " : Trust SubjectID: " + JsonConvert.SerializeObject(trusts[0].Subjects[0].SubjectId));
+
+            Assert.AreEqual(issuer.Name, trust.Name);
+            Assert.IsTrue(issuer.Subjects[0].SubjectId.Equals(trust.Subjects[0].SubjectId));
+            Assert.AreEqual(issuer.Subjects[0].ClaimModel.Metadata, ClaimMetadata.Reason);
+            Assert.IsTrue(issuer.Subjects[0].Claim.ContainsIgnoreCase("Test"));
 
             Console.WriteLine("Query Result");
             Console.WriteLine(JsonConvert.SerializeObject(result.Subjects, Formatting.Indented));
