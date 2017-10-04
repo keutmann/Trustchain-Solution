@@ -13,13 +13,14 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "subjects")]
         public List<SubjectQuery> Subjects;
 
-        //[JsonProperty(PropertyName = "subjecttype")]
-        //public string subjecttype;
-
         [JsonProperty(PropertyName = "scope")]
         public string Scope;
 
         [JsonProperty(PropertyName = "claim")]
         public string Claim;
+
+        [JsonProperty(PropertyName = "level")]
+        public int Level;
+
     }
 }

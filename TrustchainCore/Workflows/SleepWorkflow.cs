@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TrustchainCore.Workflow
+namespace TrustchainCore.Workflows
 {
     public class SleepWorkflow : WorkflowBase
     {

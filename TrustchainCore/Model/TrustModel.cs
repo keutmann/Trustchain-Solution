@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TrustchainCore.Model
 {
+    [Table("Trust")]
     [JsonObject(MemberSerialization.OptIn)]
     public class TrustModel : CoreModel
     {

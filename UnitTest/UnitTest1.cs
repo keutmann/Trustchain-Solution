@@ -34,7 +34,7 @@ namespace UnitTest
                 package.Trust.Add(trust);
 
 
-                context.Package.Add(package);
+                context.Packages.Add(package);
                 context.SaveChanges();
                 //var service = new BlogService(context);
                 //service.Add("http://sample.com");
@@ -43,7 +43,7 @@ namespace UnitTest
             // Use a separate instance of the context to verify correct data was saved to database
             using (var context = new TrustDBContext(options))
             {
-                var task = context.Package
+                var task = context.Packages
                     .Include(c => c.Trust)
                         .ThenInclude(c=> c.Subjects)
                     .AsNoTracking().ToListAsync();

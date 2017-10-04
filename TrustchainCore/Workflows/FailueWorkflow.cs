@@ -1,4 +1,4 @@
-﻿namespace TrustchainCore.Workflow
+﻿namespace TrustchainCore.Workflows
 {
     public class FailueWorkflow : WorkflowBase
     {

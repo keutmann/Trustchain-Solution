@@ -2,13 +2,13 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using TrustchainCore.Builders;
-using TrustchainCore.Controllers;
 using TrustchainCore.Repository;
 using TrustchainCore.Services;
 using TrustchainCore.Strategy;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 using TrustchainCore.Extensions;
+using Trustchain.Controllers;
 
 namespace UnitTest.TrustchainCore.Builders
 {
@@ -45,7 +45,7 @@ namespace UnitTest.TrustchainCore.Builders
             using (var context = new TrustDBContext(options))
             {
                 var trustDBService = new TrustDBService(context);
-                var trustController = new  TrustController(graphTrustService, schemaService, trustDBService);
+                var trustController = new TrustController(graphTrustService, schemaService, trustDBService);
 
                 trustController.Add(builder.Package);
 

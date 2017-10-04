@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TrustchainCore.Model
 {
@@ -6,15 +7,13 @@ namespace TrustchainCore.Model
     public class TimestampModel
     {
         [JsonIgnore]
-        public int ID { get; set; }
+        public int TimestampModelID { get; set; }
 
         [JsonProperty(PropertyName = "algo")]
         public string HashAlgorithm { get; set; }
 
-        [JsonProperty(PropertyName = "path")]
-        public byte[] Path { get; set; }
-
-
+        [JsonProperty(PropertyName = "receipt")]
+        public byte[] Receipt { get; set; }
 
     }
 }

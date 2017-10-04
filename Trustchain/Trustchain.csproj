@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TrustchainCore\TrustchainCore.csproj" />
     <ProjectReference Include="..\TrustgraphCore\TrustgraphCore.csproj" />
+    <ProjectReference Include="..\TruststampCore\TruststampCore.csproj" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />

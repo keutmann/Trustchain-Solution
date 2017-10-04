@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TrustchainCore.Model
 {
+    [Table("Subject")]
     [JsonObject(MemberSerialization.OptIn)]
     public class SubjectModel
     {

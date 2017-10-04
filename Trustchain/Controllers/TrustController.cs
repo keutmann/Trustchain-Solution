@@ -1,10 +1,9 @@
 ﻿using TrustchainCore.Model;
 using Microsoft.AspNetCore.Mvc;
 using TrustgraphCore.Interfaces;
-using TrustchainCore.Repository;
 using TrustchainCore.Interfaces;
 
-namespace TrustchainCore.Controllers
+namespace Trustchain.Controllers
 {
     [Route("api/[controller]")]
     public class TrustController : Controller
@@ -26,6 +25,24 @@ namespace TrustchainCore.Controllers
         {
             return Ok("OK");
         }
+
+        [HttpGet]
+        public ActionResult Get(byte[] issuerId, byte[] subjectId, string scope)
+        {
+            if (!_graphTrustService.ModelService.Graph.IssuersIndex.ContainsKey(issuerId))
+                return NotFound();
+
+            var index = _graphTrustService.ModelService.Graph.IssuersIndex[issuerId];
+            var issuer = _graphTrustService.ModelService.Graph.Issuers[index];
+
+            for(int i = 0; i < issuer.Subjects.Length; i++)
+            {
+
+            }
+
+            return Ok("OK");
+        }
+
 
         [Produces("application/json")]
         [HttpPost]

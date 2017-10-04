@@ -14,13 +14,13 @@ namespace TrustchainCore.Services
         {
             get
             {
-                return DBContext.Package
+                return DBContext.Packages
                 .Include(c => c.Timestamp)
                 .Include(c => c.Trust)
                     .ThenInclude(c => c.Subjects)
                 .Include(c => c.Trust)
-                    .ThenInclude(c => c.Timestamp)
-                .AsNoTracking();
+                    .ThenInclude(c => c.Timestamp);
+                
             }
         }
 
@@ -30,8 +30,7 @@ namespace TrustchainCore.Services
             {
                 return DBContext.Trusts
                     .Include(c => c.Timestamp)
-                    .Include(c => c.Subjects)
-                    .AsNoTracking();
+                    .Include(c => c.Subjects);
             }
         }
 
@@ -39,10 +38,25 @@ namespace TrustchainCore.Services
         {
             get
             {
-                return DBContext.Subject.AsNoTracking();
+                return DBContext.Subjects.AsQueryable();
             }
         }
 
+        public IQueryable<ProofEntity> Proofs
+        {
+            get
+            {
+                return DBContext.Proofs.AsQueryable();
+            }
+        }
+
+        public IQueryable<WorkflowEntity> Workflows
+        {
+            get
+            {
+                return DBContext.Workflows.AsQueryable();
+            }
+        }
 
         public TrustDBService(TrustDBContext trustDBContext)
         {
@@ -51,12 +65,10 @@ namespace TrustchainCore.Services
 
         public bool Add(PackageModel package)
         {
-            var task = DBContext.Package.SingleOrDefaultAsync(f => f.PackageId == package.PackageId);
-            task.Wait();
-            if (task.Result != null)
+            if (DBContext.Packages.Any(f => f.PackageId == package.PackageId))
                 return false;
 
-            DBContext.Package.Add(package);
+            DBContext.Packages.Add(package);
             DBContext.SaveChanges();
             return true;
         }

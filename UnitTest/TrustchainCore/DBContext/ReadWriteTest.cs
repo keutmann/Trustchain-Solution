@@ -46,14 +46,14 @@ namespace UnitTest.TrustchainCore.Builders
             // Run the test against one instance of the context
             using (var context = new TrustDBContext(options))
             {
-                context.Package.Add(builder.Package);
+                context.Packages.Add(builder.Package);
                 context.SaveChanges();
             }
 
             // Run the test against one instance of the context
             using (var context = new TrustDBContext(options))
             {
-                var task = context.Package
+                var task = context.Packages
                         .Include(c => c.Timestamp)
                         .Include(c => c.Trust)
                             .ThenInclude(c => c.Subjects)
