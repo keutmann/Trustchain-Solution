@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using TrustchainCore.Interfaces;
+using Newtonsoft.Json.Serialization;
 
 namespace TrustchainCore.Extensions
 {
@@ -18,7 +19,8 @@ namespace TrustchainCore.Extensions
         }
         public void Configure(MvcJsonOptions o)
         {
-            o.SerializerSettings.ContractResolver = new DIContractResolver(serviceProvider.GetService<IDIMeta>(), serviceProvider);
+            var resover = serviceProvider.GetService<IContractResolver>();
+            o.SerializerSettings.ContractResolver = resover;
         }
     }
 }

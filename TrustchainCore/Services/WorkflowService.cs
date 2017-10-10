@@ -5,8 +5,9 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TrustchainCore.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using TrustchainCore.Enumerations;
+using Newtonsoft.Json.Serialization;
 
 namespace TrustchainCore.Services
 {
@@ -21,18 +22,22 @@ namespace TrustchainCore.Services
             ServiceProvider = serviceProvider;
         }
 
-        public T Create<T>(WorkflowEntity workflow = null) where T : IWorkflowContext, new()
+        public T Create<T>(WorkflowEntity workflow = null) where T : IWorkflowContext
         {
             T instance = default(T);
             if(workflow == null || String.IsNullOrWhiteSpace(workflow.Data))
             {
                 instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
+                instance.State = WorkflowStatus.New.ToString();
                 instance.Initialize(); // Initialize new workflow
+                
             }
             else
             {
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.ContractResolver = new DIContractResolver(ServiceProvider.GetService<IDIMeta>(), ServiceProvider);
+                JsonSerializerSettings settings = new JsonSerializerSettings
+                {
+                    ContractResolver = ServiceProvider.GetService<IContractResolver>()
+                };
 
                 instance = JsonConvert.DeserializeObject<T>(workflow.Data, settings);
             }
@@ -58,7 +63,7 @@ namespace TrustchainCore.Services
             Task.WaitAll(executing.ToArray());
         }
 
-        public void Save(IWorkflowContext context)
+        public int Save(IWorkflowContext context)
         {
             if(context.ID != 0)
             {
@@ -69,13 +74,14 @@ namespace TrustchainCore.Services
                     entity.Tag = context.Tag;
                     entity.Data = JsonConvert.SerializeObject(context);
                     DBService.DBContext.SaveChanges();
-                    return; // Exit now!
+                    return context.ID; // Exit now!
                 }
             }
 
             var workflow = CreateWorkflowEntity(context);
             DBService.DBContext.Workflows.Add(workflow);
             DBService.DBContext.SaveChanges();
+            return workflow.ID;
         }
 
         public WorkflowEntity CreateWorkflowEntity(IWorkflowContext context)

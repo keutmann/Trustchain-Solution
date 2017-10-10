@@ -8,6 +8,7 @@ using TrustchainCore.Repository;
 using TrustchainCore.Services;
 using TrustchainCore.Strategy;
 using TrustchainCore.Extensions;
+using TrustchainCore.Factories;
 
 namespace UnitTest.TrustchainCore.Builders
 {

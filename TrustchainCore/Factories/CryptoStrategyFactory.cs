@@ -2,7 +2,7 @@
 using TrustchainCore.Extensions;
 using TrustchainCore.Strategy;
 
-namespace TrustchainCore.Services
+namespace TrustchainCore.Factories
 {
     public class CryptoStrategyFactory : ICryptoStrategyFactory
     {

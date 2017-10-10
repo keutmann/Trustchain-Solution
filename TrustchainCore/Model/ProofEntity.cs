@@ -17,10 +17,13 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "receipt", NullValueHandling = NullValueHandling.Ignore)]
         public byte[] Receipt;
 
-        [JsonProperty(PropertyName = "partition", NullValueHandling = NullValueHandling.Ignore)]
-        public string partition;
+        [JsonIgnore]
+        public int WorkflowID { get; set; } 
 
-        [JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime Timestamp;
+        //[JsonProperty(PropertyName = "partition", NullValueHandling = NullValueHandling.Ignore)]
+        //public string partition;
+
+        [JsonProperty(PropertyName = "registered", NullValueHandling = NullValueHandling.Ignore)]
+        public DateTime Registered;
     }
 }

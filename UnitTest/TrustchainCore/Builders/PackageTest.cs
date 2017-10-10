@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Text;
 using TrustchainCore.Builders;
+using TrustchainCore.Factories;
 using TrustchainCore.Services;
 using TrustchainCore.Strategy;
 

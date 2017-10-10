@@ -2,7 +2,7 @@
 {
     public enum WorkflowStatus : int
     {
-        Ready,
+        New,
         Running,
         Finished,
         Failed

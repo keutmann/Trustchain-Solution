@@ -24,7 +24,7 @@ namespace TrustchainCore.Strategy
             {
                 leafs.Add(new MerkleNode(hash));
             }
-            return null;
+            return Build(leafs);
         }
 
         public MerkleNode Build(IEnumerable<MerkleNode> leafNodes)

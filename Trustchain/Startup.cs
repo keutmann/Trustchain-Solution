@@ -5,14 +5,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using TrustchainCore.Extensions;
 using TrustgraphCore.Extensions;
+using TruststampCore.Extensions;
 using TrustchainCore.Repository;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
+using Microsoft.AspNetCore.Http;
 
 namespace Trustchain
 {
     public class Startup
     {
+        private IServiceCollection _services;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -34,22 +39,15 @@ namespace Trustchain
                 {
                     Title = "Trustchain API",
                     Version = "v1",
-                    //Contact = new Contact
-                    //{
-                    //    Name = "Trustchain website",
-                    //    Url = "/"
-                    //},
-                    //License = new License
-                    //{
-                    //    Name = "MIT License",
-                    //    Url = "https://opensource.org/licenses/MIT"
-                    //}
                 });
             });
 
             services.TrustchainCore();
             services.TrustgraphCore();
-            
+            services.TruststrampCore();
+
+            _services = services;
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,6 +62,9 @@ namespace Trustchain
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            //app.LoadGraph(); // Load the Trust Graph from Database
+            app.Timestamp();
 
             app.UseStaticFiles();
 
@@ -82,8 +83,26 @@ namespace Trustchain
                     template: "{controller}/{action=Index}/{id?}");
             });
 
+            //app.Map("/allservices", builder => builder.Run(async context =>
+            //{
+            //    var sb = new StringBuilder();
+            //    sb.Append("<h1>All Services</h1>");
+            //    sb.Append("<table><thead>");
+            //    sb.Append("<tr><th>Type</th><th>Lifetime</th><th>Instance</th></tr>");
+            //    sb.Append("</thead><tbody>");
+            //    foreach (var svc in _services)
+            //    {
+            //        sb.Append("<tr>");
+            //        sb.Append($"<td>{svc.ServiceType.FullName}</td>");
+            //        sb.Append($"<td>{svc.Lifetime}</td>");
+            //        sb.Append($"<td>{svc.ImplementationType?.FullName}</td>");
+            //        sb.Append("</tr>");
+            //    }
+            //    sb.Append("</tbody></table>");
+            //    await context.Response.WriteAsync(sb.ToString());
+            //}));
 
-            app.LoadGraph(); // Load the Trust Graph from Database
+
         }
     }
 }

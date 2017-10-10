@@ -1,22 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TruststampCore.Interfaces;
+using TruststampCore.Services;
 
 namespace TruststampCore.Extensions
 {
     public static class IServiceCollectionExtensions
     {
-        public static void TrustgraphCore(this IServiceCollection services)
+        public static void TruststrampCore(this IServiceCollection services)
         {
-            //services.AddSingleton(new GraphModel());
-            //services.AddScoped<ICryptoStrategy, CryptoBTCPKH>();
-            //services.AddScoped<ITrustLoadService, TrustLoadService>();
-            //services.AddScoped<IGraphModelService, GraphModelService>();
-            //services.AddScoped<IGraphTrustService, GraphTrustService>();
+            services.AddSingleton<ITimestampWorkflowService, TimestampWorkflowService>();
 
-            //services.AddTransient<IGraphQueryService, GraphQueryService>();
-            //services.AddTransient<IGraphExportService, GraphExportService>();
-            //services.AddTransient<IQueryRequestService, QueryRequestService>();
-            
+            services.AddTransient<ITimestampService, TimestampService>();
         }
-
     }
 }

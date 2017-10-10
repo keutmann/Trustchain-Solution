@@ -1,53 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using TruststampCore.Interfaces;
 
 namespace Trustchain.Controllers
 {
 
     public class StampController : Controller
     {
+
+        private ITimestampService _timestampService;
+
+        public StampController(ITimestampService timestampService)
+        {
+            _timestampService = timestampService;
+        }
         
         [HttpPost]
-        public ActionResult Add(string id)
+        public ActionResult Add([FromBody]byte[] source)
         {
-            //try
-            //{
-            //    using (var proof = Proof.OpenWithDatabase())
-            //    {
-            //        var result = proof.Add(id);
-            //        return Ok(result);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return new ExceptionResult(ex, this);
-            //}
-            return Ok();
+            return Ok(_timestampService.AddProof(source));
         }
 
 
 
-        //// GET api/
-        //[HttpGet]
-        //public IHttpActionResult Get([FromUri]string id)
-        //{
-        //    try
-        //    {
-        //        using (var proof = Proof.OpenWithDatabase())
-        //        {
-        //            var result = proof.Get(id);
-
-        //            if (result == null)
-        //                return Ok("ID Not found!");
-
-        //            return Ok(result);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ExceptionResult(ex, this);
-        //    }
-        //}
+        // GET api/
+        [HttpGet]
+        public ActionResult Get([FromQuery]byte[] source)
+        {
+            return Ok(_timestampService.GetProof(source));
+        }
 
         //[HttpGet]
         //public IHttpActionResult GetAllProofs()

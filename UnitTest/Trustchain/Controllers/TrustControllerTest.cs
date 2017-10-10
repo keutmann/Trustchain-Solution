@@ -9,6 +9,7 @@ using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 using TrustchainCore.Extensions;
 using Trustchain.Controllers;
+using TrustchainCore.Factories;
 
 namespace UnitTest.TrustchainCore.Builders
 {

@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <Folder Include="Factories\" />
+    <Folder Include="Model\" />
     <Folder Include="Repository\" />
   </ItemGroup>
 

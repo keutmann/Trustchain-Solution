@@ -1,34 +1,48 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Linq;
 using TrustchainCore.Workflows;
 using TrustchainCore.Interfaces;
+using TrustchainCore.Model;
 
 namespace TruststampCore.Workflows
 {
     public class MerkleStep : WorkflowStep
     {
         private ITrustDBService _trustDBService;
+        private IMerkleTree _merkleTree;
 
-
-        public MerkleStep(ITrustDBService trustDBService)
+        public MerkleStep(ITrustDBService trustDBService, IMerkleTree merkleTree)
         {
             _trustDBService = trustDBService;
+            _merkleTree = merkleTree;
         }
 
         public override void Execute()
         {
-            //Context.Log("Started");
+            //var proofs = (from p in _trustDBService.Proofs
+            //             where p.Receipt == null
+            //             select new MerkleNode(p.Source, p)).ToList();
 
-            // This may take some time.
-            //var proofCount = BuildMerkle(DataBase);
+            //var rootNode = _merkleTree.Build(proofs);
+            
 
-            //WriteLog(string.Format("Finished building {0} proofs.", proofCount));
 
-            //if (proofCount > 0)
-            //    Push(new BitcoinWorkflow());
-            //else
-            //    Push(new FailedWorkflow());
+            
+                                 //var proofs = db.ProofTable.GetByPartition(CurrentBatch["partition"].ToString());
+                                 //if (proofs.Count == 0)
+                                 //                return 0;
+                                 //Context.Log("Started");
 
-            //Update();
+                                 // This may take some time.
+                                 //var proofCount = BuildMerkle(DataBase);
+
+                                 //WriteLog(string.Format("Finished building {0} proofs.", proofCount));
+
+                                 //if (proofCount > 0)
+                                 //    Push(new BitcoinWorkflow());
+                                 //else
+                                 //    Push(new FailedWorkflow());
+
+                                 //Update();
         }
 
         //private int BuildMerkle(TruststampDatabase db)
