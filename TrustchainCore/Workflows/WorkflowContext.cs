@@ -70,6 +70,17 @@ namespace TrustchainCore.Workflows
             Success();
         }
 
+        public T GetStep<T>()
+        {
+            foreach (var step in Steps)
+            {
+                if (typeof(T).IsAssignableFrom(step.GetType()))
+                    return (T)step;
+            }
+
+            return default(T);
+        }
+
         public virtual void Save()
         {
             _workflowService.Save(this);

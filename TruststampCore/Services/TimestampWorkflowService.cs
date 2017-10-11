@@ -1,6 +1,8 @@
-﻿using TrustchainCore.Services;
+﻿using System;
+using TrustchainCore.Services;
 using TruststampCore.Interfaces;
 using TruststampCore.Workflows;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TruststampCore.Services
 {
@@ -16,17 +18,19 @@ namespace TruststampCore.Services
         }
          
 
-        public IWorkflowService WorkflowService { get; set; }
+        
+        private IServiceProvider _serviceProvider;
 
-        public TimestampWorkflowService(IWorkflowService workflowService)
+        public TimestampWorkflowService(IServiceProvider serviceProvider)
         {
-            WorkflowService = workflowService;
+            _serviceProvider = serviceProvider;
         }
 
         public void CreateNextWorkflow()
         {
-            var wf = WorkflowService.Create<TimestampWorkflow>();
-            _currentWorkflowID = WorkflowService.Save(wf);
+            var workflowService = _serviceProvider.GetRequiredService<IWorkflowService>();
+            var wf = workflowService.Create<TimestampWorkflow>();
+            _currentWorkflowID = workflowService.Save(wf);
         }
     }
 }

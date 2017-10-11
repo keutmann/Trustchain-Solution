@@ -1,12 +1,14 @@
 ﻿using System.Linq;
 using TrustchainCore.Workflows;
 using TrustchainCore.Interfaces;
-using TrustchainCore.Model;
+using TruststampCore.Interfaces;
 
 namespace TruststampCore.Workflows
 {
-    public class MerkleStep : WorkflowStep
+    public class MerkleStep : WorkflowStep, IMerkleStep
     {
+        public byte[] RootHash { get; set; }
+
         private ITrustDBService _trustDBService;
         private IMerkleTree _merkleTree;
 
@@ -18,52 +20,20 @@ namespace TruststampCore.Workflows
 
         public override void Execute()
         {
-            //var proofs = (from p in _trustDBService.Proofs
-            //             where p.Receipt == null
-            //             select new MerkleNode(p.Source, p)).ToList();
+            var proofs = (from p in _trustDBService.Proofs
+                          where p.WorkflowID == Context.ID
+                          select p).ToList();
 
-            //var rootNode = _merkleTree.Build(proofs);
-            
+            foreach (var proof in proofs)
+            {
+                _merkleTree.Add(proof);
+            }
 
+            RootHash = _merkleTree.Build().Hash;
 
-            
-                                 //var proofs = db.ProofTable.GetByPartition(CurrentBatch["partition"].ToString());
-                                 //if (proofs.Count == 0)
-                                 //                return 0;
-                                 //Context.Log("Started");
+            _trustDBService.DBContext.SaveChanges();
 
-                                 // This may take some time.
-                                 //var proofCount = BuildMerkle(DataBase);
-
-                                 //WriteLog(string.Format("Finished building {0} proofs.", proofCount));
-
-                                 //if (proofCount > 0)
-                                 //    Push(new BitcoinWorkflow());
-                                 //else
-                                 //    Push(new FailedWorkflow());
-
-                                 //Update();
+            Context.Log($"Finished building {proofs.Count} proofs.");
         }
-
-        //private int BuildMerkle(TruststampDatabase db)
-        //{
-        //    var proofs = db.ProofTable.GetByPartition(CurrentBatch["partition"].ToString());
-        //    if (proofs.Count == 0)
-        //        return 0;
-
-        //    var leafNodes = (from p in proofs
-        //                    select new Models.MerkleNode((JObject)p)).ToList();
-
-        //    var merkleTree = new MerkleTree(leafNodes);
-        //    var rootNode = merkleTree.Build();
-        //    CurrentBatch["root"] = rootNode.Hash;
-
-        //    // Update the path back to proof entities
-        //    foreach (var node in leafNodes)
-        //        db.ProofTable.UpdatePath(node.Hash, node.Path);
-
-        //    return proofs.Count;
-        //}
-
     }
 }

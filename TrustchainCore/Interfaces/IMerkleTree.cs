@@ -5,6 +5,7 @@ namespace TrustchainCore.Interfaces
 {
     public interface IMerkleTree
     {
-        MerkleNode Build(IEnumerable<byte[]> nodes);
+        MerkleNode Add(IProof proof);
+        MerkleNode Build();
     }
 }

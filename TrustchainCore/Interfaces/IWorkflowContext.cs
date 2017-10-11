@@ -16,6 +16,7 @@ namespace TrustchainCore.Interfaces
 
         void Initialize();
         Task Execute();
-
+        T GetStep<T>();
+        void Log(string message);
     }
 }

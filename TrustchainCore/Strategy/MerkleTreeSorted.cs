@@ -9,25 +9,33 @@ namespace TrustchainCore.Strategy
 {
     public class MerkleTreeSorted : IMerkleTree
     {
-        private IEnumerable<MerkleNode> LeafNodes { get; }
+        private IList<MerkleNode> LeafNodes { get; }
         private ICryptoStrategy CryptoService { get; }
 
         public MerkleTreeSorted(ICryptoStrategy cryptoService)
         {
             CryptoService = cryptoService;
+            LeafNodes = new List<MerkleNode>();
         }
 
-        public MerkleNode Build(IEnumerable<Byte[]> hashs)
+        public MerkleNode Add(IProof proof)
         {
-            var leafs = new List<MerkleNode>();
-            foreach (var hash in hashs)
-            {
-                leafs.Add(new MerkleNode(hash));
-            }
-            return Build(leafs);
+            var node = new MerkleNode(proof);
+            LeafNodes.Add(node);
+            return node;
         }
 
-        public MerkleNode Build(IEnumerable<MerkleNode> leafNodes)
+        //public MerkleNode Build()
+        //{
+        //    var leafs = new List<MerkleNode>();
+        //    foreach (var hash in hashs)
+        //    {
+        //        leafs.Add(new MerkleNode(hash));
+        //    }
+        //    return Build(leafs);
+        //}
+
+        public MerkleNode Build()
         {
             var rootNode = BuildTree(LeafNodes);
             ComputeMerkleTree(rootNode);
@@ -79,7 +87,7 @@ namespace TrustchainCore.Strategy
                 foreach (var v in merkle)
                     tree.AddRange(v);
 
-                node.Path = tree.ToArray();
+                node.Proof.Receipt = tree.ToArray();
             }
 
             if (node.Left != null)
