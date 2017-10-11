@@ -32,6 +32,24 @@ namespace TrustchainCore.Migrations
                     b.ToTable("Package");
                 });
 
+            modelBuilder.Entity("TrustchainCore.Model.ProofEntity", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<byte[]>("Receipt");
+
+                    b.Property<byte[]>("Source");
+
+                    b.Property<int>("WorkflowID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("Source");
+
+                    b.ToTable("Proof");
+                });
+
             modelBuilder.Entity("TrustchainCore.Model.SubjectModel", b =>
                 {
                     b.Property<int>("ID")
@@ -68,18 +86,18 @@ namespace TrustchainCore.Migrations
 
             modelBuilder.Entity("TrustchainCore.Model.TimestampModel", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("TimestampModelID")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("HashAlgorithm");
 
                     b.Property<int?>("PackageModelID");
 
-                    b.Property<byte[]>("Path");
+                    b.Property<byte[]>("Receipt");
 
                     b.Property<int?>("TrustModelID");
 
-                    b.HasKey("ID");
+                    b.HasKey("TimestampModelID");
 
                     b.HasIndex("PackageModelID");
 
@@ -112,7 +130,29 @@ namespace TrustchainCore.Migrations
 
                     b.HasIndex("TrustId");
 
-                    b.ToTable("Trusts");
+                    b.ToTable("Trust");
+                });
+
+            modelBuilder.Entity("TrustchainCore.Model.WorkflowEntity", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Data");
+
+                    b.Property<string>("State");
+
+                    b.Property<string>("Tag");
+
+                    b.Property<string>("Type");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("State");
+
+                    b.HasIndex("Type");
+
+                    b.ToTable("Workflow");
                 });
 
             modelBuilder.Entity("TrustchainCore.Model.PackageModel", b =>
@@ -184,7 +224,7 @@ namespace TrustchainCore.Migrations
 
                             b1.Property<string>("Version");
 
-                            b1.ToTable("Trusts");
+                            b1.ToTable("Trust");
 
                             b1.HasOne("TrustchainCore.Model.TrustModel")
                                 .WithOne("Head")
@@ -200,7 +240,7 @@ namespace TrustchainCore.Migrations
 
                             b1.Property<byte[]>("Signature");
 
-                            b1.ToTable("Trusts");
+                            b1.ToTable("Trust");
 
                             b1.HasOne("TrustchainCore.Model.TrustModel")
                                 .WithOne("Server")

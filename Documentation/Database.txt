@@ -11,6 +11,16 @@ Command line:
 dotnet ef migrations add InitialCreate 
 dotnet ef database update
 
+Step by step
+*. Open Package Manager Console
+*. cd trustchain
+*. Change default project to: TrustchainCore
+*. Delete files in Migration folder under TrustchainCore
+*. Delete trust.db in Trustchain project
+*. Maybe restart Visual Studio
+*. Add-Migration trust.db
+*. Update-Database
+
 
 New stuff
 Add-Migration [Name]

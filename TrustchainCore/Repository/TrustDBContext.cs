@@ -41,11 +41,11 @@ namespace TrustchainCore.Repository
 
             // Proof
             builder.Entity<ProofEntity>().HasIndex("Source");
+            builder.Entity<ProofEntity>().HasIndex("WorkflowID");
 
             // Workflow
             builder.Entity<WorkflowEntity>().HasIndex("Type");
             builder.Entity<WorkflowEntity>().HasIndex("State");
-
 
             base.OnModelCreating(builder);
         }

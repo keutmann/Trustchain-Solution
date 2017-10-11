@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace TrustchainCore.Migrations
 {
-    public partial class InitialCreation : Migration
+    public partial class trustdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -26,7 +26,38 @@ namespace TrustchainCore.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Trusts",
+                name: "Proof",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Receipt = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    Source = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    WorkflowID = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Proof", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Workflow",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Data = table.Column<string>(type: "TEXT", nullable: true),
+                    State = table.Column<string>(type: "TEXT", nullable: true),
+                    Tag = table.Column<string>(type: "TEXT", nullable: true),
+                    Type = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Workflow", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Trust",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
@@ -44,9 +75,9 @@ namespace TrustchainCore.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Trusts", x => x.ID);
+                    table.PrimaryKey("PK_Trust", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Trusts_Package_PackageModelID",
+                        name: "FK_Trust_Package_PackageModelID",
                         column: x => x.PackageModelID,
                         principalTable: "Package",
                         principalColumn: "ID",
@@ -74,9 +105,9 @@ namespace TrustchainCore.Migrations
                 {
                     table.PrimaryKey("PK_Subject", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Subject_Trusts_TrustModelID",
+                        name: "FK_Subject_Trust_TrustModelID",
                         column: x => x.TrustModelID,
-                        principalTable: "Trusts",
+                        principalTable: "Trust",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -85,16 +116,16 @@ namespace TrustchainCore.Migrations
                 name: "TimestampModel",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                    TimestampModelID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     HashAlgorithm = table.Column<string>(type: "TEXT", nullable: true),
                     PackageModelID = table.Column<int>(type: "INTEGER", nullable: true),
-                    Path = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    Receipt = table.Column<byte[]>(type: "BLOB", nullable: true),
                     TrustModelID = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TimestampModel", x => x.ID);
+                    table.PrimaryKey("PK_TimestampModel", x => x.TimestampModelID);
                     table.ForeignKey(
                         name: "FK_TimestampModel_Package_PackageModelID",
                         column: x => x.PackageModelID,
@@ -102,9 +133,9 @@ namespace TrustchainCore.Migrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_TimestampModel_Trusts_TrustModelID",
+                        name: "FK_TimestampModel_Trust_TrustModelID",
                         column: x => x.TrustModelID,
-                        principalTable: "Trusts",
+                        principalTable: "Trust",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -113,6 +144,11 @@ namespace TrustchainCore.Migrations
                 name: "IX_Package_PackageId",
                 table: "Package",
                 column: "PackageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Proof_Source",
+                table: "Proof",
+                column: "Source");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subject_SubjectId",
@@ -135,18 +171,31 @@ namespace TrustchainCore.Migrations
                 column: "TrustModelID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Trusts_PackageModelID",
-                table: "Trusts",
+                name: "IX_Trust_PackageModelID",
+                table: "Trust",
                 column: "PackageModelID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Trusts_TrustId",
-                table: "Trusts",
+                name: "IX_Trust_TrustId",
+                table: "Trust",
                 column: "TrustId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Workflow_State",
+                table: "Workflow",
+                column: "State");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Workflow_Type",
+                table: "Workflow",
+                column: "Type");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Proof");
+
             migrationBuilder.DropTable(
                 name: "Subject");
 
@@ -154,7 +203,10 @@ namespace TrustchainCore.Migrations
                 name: "TimestampModel");
 
             migrationBuilder.DropTable(
-                name: "Trusts");
+                name: "Workflow");
+
+            migrationBuilder.DropTable(
+                name: "Trust");
 
             migrationBuilder.DropTable(
                 name: "Package");

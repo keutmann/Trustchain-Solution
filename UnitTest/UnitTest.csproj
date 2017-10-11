@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
@@ -18,6 +19,8 @@
   <ItemGroup>
     <ProjectReference Include="..\TrustchainCore\TrustchainCore.csproj" />
     <ProjectReference Include="..\Trustchain\Trustchain.csproj" />
+    <ProjectReference Include="..\TrustgraphCore\TrustgraphCore.csproj" />
+    <ProjectReference Include="..\TruststampCore\TruststampCore.csproj" />
   </ItemGroup>
 
 </Project>
