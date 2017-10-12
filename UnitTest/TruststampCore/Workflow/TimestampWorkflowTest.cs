@@ -12,10 +12,6 @@ namespace UnitTest.TruststampCore.Workflow
         public void SaveAndLoadWithSteps()
         {
             // Run the test against one instance of the context
-            using (var context = InMemoryDataBase.Create())
-            {
-
-            }
         }
     }
 }

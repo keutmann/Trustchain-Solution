@@ -50,7 +50,7 @@ namespace TrustchainCore.Services
             }
         }
 
-        public IQueryable<WorkflowEntity> Workflows
+        public IQueryable<WorkflowContainer> Workflows
         {
             get
             {

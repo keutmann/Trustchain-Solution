@@ -28,9 +28,7 @@ namespace Trustchain
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<TrustDBContext>(options =>
-                //options.UseSqlite(Configuration.GetConnectionString("TrustDB"), b => b.MigrationsAssembly("TrustchainCore"))); 
-                options.UseSqlite("Filename=./trust.db", b => b.MigrationsAssembly("TrustchainCore"))); 
+            ConfigureDbContext(services);
 
             services.AddMvc();
             services.AddSwaggerGen(c =>
@@ -49,6 +47,16 @@ namespace Trustchain
             _services = services;
 
         }
+
+        public virtual void ConfigureDbContext(IServiceCollection services)
+        {
+            services.AddDbContext<TrustDBContext>(options =>
+                //options.UseSqlite(Configuration.GetConnectionString("TrustDB"), b => b.MigrationsAssembly("TrustchainCore"))); 
+                options.UseSqlite("Filename=./trust.db", b => b.MigrationsAssembly("TrustchainCore")));
+
+        }
+
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -101,8 +109,6 @@ namespace Trustchain
             //    sb.Append("</tbody></table>");
             //    await context.Response.WriteAsync(sb.ToString());
             //}));
-
-
         }
     }
 }

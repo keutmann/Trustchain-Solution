@@ -5,7 +5,7 @@ using TrustchainCore.Interfaces;
 namespace TrustchainCore.Model
 {
     [Table("Workflow")]
-    public class WorkflowEntity
+    public class WorkflowContainer
     {
         [JsonIgnore]
         public int ID { get; set; } // Database row key

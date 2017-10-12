@@ -7,14 +7,16 @@ namespace TruststampCore.Workflows
 {
     public class TimestampWorkflow : WorkflowContext
     {
+        private IServiceProvider _serviceProvider;
 
-        public TimestampWorkflow(IWorkflowService workflowService) : base(workflowService)
+        public TimestampWorkflow(IWorkflowService workflowService, IServiceProvider serviceProvider) : base(workflowService)
         {
+            _serviceProvider = serviceProvider;
         }
 
         public override void Initialize()
         {
-            Steps.Add(this._workflowService.ServiceProvider.GetRequiredService<MerkleStep>());
+            Steps.Add(_serviceProvider.GetRequiredService<MerkleStep>());
         }
     }
 }

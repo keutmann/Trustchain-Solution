@@ -13,19 +13,19 @@ namespace TrustchainCore.Services
 {
     public class WorkflowService : IWorkflowService
     {
-        public ITrustDBService DBService { get; set; }
-        public IServiceProvider ServiceProvider { get; set; }
+        private ITrustDBService _trustDBService;
+        private IServiceProvider _serviceProvider;
 
         public WorkflowService(ITrustDBService trustDBService, IServiceProvider serviceProvider)
         {
-            DBService = trustDBService;
-            ServiceProvider = serviceProvider;
+            _trustDBService = trustDBService;
+            _serviceProvider = serviceProvider;
         }
 
-        public T Create<T>(WorkflowEntity workflow = null) where T : IWorkflowContext
+        public T Create<T>(WorkflowContainer container = null) where T : IWorkflowContext
         {
             T instance = default(T);
-            if(workflow == null || String.IsNullOrWhiteSpace(workflow.Data))
+            if(container == null || String.IsNullOrWhiteSpace(container.Data))
             {
                 instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
                 instance.State = WorkflowStatus.New.ToString();
@@ -36,17 +36,17 @@ namespace TrustchainCore.Services
             {
                 JsonSerializerSettings settings = new JsonSerializerSettings
                 {
-                    ContractResolver = ServiceProvider.GetService<IContractResolver>()
+                    ContractResolver = _serviceProvider.GetService<IContractResolver>()
                 };
 
-                instance = JsonConvert.DeserializeObject<T>(workflow.Data, settings);
+                instance = JsonConvert.DeserializeObject<T>(container.Data, settings);
             }
 
-            if (workflow != null)
+            if (container != null)
             {
-                instance.ID = workflow.ID;
-                instance.State = workflow.State;
-                instance.Tag = workflow.Tag;
+                instance.ID = container.ID;
+                instance.State = container.State;
+                instance.Tag = container.Tag;
             }
 
             return instance;
@@ -63,30 +63,31 @@ namespace TrustchainCore.Services
             Task.WaitAll(executing.ToArray());
         }
 
-        public int Save(IWorkflowContext context)
+        public int Save(IWorkflowContext workflow)
         {
-            if(context.ID != 0)
+            if(workflow.ID != 0)
             {
-                var entity = DBService.Workflows.FirstOrDefault(w => w.ID == context.ID);
+                var entity = _trustDBService.Workflows.FirstOrDefault(w => w.ID == workflow.ID);
                 if (entity != null)
                 {
-                    entity.State = context.State;
-                    entity.Tag = context.Tag;
-                    entity.Data = JsonConvert.SerializeObject(context);
-                    DBService.DBContext.SaveChanges();
-                    return context.ID; // Exit now!
+                    entity.State = workflow.State;
+                    entity.Tag = workflow.Tag;
+                    entity.Data = JsonConvert.SerializeObject(workflow);
+                    _trustDBService.DBContext.SaveChanges();
+                    return workflow.ID; // Exit now!
                 }
             }
 
-            var workflow = CreateWorkflowEntity(context);
-            DBService.DBContext.Workflows.Add(workflow);
-            DBService.DBContext.SaveChanges();
-            return workflow.ID;
+            var container = CreateWorkflowContainer(workflow);
+            _trustDBService.DBContext.Workflows.Add(container);
+            _trustDBService.DBContext.SaveChanges();
+            workflow.ID = container.ID;
+            return container.ID;
         }
 
-        public WorkflowEntity CreateWorkflowEntity(IWorkflowContext context)
+        public WorkflowContainer CreateWorkflowContainer(IWorkflowContext context)
         {
-            var entity = new WorkflowEntity
+            var entity = new WorkflowContainer
             {
                 Type = context.GetType().FullName,
                 State = context.State,

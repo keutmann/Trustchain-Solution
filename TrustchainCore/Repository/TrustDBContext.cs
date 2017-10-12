@@ -12,7 +12,7 @@ namespace TrustchainCore.Repository
         public DbSet<TrustModel> Trusts { get; set; }
         public DbSet<SubjectModel> Subjects { get; set; }
         public DbSet<ProofEntity> Proofs { get; set; }
-        public DbSet<WorkflowEntity> Workflows { get; set; }
+        public DbSet<WorkflowContainer> Workflows { get; set; }
 
         public TrustDBContext(DbContextOptions options) : base(options)
         {
@@ -44,8 +44,8 @@ namespace TrustchainCore.Repository
             builder.Entity<ProofEntity>().HasIndex("WorkflowID");
 
             // Workflow
-            builder.Entity<WorkflowEntity>().HasIndex("Type");
-            builder.Entity<WorkflowEntity>().HasIndex("State");
+            builder.Entity<WorkflowContainer>().HasIndex("Type");
+            builder.Entity<WorkflowContainer>().HasIndex("State");
 
             base.OnModelCreating(builder);
         }

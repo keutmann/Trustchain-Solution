@@ -11,7 +11,7 @@ namespace TrustchainCore.Interfaces
         IQueryable<TrustModel> Trusts { get; }
         IQueryable<SubjectModel> Subjects { get; }
         IQueryable<ProofEntity> Proofs { get; }
-        IQueryable<WorkflowEntity> Workflows { get; }
+        IQueryable<WorkflowContainer> Workflows { get; }
 
         TrustDBContext DBContext { get; }
 
