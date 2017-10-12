@@ -26,22 +26,24 @@ namespace TrustchainCore.Workflows
         public IList<IWorkflowStep> Steps { get; set; }
 
         [JsonIgnore]
-        public WorkflowStatus Status { get; set; }
+        public WorkflowStatusType Status { get; set; }
 
         [JsonProperty(PropertyName = "logs", NullValueHandling = NullValueHandling.Ignore)]
         public List<IWorkflowLog> Logs { get; set; }
 
         protected IWorkflowService _workflowService;
 
-        public WorkflowContext(IWorkflowService workflowService)
+        public WorkflowContext(IWorkflowService workflowService) 
         {
             _workflowService = workflowService;
         }
 
         public virtual void Initialize()
         {
+            Steps = new List<IWorkflowStep>();
+            Logs = new List<IWorkflowLog>();
         }
-        
+
         public virtual async Task Execute()
         {
             await Task.Run(() =>
@@ -105,13 +107,13 @@ namespace TrustchainCore.Workflows
 
         public virtual void Success()
         {
-            Status = WorkflowStatus.Finished;
+            Status = WorkflowStatusType.Finished;
             Log("Workflow completed successfully");
         }
 
         public virtual void Failed(IWorkflowStep step, Exception ex)
         {
-            Status = WorkflowStatus.Failed;
+            Status = WorkflowStatusType.Failed;
             Log($"Step: {step.GetType().Name} has failed with an error: {ex.Message}");
         }
 

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Serialization;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 using System;
 using TrustchainCore.Interfaces;
 
@@ -9,20 +10,21 @@ namespace TrustchainCore.Extensions
     /// </summary>
     public class DIContractResolver : CamelCasePropertyNamesContractResolver
     {
-        IDIMeta diMeta;
-        IServiceProvider sp;
-        public DIContractResolver(IDIMeta diMeta, IServiceProvider sp)
+        IDIMeta _diMeta;
+        IServiceProvider _serviceProvider;
+
+        public DIContractResolver(IDIMeta diMeta, IServiceProvider serviceProvider)
         {
-            this.diMeta = diMeta;
-            this.sp = sp;
+            _diMeta = diMeta;
+            _serviceProvider = serviceProvider;
         }
         protected override JsonObjectContract CreateObjectContract(Type objectType)
         {
 
-            if (diMeta.IsRegistred(objectType))
+            if (_diMeta.IsRegistred(objectType))
             {
                 JsonObjectContract contract = DIResolveContract(objectType);
-                contract.DefaultCreator = () => sp.GetService(objectType);
+                contract.DefaultCreator = () => _serviceProvider.GetRequiredService(objectType);
 
                 return contract;
             }
@@ -31,7 +33,7 @@ namespace TrustchainCore.Extensions
         }
         private JsonObjectContract DIResolveContract(Type objectType)
         {
-            var fType = diMeta.RegistredTypeFor(objectType);
+            var fType = _diMeta.RegistredTypeFor(objectType);
             if (fType != null) return base.CreateObjectContract(fType);
             else return CreateObjectContract(objectType);
         }

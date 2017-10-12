@@ -14,31 +14,32 @@ namespace TrustchainCore.Services
     public class WorkflowService : IWorkflowService
     {
         private ITrustDBService _trustDBService;
-        private IServiceProvider _serviceProvider;
+        public IServiceProvider ServiceProvider { get; set; }
 
         public WorkflowService(ITrustDBService trustDBService, IServiceProvider serviceProvider)
         {
             _trustDBService = trustDBService;
-            _serviceProvider = serviceProvider;
+            ServiceProvider = serviceProvider;
         }
 
         public T Create<T>(WorkflowContainer container = null) where T : IWorkflowContext
         {
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                ContractResolver = ServiceProvider.GetService<IContractResolver>()
+            };
+
             T instance = default(T);
             if(container == null || String.IsNullOrWhiteSpace(container.Data))
             {
                 instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
-                instance.State = WorkflowStatus.New.ToString();
+                //instance = JsonConvert.DeserializeObject<T>("{}", settings);
+                instance.State = WorkflowStatusType.New.ToString();
                 instance.Initialize(); // Initialize new workflow
                 
             }
             else
             {
-                JsonSerializerSettings settings = new JsonSerializerSettings
-                {
-                    ContractResolver = _serviceProvider.GetService<IContractResolver>()
-                };
-
                 instance = JsonConvert.DeserializeObject<T>(container.Data, settings);
             }
 

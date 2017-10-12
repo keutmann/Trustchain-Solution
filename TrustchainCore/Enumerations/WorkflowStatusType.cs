@@ -1,6 +1,6 @@
 ﻿namespace TrustchainCore.Enumerations
 {
-    public enum WorkflowStatus : int
+    public enum WorkflowStatusType : int
     {
         New,
         Running,

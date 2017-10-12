@@ -1,6 +1,8 @@
-﻿namespace TruststampCore.Interfaces
+﻿using TrustchainCore.Interfaces;
+
+namespace TruststampCore.Interfaces
 {
-    public interface IMerkleStep
+    public interface IMerkleStep : IWorkflowStep
     {
         byte[] RootHash { get; set; }
     }

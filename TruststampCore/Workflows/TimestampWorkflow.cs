@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using TrustchainCore.Workflows;
 using TrustchainCore.Services;
+using TruststampCore.Interfaces;
 
 namespace TruststampCore.Workflows
 {
@@ -9,14 +10,15 @@ namespace TruststampCore.Workflows
     {
         private IServiceProvider _serviceProvider;
 
-        public TimestampWorkflow(IWorkflowService workflowService, IServiceProvider serviceProvider) : base(workflowService)
+        public TimestampWorkflow(IWorkflowService workflowService) : base(workflowService)
         {
-            _serviceProvider = serviceProvider;
+            _serviceProvider = workflowService.ServiceProvider;
         }
 
         public override void Initialize()
         {
-            Steps.Add(_serviceProvider.GetRequiredService<MerkleStep>());
+            base.Initialize();
+            Steps.Add(_serviceProvider.GetRequiredService<IMerkleStep>());
         }
     }
 }

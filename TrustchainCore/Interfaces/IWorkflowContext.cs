@@ -10,7 +10,7 @@ namespace TrustchainCore.Interfaces
         int ID { get; set; }
         List<IWorkflowLog> Logs { get; set; }
         string State { get; set; }
-        WorkflowStatus Status { get; set; }
+        WorkflowStatusType Status { get; set; }
         IList<IWorkflowStep> Steps { get; set; }
         string Tag { get; set; }
 
