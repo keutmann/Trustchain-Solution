@@ -20,7 +20,6 @@ namespace TrustchainCore.Extensions
         }
         protected override JsonObjectContract CreateObjectContract(Type objectType)
         {
-
             if (_diMeta.IsRegistred(objectType))
             {
                 JsonObjectContract contract = DIResolveContract(objectType);

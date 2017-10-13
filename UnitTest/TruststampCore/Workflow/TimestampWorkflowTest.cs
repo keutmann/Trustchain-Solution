@@ -1,7 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using System;
+using TrustchainCore.Extensions;
 using TrustchainCore.Services;
+using TruststampCore.Interfaces;
 using TruststampCore.Workflows;
 
 namespace UnitTest.TruststampCore.Workflow
@@ -10,10 +15,37 @@ namespace UnitTest.TruststampCore.Workflow
     public class TimestampWorkflowTest : StartupTest
     {
         [TestMethod]
+        public void Serialize()
+        {
+            
+
+            var resolver = ServiceProvider.GetService<IContractResolver>();
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = resolver,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+            settings.Converters.Add(new DICustomConverter<TimestampWorkflow>(ServiceProvider));
+
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = new TimestampWorkflow(workflowService);
+            workflow.Initialize();
+            workflow.CurrentStepIndex = 2;
+            ((IMerkleStep)workflow.Steps[0]).RootHash = new byte[] { 1 };
+
+            var data = JsonConvert.SerializeObject(workflow, settings);
+            Console.WriteLine(data);
+            var wf2 = JsonConvert.DeserializeObject<TimestampWorkflow>(data, settings);
+            Assert.AreEqual(workflow.CurrentStepIndex, wf2.CurrentStepIndex);
+            Assert.AreEqual(((IMerkleStep)workflow.Steps[0]).RootHash[0], ((IMerkleStep)wf2.Steps[0]).RootHash[0]);
+        }
+
+
+        [TestMethod]
         public void Create()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<TimestampWorkflow>(null);
+            var workflow = workflowService.Create<TimestampWorkflow>();
             Assert.IsNotNull(workflow);
             workflow.CurrentStepIndex = 1;
 

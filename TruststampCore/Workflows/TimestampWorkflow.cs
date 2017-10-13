@@ -19,6 +19,11 @@ namespace TruststampCore.Workflows
         {
             base.Initialize();
             Steps.Add(_serviceProvider.GetRequiredService<IMerkleStep>());
+
+            foreach (var step in Steps)
+            {
+                step.Context = this;
+            }
         }
     }
 }

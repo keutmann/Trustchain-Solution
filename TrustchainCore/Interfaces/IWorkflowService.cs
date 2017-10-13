@@ -10,7 +10,7 @@ namespace TrustchainCore.Services
         //ITrustDBService DBService { get; set; }
         IServiceProvider ServiceProvider { get; set; }
 
-        T Create<T>(WorkflowContainer container = null) where T : IWorkflowContext;
+        T Create<T>(WorkflowContainer container = null) where T : class, IWorkflowContext;
         void Execute(IList<IWorkflowContext> workflows);
         int Save(IWorkflowContext workflow);
         WorkflowContainer CreateWorkflowContainer(IWorkflowContext context);

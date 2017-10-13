@@ -5,7 +5,7 @@ using TrustchainCore.Enumerations;
 
 namespace TrustchainCore.Interfaces
 {
-    public interface IWorkflowContext
+    public interface IWorkflowContext 
     {
         int ID { get; set; }
         List<IWorkflowLog> Logs { get; set; }

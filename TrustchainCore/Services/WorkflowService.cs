@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TrustchainCore.Enumerations;
 using Newtonsoft.Json.Serialization;
+using TrustchainCore.Extensions;
 
 namespace TrustchainCore.Services
 {
@@ -22,12 +23,15 @@ namespace TrustchainCore.Services
             ServiceProvider = serviceProvider;
         }
 
-        public T Create<T>(WorkflowContainer container = null) where T : IWorkflowContext
+        public T Create<T>(WorkflowContainer container = null) where T : class, IWorkflowContext
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings
+            var settings = new JsonSerializerSettings
             {
-                ContractResolver = ServiceProvider.GetService<IContractResolver>()
+                ContractResolver = ServiceProvider.GetService<IContractResolver>(),
+                TypeNameHandling = TypeNameHandling.Auto
             };
+            settings.Converters.Add(new DICustomConverter<T>(ServiceProvider));
+
 
             T instance = default(T);
             if(container == null || String.IsNullOrWhiteSpace(container.Data))
@@ -41,6 +45,10 @@ namespace TrustchainCore.Services
             else
             {
                 instance = JsonConvert.DeserializeObject<T>(container.Data, settings);
+                foreach (var step in instance.Steps)
+                {
+                    step.Context = instance;
+                } 
             }
 
             if (container != null)
@@ -88,12 +96,18 @@ namespace TrustchainCore.Services
 
         public WorkflowContainer CreateWorkflowContainer(IWorkflowContext context)
         {
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                ContractResolver = ServiceProvider.GetService<IContractResolver>(),
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+
             var entity = new WorkflowContainer
             {
                 Type = context.GetType().FullName,
                 State = context.State,
                 Tag = context.Tag,
-                Data = JsonConvert.SerializeObject(context)
+                Data = JsonConvert.SerializeObject(context, settings)
             };
             return entity;
         }
