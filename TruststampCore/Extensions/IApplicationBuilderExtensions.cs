@@ -6,14 +6,12 @@ namespace TruststampCore.Extensions
 {
     public static class IApplicationBuilderExtensions
     {
-        public static void Timestamp(this IApplicationBuilder app)
+        public static void Truststamp(this IApplicationBuilder app)
         {
-            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            using (var scope = scopeFactory.CreateScope())
-            {
-                var timestampWorkflowService = scope.ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
-                timestampWorkflowService.CreateNextWorkflow();
-            }
+            //var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+
+            var timestampWorkflowService = app.ApplicationServices.GetRequiredService<ITimestampWorkflowService>();
+            timestampWorkflowService.RunWorkflows();
         }
     }
 }

@@ -79,6 +79,7 @@ namespace TrustchainCore.Services
                 var entity = _trustDBService.Workflows.FirstOrDefault(w => w.ID == workflow.ID);
                 if (entity != null)
                 {
+                    entity.Type = workflow.GetType().FullName;
                     entity.State = workflow.State;
                     entity.Tag = workflow.Tag;
                     entity.Data = JsonConvert.SerializeObject(workflow);
@@ -94,7 +95,7 @@ namespace TrustchainCore.Services
             return container.ID;
         }
 
-        public WorkflowContainer CreateWorkflowContainer(IWorkflowContext context)
+        public WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow)
         {
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
@@ -104,10 +105,10 @@ namespace TrustchainCore.Services
 
             var entity = new WorkflowContainer
             {
-                Type = context.GetType().FullName,
-                State = context.State,
-                Tag = context.Tag,
-                Data = JsonConvert.SerializeObject(context, settings)
+                Type = workflow.GetType().FullName,
+                State = workflow.State,
+                Tag = workflow.Tag,
+                Data = JsonConvert.SerializeObject(workflow, settings)
             };
             return entity;
         }

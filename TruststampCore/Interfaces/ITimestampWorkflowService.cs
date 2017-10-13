@@ -1,4 +1,6 @@
-﻿using TrustchainCore.Services;
+﻿using System.Collections.Generic;
+using TrustchainCore.Services;
+using TruststampCore.Workflows;
 
 namespace TruststampCore.Interfaces
 {
@@ -6,5 +8,7 @@ namespace TruststampCore.Interfaces
     {
         int CurrentWorkflowID { get; }
         void CreateNextWorkflow();
+        IList<TimestampWorkflow> GetRunningWorkflows();
+        void RunWorkflows();
     }
 }

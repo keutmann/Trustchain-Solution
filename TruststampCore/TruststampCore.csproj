@@ -10,7 +10,6 @@
     <Compile Remove="Factories\BlockchainFactory.cs" />
     <Compile Remove="Repository\BlockrRepository.cs" />
     <Compile Remove="Services\Batch.cs" />
-    <Compile Remove="Services\Bitcoin.cs" />
     <Compile Remove="Services\Crypto.cs" />
     <Compile Remove="Services\Info.cs" />
     <Compile Remove="Services\Proof.cs" />

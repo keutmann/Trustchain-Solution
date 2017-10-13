@@ -72,7 +72,7 @@ namespace Trustchain
             }
 
             //app.LoadGraph(); // Load the Trust Graph from Database
-            app.Timestamp();
+            app.Truststamp();
 
             app.UseStaticFiles();
 

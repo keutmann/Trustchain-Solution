@@ -70,8 +70,8 @@ namespace TruststampCore.Service
 
             if (fee.Satoshi * 2 > sumOfCoins)
             {
-                var unspent = Blockchain.GetUnspentAsync(SourceKey.PubKey.GetAddress(Network).ToWif());
-                unspent.Wait();
+                var unspent = Blockchain.GetUnspentAsync(SourceKey.PubKey.GetAddress(Network).ToString()); //.ToWif());
+                //unspent.Wait();
                 coins = unspent.Result;
                 if (coins.Count() == 0)
                     throw new ApplicationException("No coins to spend");
