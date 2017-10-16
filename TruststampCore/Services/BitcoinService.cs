@@ -5,10 +5,11 @@ using NBitcoin;
 using NBitcoin.Crypto;
 using TruststampCore.Interfaces;
 using TruststampCore.Extensions;
+using Newtonsoft.Json.Linq;
 
-namespace TruststampCore.Service
+namespace TruststampCore.Services
 {
-    public class Bitcoin
+    public class BitcoinService : IBlockchainService
     {
         public string WIF { get; }
         public Key SourceKey { get; }
@@ -17,24 +18,30 @@ namespace TruststampCore.Service
         public IBlockchainRepository Blockchain { get; }
         public Network Network { get; }
 
-        public Bitcoin(string wif, IBlockchainRepository blockchain, Network network)
+        public BitcoinService(IBlockchainRepository blockchain)
         {
-            Network = network;
-            WIF = wif;
+            //WIF = wif;
             var secret = new BitcoinSecret(WIF);
             SourceKey = secret.PrivateKey;
             SourceAddress = SourceKey.PubKey.GetAddress(Network);
             Blockchain = blockchain;
-            Network = network;
+            Network = Network.TestNet;
         }
 
-        public Tuple<Transaction, Transaction> Send(byte[] batchHash, Transaction previousTx)
+        public JObject GetAdress(string address)
         {
+            return Blockchain.GetAddressInfo(address);
+        }
+
+        public IList<Transaction> Send(byte[] batchHash)
+        {
+            var txs = new List<Transaction>();
+
             Key batchKey = GetKey(batchHash);
             
             var fee = Blockchain.GetEstimatedFee().FeePerK;
 
-            var coins = GetCoins(previousTx, fee);
+            var coins = GetCoins(null, fee);
 
             var sourceTx = new TransactionBuilder()
                 .AddCoins(coins)
@@ -45,6 +52,7 @@ namespace TruststampCore.Service
                 .BuildTransaction(true);
 
             Blockchain.BroadcastAsync(sourceTx);
+            txs.Add(sourceTx);
 
             var txNota = new TransactionBuilder()
                 .AddCoins(sourceTx.Outputs.AsCoins())
@@ -54,8 +62,9 @@ namespace TruststampCore.Service
                 .BuildTransaction(true);
 
             Blockchain.BroadcastAsync(txNota);
+            txs.Add(txNota);
 
-            return Tuple.Create(sourceTx, txNota);
+            return txs;
         }
 
         public IEnumerable<Coin> GetCoins(Transaction previousTx, Money fee)
@@ -91,6 +100,7 @@ namespace TruststampCore.Service
 
             return key;
         }
+
 
     }
 }
