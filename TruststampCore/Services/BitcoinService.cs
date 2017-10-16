@@ -6,6 +6,8 @@ using NBitcoin.Crypto;
 using TruststampCore.Interfaces;
 using TruststampCore.Extensions;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Configuration;
+using TrustchainCore.Extensions;
 
 namespace TruststampCore.Services
 {
@@ -18,14 +20,18 @@ namespace TruststampCore.Services
         public IBlockchainRepository Blockchain { get; }
         public Network Network { get; }
 
-        public BitcoinService(IBlockchainRepository blockchain)
+        public BitcoinService(IBlockchainRepository blockchain, IConfiguration configuration)
         {
-            //WIF = wif;
+            WIF = configuration["wif"];
+            //if(String.IsNullOrEmpty(WIF))
+            //    WIF = 
             var secret = new BitcoinSecret(WIF);
             SourceKey = secret.PrivateKey;
             SourceAddress = SourceKey.PubKey.GetAddress(Network);
             Blockchain = blockchain;
-            Network = Network.TestNet;
+            var blockchainName = configuration.GetValue("blockchain", "btctest");
+            
+            Network = ("btc".EqualsIgnoreCase(blockchainName)) ? Network.Main: Network.TestNet;
         }
 
         public JObject GetAdress(string address)

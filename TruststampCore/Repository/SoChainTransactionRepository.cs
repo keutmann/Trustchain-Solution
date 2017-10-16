@@ -1,4 +1,5 @@
-﻿using NBitcoin;
+﻿using Microsoft.Extensions.Configuration;
+using NBitcoin;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -39,11 +40,11 @@ namespace TruststampCore.Repository
     public class SoChainTransactionRepository : IBlockchainRepository
     {
         public string ApiVersion = "v2";
-        public string Blockchain = "btc";
+        public string BlockchainName { get; set; }
 
-        public SoChainTransactionRepository()
+        public SoChainTransactionRepository(IConfiguration configuration)
         {
-            Blockchain = "BTCTEST";
+            BlockchainName = (!String.IsNullOrWhiteSpace(configuration["blockchain"])) ? configuration["blockchain"] : "btctest";
         }
 
 
@@ -55,7 +56,7 @@ namespace TruststampCore.Repository
         {
             while (true)
             {
-                using (var response = await Client.GetAsync($"{SoChainAddress}/get_tx/{Blockchain}/{txId}").ConfigureAwait(false))
+                using (var response = await Client.GetAsync($"{SoChainAddress}/get_tx/{BlockchainName}/{txId}").ConfigureAwait(false))
                 {
                     if (response.StatusCode == HttpStatusCode.NotFound)
                         return null;
@@ -77,7 +78,7 @@ namespace TruststampCore.Repository
         {
             while (true)
             {
-                using (var response = await Client.GetAsync($"{SoChainAddress}/get_tx_unspent/{Blockchain}/{address}").ConfigureAwait(false))
+                using (var response = await Client.GetAsync($"{SoChainAddress}/get_tx_unspent/{BlockchainName}/{address}").ConfigureAwait(false))
                 {
                     if (response.StatusCode == HttpStatusCode.NotFound)
                         return null;
@@ -100,7 +101,7 @@ namespace TruststampCore.Repository
 
         public JObject GetAddressInfo(string address)
         {
-            using (var response = Client.GetAsync($"{SoChainAddress}/api/v2/get_address_balance/{Blockchain}/{address}").Result)
+            using (var response = Client.GetAsync($"{SoChainAddress}/api/v2/get_address_balance/{BlockchainName}/{address}").Result)
             {
                 if (response.StatusCode == HttpStatusCode.NotFound)
                     return null;
@@ -125,7 +126,7 @@ namespace TruststampCore.Repository
             };
             var content = new StringContent(jsonTx.ToString(), Encoding.UTF8, "application/json"); 
 
-            using (var response = await Client.PostAsync($"{SoChainAddress}/api/v2/send_tx/{Blockchain}", content).ConfigureAwait(false))
+            using (var response = await Client.PostAsync($"{SoChainAddress}/api/v2/send_tx/{BlockchainName}", content).ConfigureAwait(false))
             {
                 var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var json = JObject.Parse(result);
