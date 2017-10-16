@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 
@@ -9,11 +10,15 @@ namespace TrustchainCore.Services
     {
         //ITrustDBService DBService { get; set; }
         IServiceProvider ServiceProvider { get; set; }
+        IQueryable<WorkflowContainer> Workflows { get;  }
 
+        IWorkflowContext Create(WorkflowContainer container);
         T Create<T>(WorkflowContainer container = null) where T : class, IWorkflowContext;
         void Execute(IList<IWorkflowContext> workflows);
         int Save(IWorkflowContext workflow);
         //WorkflowContainer Load();
         WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);
+        IList<IWorkflowContext> GetRunningWorkflows();
+        void RunWorkflows();
     }
 }

@@ -6,12 +6,12 @@ using TruststampCore.Interfaces;
 
 namespace TruststampCore.Services
 {
-    public class TimestampService : ITimestampService
+    public class ProofService : IProofService
     {
         private ITimestampWorkflowService _timestampWorkflowService;
         private ITrustDBService _trustDBService;
 
-        public TimestampService(ITimestampWorkflowService timestampWorkflowService, ITrustDBService trustDBService)
+        public ProofService(ITimestampWorkflowService timestampWorkflowService, ITrustDBService trustDBService)
         {
             _timestampWorkflowService = timestampWorkflowService;
             _trustDBService = trustDBService;

@@ -20,13 +20,14 @@ namespace TruststampCore.Services
                 return _currentWorkflowID;
             }
         }
-         
 
-        
+
+        private IWorkflowService _workflowService;
         private IServiceProvider _serviceProvider;
 
-        public TimestampWorkflowService(IServiceProvider serviceProvider)
+        public TimestampWorkflowService(IWorkflowService workflowService, IServiceProvider serviceProvider)
         {
+            _workflowService = workflowService;
             _serviceProvider = serviceProvider;
         }
 
@@ -37,47 +38,19 @@ namespace TruststampCore.Services
             _currentWorkflowID = workflowService.Save(wf);
         }
 
-        public IList<TimestampWorkflow> GetRunningWorkflows()
+
+        public void EnsureTimestampWorkflow()
         {
-            var list = new List<TimestampWorkflow>();
-            var trustDBService = _serviceProvider.GetRequiredService<ITrustDBService>();
-            var workflowService = _serviceProvider.GetRequiredService<IWorkflowService>();
-            var timestampWorkflowType = typeof(TimestampWorkflow).GetType().FullName;
-            var containers = from p in trustDBService.Workflows
-                             where p.ID != CurrentWorkflowID
-                             && p.Type == timestampWorkflowType
-                             && (p.State != WorkflowStatusType.Finished.ToString() || p.State != WorkflowStatusType.Failed.ToString())
-                             select p;
-            foreach (var container in containers)
+            var timestampWorkflowContainer = _workflowService.Workflows.FirstOrDefault(p => p.Type == typeof(TimestampScheduleWorkflow).FullName
+                                             && (p.State == WorkflowStatusType.New.ToString() 
+                                             || p.State == WorkflowStatusType.Running.ToString()));
+                                             
+            if(timestampWorkflowContainer == null)
             {
-                list.Add(workflowService.Create<TimestampWorkflow>(container));
+                var wf = _workflowService.Create<TimestampScheduleWorkflow>();
+                _workflowService.Save(wf);
             }
-            return list;
         }
 
-        public void RunWorkflows()
-        {
-            int id = 0;
-            var taskProcessor = new System.Timers.Timer { Interval = 1000 * 60 * 10 };
-            taskProcessor.Elapsed += (sender, e) =>
-            {
-                var localID = id++;
-                var scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
-                using (var scope = scopeFactory.CreateScope())
-                {
-                    var timestampWorkflowService = scope.ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
-                    timestampWorkflowService.CreateNextWorkflow(); // Ensure a workflow for proofs
-
-                    var workflows = timestampWorkflowService.GetRunningWorkflows();
-
-                    foreach (var workflow in workflows)
-                    {
-                        var task = workflow.Execute();
-                        task.Wait(); // Timestamp workflow need to be syncron because of blockchain TX output
-                    }
-                }
-            };
-            taskProcessor.Start();
-        }
     }
 }

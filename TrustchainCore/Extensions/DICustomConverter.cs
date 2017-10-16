@@ -17,5 +17,6 @@ namespace TrustchainCore.Extensions
         {
             return _serviceProvider.GetRequiredService(objectType) as T;
         }
+
     }
 }

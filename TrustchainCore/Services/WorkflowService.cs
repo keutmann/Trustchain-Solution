@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TrustchainCore.Enumerations;
 using Newtonsoft.Json.Serialization;
 using TrustchainCore.Extensions;
+using TrustchainCore.Workflows;
 
 namespace TrustchainCore.Services
 {
@@ -17,10 +18,40 @@ namespace TrustchainCore.Services
         private ITrustDBService _trustDBService;
         public IServiceProvider ServiceProvider { get; set; }
 
+        public IQueryable<WorkflowContainer> Workflows {
+            get
+            {
+                return _trustDBService.Workflows;
+            }
+        }
+
         public WorkflowService(ITrustDBService trustDBService, IServiceProvider serviceProvider)
         {
             _trustDBService = trustDBService;
             ServiceProvider = serviceProvider;
+        }
+
+        public IWorkflowContext Create(WorkflowContainer container) 
+        {
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = ServiceProvider.GetService<IContractResolver>(),
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+            settings.Converters.Add(new DICustomConverter<WorkflowContext>(ServiceProvider));
+
+
+            var instance = JsonConvert.DeserializeObject<WorkflowContext>(container.Data, settings);
+            foreach (var step in instance.Steps)
+            {
+                step.Context = instance;
+            }
+
+            instance.ID = container.ID;
+            instance.State = container.State;
+            instance.Tag = container.Tag;
+
+            return instance;
         }
 
         public T Create<T>(WorkflowContainer container = null) where T : class, IWorkflowContext
@@ -111,6 +142,45 @@ namespace TrustchainCore.Services
                 Data = JsonConvert.SerializeObject(workflow, settings)
             };
             return entity;
+        }
+
+        public IList<IWorkflowContext> GetRunningWorkflows()
+        {
+            var list = new List<IWorkflowContext>();
+            var containers = from p in _trustDBService.Workflows
+                             where (p.State == WorkflowStatusType.New.ToString() || p.State == WorkflowStatusType.Running.ToString())
+                             select p;
+
+            foreach (var container in containers)
+            {
+                list.Add(Create(container));
+            }
+            return list;
+        }
+
+        public void RunWorkflows()
+        {
+            int id = 0;
+            var taskProcessor = new System.Timers.Timer { Interval = 1000 }; // Run the interval 1 sec
+            taskProcessor.Elapsed += (sender, e) =>
+            {
+                var localID = id++;
+                var scopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
+                using (var scope = scopeFactory.CreateScope())
+                {
+                    //var timestampWorkflowService = scope.ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
+                    //timestampWorkflowService.CreateNextWorkflow(); // Ensure a workflow for proofs
+
+                    var workflows = GetRunningWorkflows();
+
+                    foreach (var workflow in workflows)
+                    {
+                        var task = workflow.Execute();
+                        task.Wait(); // Timestamp workflow need to be syncron because of blockchain TX output
+                    }
+                }
+            };
+            taskProcessor.Start();
         }
 
     }

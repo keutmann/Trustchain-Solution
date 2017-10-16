@@ -2,7 +2,7 @@
 
 namespace TruststampCore.Interfaces
 {
-    public interface ITimestampService
+    public interface IProofService
     {
         ProofEntity AddProof(byte[] source);
         ProofEntity GetProof(byte[] source);

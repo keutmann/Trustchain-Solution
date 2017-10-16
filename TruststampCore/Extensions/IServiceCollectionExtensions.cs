@@ -12,7 +12,7 @@ namespace TruststampCore.Extensions
         {
             services.AddSingleton<ITimestampWorkflowService, TimestampWorkflowService>();
 
-            services.AddTransient<ITimestampService, TimestampService>();
+            services.AddTransient<IProofService, ProofService>();
 
             services.AddTransient<IMerkleStep, MerkleStep>();
             services.AddTransient<TimestampWorkflow>();

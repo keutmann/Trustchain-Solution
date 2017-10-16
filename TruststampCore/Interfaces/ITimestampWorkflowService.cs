@@ -8,7 +8,6 @@ namespace TruststampCore.Interfaces
     {
         int CurrentWorkflowID { get; }
         void CreateNextWorkflow();
-        IList<TimestampWorkflow> GetRunningWorkflows();
-        void RunWorkflows();
+        void EnsureTimestampWorkflow();
     }
 }

@@ -8,9 +8,9 @@ namespace Trustchain.Controllers
     public class StampController : Controller
     {
 
-        private ITimestampService _timestampService;
+        private IProofService _timestampService;
 
-        public StampController(ITimestampService timestampService)
+        public StampController(IProofService timestampService)
         {
             _timestampService = timestampService;
         }
