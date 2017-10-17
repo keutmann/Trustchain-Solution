@@ -16,7 +16,7 @@ namespace UnitTest.TrustchainCore.Workflow
         public void Create()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>(null);
+            var workflow = workflowService.Create<WorkflowContext>();
             Assert.IsNotNull(workflow);
 
             var container = workflowService.CreateWorkflowContainer(workflow);
@@ -32,14 +32,14 @@ namespace UnitTest.TrustchainCore.Workflow
         public void CreateGeneric()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>(null);
+            var workflow = workflowService.Create<WorkflowContext>();
             Assert.IsNotNull(workflow);
             workflow.CurrentStepIndex = 1;
 
             var container = workflowService.CreateWorkflowContainer(workflow);
             Assert.IsNotNull(container);
 
-            var workflow2 = workflowService.Create<WorkflowContext>(container);
+            var workflow2 = workflowService.Create(container);
             Assert.IsNotNull(workflow2);
             Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
         }

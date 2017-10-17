@@ -57,7 +57,7 @@ namespace TrustchainCore.Services
             return instance;
         }
 
-        public T Create<T>(WorkflowContainer container = null) where T : class, IWorkflowContext
+        public T Create<T>() where T : class, IWorkflowContext
         {
             var settings = new JsonSerializerSettings
             {
@@ -66,32 +66,9 @@ namespace TrustchainCore.Services
             };
             settings.Converters.Add(new DICustomConverter<IWorkflowContext>(ServiceProvider));
 
-
-            IWorkflowContext instance = default(T);
-            if(container == null || String.IsNullOrWhiteSpace(container.Data))
-            {
-                instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
-                //instance = JsonConvert.DeserializeObject<T>("{}", settings);
-                instance.State = WorkflowStatusType.New.ToString();
-                instance.Initialize(); // Initialize new workflow
+            T instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
+            instance.Initialize(); // Initialize new workflow
                 
-            }
-            else
-            {
-                instance = (IWorkflowContext)JsonConvert.DeserializeObject(container.Data, settings);
-                foreach (var step in instance.Steps)
-                {
-                    step.Context = instance;
-                } 
-            }
-
-            if (container != null)
-            {
-                instance.ID = container.ID;
-                instance.State = container.State;
-                instance.Tag = container.Tag;
-            }
-
             return instance;
         }
 

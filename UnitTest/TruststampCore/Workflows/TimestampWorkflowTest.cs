@@ -56,7 +56,7 @@ namespace UnitTest.TruststampCore.Workflows
             Assert.IsNotNull(container);
             Console.WriteLine(container.Data);
 
-            var workflow2 = workflowService.Create<TimestampWorkflow>(container);
+            var workflow2 = workflowService.Create(container);
             Assert.IsNotNull(workflow2);
             Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
             Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
@@ -77,7 +77,7 @@ namespace UnitTest.TruststampCore.Workflows
             Assert.IsNotNull(container);
             Console.WriteLine(container.Data);
 
-            var workflow2 = workflowService.Create<TimestampWorkflow>(container);
+            var workflow2 = workflowService.Create(container);
             Assert.IsNotNull(workflow2);
             Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
             Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);

@@ -13,7 +13,7 @@ namespace TrustchainCore.Services
         IQueryable<WorkflowContainer> Workflows { get;  }
 
         IWorkflowContext Create(WorkflowContainer container);
-        T Create<T>(WorkflowContainer container = null) where T : class, IWorkflowContext;
+        T Create<T>() where T : class, IWorkflowContext;
         void Execute(IList<IWorkflowContext> workflows);
         int Save(IWorkflowContext workflow);
         //WorkflowContainer Load();
