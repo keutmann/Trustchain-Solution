@@ -1,6 +1,6 @@
 ﻿using TrustchainCore.Interfaces;
 
-namespace TruststampCore.Services
+namespace TruststampCore.Interfaces
 {
     public interface IRunTimestampStep : IWorkflowStep
     {

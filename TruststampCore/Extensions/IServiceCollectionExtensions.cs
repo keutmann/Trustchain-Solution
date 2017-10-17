@@ -16,6 +16,8 @@ namespace TruststampCore.Extensions
             services.AddTransient<IProofService, ProofService>();
 
             services.AddTransient<IMerkleStep, MerkleStep>();
+            services.AddTransient<IRunTimestampStep, RunTimestampStep>();
+            
             services.AddTransient<TimestampWorkflow>();
             services.AddTransient<IBlockchainRepository, SoChainTransactionRepository>();
             services.AddTransient<IBlockchainService, BitcoinService>();

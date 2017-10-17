@@ -2,6 +2,7 @@
 using System;
 using TrustchainCore.Services;
 using TrustchainCore.Workflows;
+using TruststampCore.Interfaces;
 using TruststampCore.Services;
 
 namespace TruststampCore.Workflows

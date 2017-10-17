@@ -19,6 +19,8 @@ namespace UnitTest
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
+            services.AddTransient<IConfiguration>(p => new ConfigurationBuilder().Build());
+
             ServiceScope = services.BuildServiceProvider(false).CreateScope();
             ServiceProvider = ServiceScope.ServiceProvider;
         }
