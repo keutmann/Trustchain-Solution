@@ -40,7 +40,7 @@ namespace TrustchainCore.Workflows
             NextExecution = DateTime.MinValue;
             Steps = new List<IWorkflowStep>();
             Logs = new List<IWorkflowLog>();
-
+            State = WorkflowStatusType.New.ToString();
         }
 
         public virtual void Initialize()
@@ -53,11 +53,13 @@ namespace TrustchainCore.Workflows
 
         public virtual async Task Execute()
         {
-            if (!DoExecution())
-                return; 
-
             await Task.Run(() =>
             {
+                if (!DoExecution())
+                    return;
+
+                UpdateState();
+
                 while (TryGetNextStep(out IWorkflowStep step))
                 {
                     try
@@ -82,7 +84,7 @@ namespace TrustchainCore.Workflows
                 }
             });
 
-            if(CurrentStepIndex > Steps.Count)
+            if(CurrentStepIndex >= Steps.Count)
                 Success();
         }
 
@@ -102,6 +104,12 @@ namespace TrustchainCore.Workflows
             if (NextExecution > DateTime.Now)
                 return false;
             return true;
+        }
+
+        public virtual void UpdateState()
+        {
+            if (State == WorkflowStatusType.New.ToString())
+                State = WorkflowStatusType.Running.ToString();
         }
 
         public virtual void Save()

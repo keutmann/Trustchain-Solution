@@ -5,6 +5,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
+using TrustchainCore.Enumerations;
 using TrustchainCore.Extensions;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Services;
@@ -43,9 +44,41 @@ namespace UnitTest.TruststampCore.Workflow
 
 
         [TestMethod]
-        public void Run()
+        public void ExecuteWithNoProof()
         {
+            var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = workflowService.Create<TimestampScheduleWorkflow>();
+            workflow.Execute().Wait();
 
+            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
+            Assert.IsTrue(timestampSynchronizationService.CurrentWorkflowID == 0);
+            var saveCurrentID = timestampSynchronizationService.CurrentWorkflowID;
+
+            workflow.Execute().Wait();
+            Assert.AreEqual(saveCurrentID, timestampSynchronizationService.CurrentWorkflowID);
+            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
+        }
+
+        [TestMethod]
+        public void ExecuteWithProof()
+        {
+            var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = workflowService.Create<TimestampScheduleWorkflow>();
+            workflow.Execute().Wait();
+
+            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
+            Assert.IsTrue(timestampSynchronizationService.CurrentWorkflowID == 0);
+            var saveCurrentID = timestampSynchronizationService.CurrentWorkflowID;
+
+            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+            proofService.AddProof(Guid.NewGuid().ToByteArray());
+            workflow.NextExecution = DateTime.MinValue;
+
+            workflow.Execute().Wait();
+            Assert.AreNotEqual(saveCurrentID, timestampSynchronizationService.CurrentWorkflowID);
+            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
         }
 
     }

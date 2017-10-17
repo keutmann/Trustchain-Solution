@@ -60,8 +60,6 @@ namespace UnitTest.TruststampCore.Workflow
             Assert.IsNotNull(workflow2);
             Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
             Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
-
-
         }
 
         [TestMethod]
@@ -84,9 +82,6 @@ namespace UnitTest.TruststampCore.Workflow
             Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
             Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
             Assert.AreEqual(((IMerkleStep)workflow.Steps[0]).RootHash[0], ((IMerkleStep)workflow2.Steps[0]).RootHash[0]);
-
-
-
         }
     }
 }
