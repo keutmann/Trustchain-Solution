@@ -11,7 +11,7 @@ using TrustchainCore.Services;
 using TruststampCore.Interfaces;
 using TruststampCore.Workflows;
 
-namespace UnitTest.TruststampCore.Workflow
+namespace UnitTest.TruststampCore.Workflows
 {
     [TestClass]
     public class TimestampWorkflowTest : StartupTest

@@ -10,6 +10,7 @@ using TrustchainCore.Enumerations;
 using Newtonsoft.Json.Serialization;
 using TrustchainCore.Extensions;
 using TrustchainCore.Workflows;
+using Microsoft.Extensions.Configuration;
 
 namespace TrustchainCore.Services
 {
@@ -38,12 +39,12 @@ namespace TrustchainCore.Services
             var settings = new JsonSerializerSettings
             {
                 ContractResolver = ServiceProvider.GetService<IContractResolver>(),
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = TypeNameHandling.Objects | TypeNameHandling.Arrays
             };
-            settings.Converters.Add(new DICustomConverter<WorkflowContext>(ServiceProvider));
+            settings.Converters.Add(new DICustomConverter<IWorkflowContext>(ServiceProvider));
 
 
-            var instance = JsonConvert.DeserializeObject<WorkflowContext>(container.Data, settings);
+            var instance = (WorkflowContext)JsonConvert.DeserializeObject(container.Data, settings);
             foreach (var step in instance.Steps)
             {
                 step.Context = instance;
@@ -63,10 +64,10 @@ namespace TrustchainCore.Services
                 ContractResolver = ServiceProvider.GetService<IContractResolver>(),
                 TypeNameHandling = TypeNameHandling.Auto
             };
-            settings.Converters.Add(new DICustomConverter<T>(ServiceProvider));
+            settings.Converters.Add(new DICustomConverter<IWorkflowContext>(ServiceProvider));
 
 
-            T instance = default(T);
+            IWorkflowContext instance = default(T);
             if(container == null || String.IsNullOrWhiteSpace(container.Data))
             {
                 instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
@@ -77,7 +78,7 @@ namespace TrustchainCore.Services
             }
             else
             {
-                instance = JsonConvert.DeserializeObject<T>(container.Data, settings);
+                instance = (IWorkflowContext)JsonConvert.DeserializeObject(container.Data, settings);
                 foreach (var step in instance.Steps)
                 {
                     step.Context = instance;
@@ -103,9 +104,8 @@ namespace TrustchainCore.Services
                     continue; // Ignore the workflow, because its allready running!
 
                 _executionSynchronizationService.Workflows.TryAdd(workflow.ID, workflow);
-                var task = workflow.Execute();
-                task.ContinueWith(t => _executionSynchronizationService.Workflows.TryRemove(workflow.ID, out IWorkflowContext value));
-
+                var task = workflow.Execute().ContinueWith(t => _executionSynchronizationService.Workflows.TryRemove(workflow.ID, out IWorkflowContext value));
+                
                 executing.Add(task);
             }
 
@@ -140,7 +140,7 @@ namespace TrustchainCore.Services
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 ContractResolver = ServiceProvider.GetService<IContractResolver>(),
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = TypeNameHandling.Objects | TypeNameHandling.Arrays
             };
 
             var entity = new WorkflowContainer
@@ -169,8 +169,9 @@ namespace TrustchainCore.Services
 
         public void RunWorkflows()
         {
+            var configuration = ServiceProvider.GetRequiredService<IConfiguration>();
             int id = 0;
-            var taskProcessor = new System.Timers.Timer { Interval = 1000 }; // Run the interval 1 sec
+            var taskProcessor = new System.Timers.Timer { Interval = configuration.GetValue<int>("WorkflowInterval", 1000) }; // Run the interval 1 sec
             taskProcessor.Elapsed += (sender, e) =>
             {
                 var localID = id++;

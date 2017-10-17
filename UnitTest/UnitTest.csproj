@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TrustchainCore\Workflow\" />
+    <Folder Include="TrustchainCore\Workflows\" />
   </ItemGroup>
 
 </Project>

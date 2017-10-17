@@ -10,9 +10,11 @@ namespace TrustchainCore.Interfaces
         int ID { get; set; }
         List<IWorkflowLog> Logs { get; set; }
         string State { get; set; }
-        WorkflowStatusType Status { get; set; }
+        //WorkflowStatusType Status { get; set; }
         IList<IWorkflowStep> Steps { get; set; }
+        int CurrentStepIndex { get; set; }
         string Tag { get; set; }
+        DateTime NextExecution { get; set; }
 
         bool DoExecution();
         void RunStepAgain(int seconds);

@@ -13,7 +13,7 @@ using TruststampCore.Interfaces;
 using TruststampCore.Services;
 using TruststampCore.Workflows;
 
-namespace UnitTest.TruststampCore.Workflow
+namespace UnitTest.TruststampCore.Workflows
 {
     [TestClass]
     public class TimestampScheduleWorkflowTest : StartupTest

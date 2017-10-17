@@ -21,13 +21,14 @@ namespace TrustchainCore.Workflows
 
 
         public DateTime NextExecution { get; set; }
+
         public int CurrentStepIndex { get; set; }
 
         [JsonProperty(PropertyName = "steps", NullValueHandling = NullValueHandling.Ignore)]
         public IList<IWorkflowStep> Steps { get; set; }
 
-        [JsonIgnore]
-        public WorkflowStatusType Status { get; set; }
+        //[JsonIgnore]
+        //public WorkflowStatusType Status { get; set; }
 
         [JsonProperty(PropertyName = "logs", NullValueHandling = NullValueHandling.Ignore)]
         public List<IWorkflowLog> Logs { get; set; }
@@ -147,13 +148,13 @@ namespace TrustchainCore.Workflows
 
         public virtual void Success()
         {
-            Status = WorkflowStatusType.Finished;
+            State = WorkflowStatusType.Finished.ToString();
             Log("Workflow completed successfully");
         }
 
         public virtual void Failed(IWorkflowStep step, Exception ex)
         {
-            Status = WorkflowStatusType.Failed;
+            State = WorkflowStatusType.Failed.ToString();
             Log($"Step: {step.GetType().Name} has failed with an error: {ex.Message}");
         }
 

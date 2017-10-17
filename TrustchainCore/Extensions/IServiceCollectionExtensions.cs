@@ -6,6 +6,7 @@ using TrustchainCore.Factories;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Services;
 using TrustchainCore.Strategy;
+using TrustchainCore.Workflows;
 
 namespace TrustchainCore.Extensions
 {
@@ -29,6 +30,8 @@ namespace TrustchainCore.Extensions
             });
             services.AddTransient<IContractResolver, DIContractResolver>();
             services.AddTransient<IConfigureOptions<MvcJsonOptions>, JsonOptionsSetup>();
+
+            services.AddTransient<IWorkflowContext, WorkflowContext>();
 
 
             // ---------------------------------------------------------------------------------------------------------------
