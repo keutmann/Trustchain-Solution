@@ -14,7 +14,7 @@ namespace TrustchainCore.Services
 
         IWorkflowContext Create(WorkflowContainer container);
         T Create<T>() where T : class, IWorkflowContext;
-        void Execute(IList<IWorkflowContext> workflows);
+        void Execute(IList<IWorkflowContext> workflows, int localID = 0);
         int Save(IWorkflowContext workflow);
         //WorkflowContainer Load();
         WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);

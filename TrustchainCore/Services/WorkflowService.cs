@@ -11,6 +11,7 @@ using Newtonsoft.Json.Serialization;
 using TrustchainCore.Extensions;
 using TrustchainCore.Workflows;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace TrustchainCore.Services
 {
@@ -19,6 +20,7 @@ namespace TrustchainCore.Services
         private ITrustDBService _trustDBService;
         private IExecutionSynchronizationService _executionSynchronizationService;
         public IServiceProvider ServiceProvider { get; set; }
+        private ILogger _logger;
 
         public IQueryable<WorkflowContainer> Workflows {
             get
@@ -27,11 +29,12 @@ namespace TrustchainCore.Services
             }
         }
 
-        public WorkflowService(ITrustDBService trustDBService, IServiceProvider serviceProvider, IExecutionSynchronizationService executionSynchronizationService)
+        public WorkflowService(ITrustDBService trustDBService, IServiceProvider serviceProvider, IExecutionSynchronizationService executionSynchronizationService, ILogger<WorkflowService> logger)
         {
             _trustDBService = trustDBService;
             _executionSynchronizationService = executionSynchronizationService;
             ServiceProvider = serviceProvider;
+            _logger = logger;
         }
 
         public IWorkflowContext Create(WorkflowContainer container) 
@@ -59,29 +62,30 @@ namespace TrustchainCore.Services
 
         public T Create<T>() where T : class, IWorkflowContext
         {
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = ServiceProvider.GetService<IContractResolver>(),
-                TypeNameHandling = TypeNameHandling.Auto
-            };
-            settings.Converters.Add(new DICustomConverter<IWorkflowContext>(ServiceProvider));
-
             T instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
             instance.Initialize(); // Initialize new workflow
                 
             return instance;
         }
 
-        public void Execute(IList<IWorkflowContext> workflows)
+        public void Execute(IList<IWorkflowContext> workflows, int localID = 0)
         {
             var executing = new List<Task>();
             foreach (var workflow in workflows)
             {
+                _logger.LogInformation(localID, $"ExecutionSynchronizationService contains {_executionSynchronizationService.Workflows.Count} workflows");
                 if (_executionSynchronizationService.Workflows.ContainsKey(workflow.ID))
+                {
+                    _logger.LogInformation(localID, $"ExecutionSynchronizationService contains a workflow with id : {workflow.ID}");
                     continue; // Ignore the workflow, because its allready running!
+                }
 
                 _executionSynchronizationService.Workflows.TryAdd(workflow.ID, workflow);
-                var task = workflow.Execute().ContinueWith(t => _executionSynchronizationService.Workflows.TryRemove(workflow.ID, out IWorkflowContext value));
+                _logger.LogInformation(localID, $"Executing workflow id : {workflow.ID}");
+                var task = workflow.Execute().ContinueWith(t => {
+                    _executionSynchronizationService.Workflows.TryRemove(workflow.ID, out IWorkflowContext value);
+                    _logger.LogInformation(localID, $"ContinueWith -> Done executing workflow id {workflow.ID}");
+                    });
                 
                 executing.Add(task);
             }
@@ -151,13 +155,19 @@ namespace TrustchainCore.Services
             var taskProcessor = new System.Timers.Timer { Interval = configuration.GetValue<int>("WorkflowInterval", 1000) }; // Run the interval 1 sec
             taskProcessor.Elapsed += (sender, e) =>
             {
+                taskProcessor.Enabled = false;
+
                 var localID = id++;
                 var scopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
                 using (var scope = scopeFactory.CreateScope())
                 {
+                    _logger.LogInformation(localID, $"GetRunningWorkflows");
                     var workflows = GetRunningWorkflows();
-                    Execute(workflows);
+                    _logger.LogInformation(localID, $"Workflows found: {workflows.Count}");
+                    Execute(workflows, localID);
+                    _logger.LogInformation(localID, $"Done executing Workflows");
                 }
+                taskProcessor.Enabled = true;
             };
             taskProcessor.Start();
         }

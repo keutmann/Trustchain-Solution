@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Trustchain
 {
@@ -56,15 +57,23 @@ namespace Trustchain
 
         }
 
+        public virtual void ConfigureTimers(IApplicationBuilder app)
+        {
+            app.Trustchain();
+        }
+
+
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
+
+                loggerFactory.AddConsole();
             }
             else
             {
@@ -72,9 +81,8 @@ namespace Trustchain
             }
 
             //app.LoadGraph(); // Load the Trust Graph from Database
-            app.Trustchain();
             app.Truststamp();
-
+            ConfigureTimers(app);
             app.UseStaticFiles();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.

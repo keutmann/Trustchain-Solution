@@ -5,6 +5,9 @@ using TrustchainCore.Workflows;
 using TrustchainCore.Enumerations;
 using TrustchainCore.Interfaces;
 using System.Collections.Generic;
+using UnitTest.TrustchainCore.Workflows;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace UnitTest.TrustchainCore.Workflow
 {
@@ -137,25 +140,42 @@ namespace UnitTest.TrustchainCore.Workflow
         }
 
 
-        //[TestMethod]
-        //public void ExecuteOneSame()
-        //{
-        //    var executionSynchronizationService = ServiceProvider.GetService<IExecutionSynchronizationService>();
-        //    var list = new List<IWorkflowContext>();
-        //    var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-        //    var workflow = workflowService.Create<WorkflowContext>();
-        //    Assert.IsNotNull(workflow);
-        //    list.Add(workflow);
+        [TestMethod]
+        public void RunWorkflows()
+        {
 
-        //    workflowService.Execute(list);
-        //    Assert.AreEqual(WorkflowStatusType.Finished.ToString(), workflow.State);
-        //    workflow.State = WorkflowStatusType.Running.ToString();
+            var logger = ServiceProvider.GetRequiredService<ILogger<WorkflowServiceTest>>();
+
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = workflowService.Create<WorkflowContext>();
+
+            var step = new BlockingWorkflowStep();
+            workflow.Steps.Add(step);
+            var id = workflowService.Save(workflow);
+
+            logger.LogInformation("Running RunWorkflows");
+            workflowService.RunWorkflows();
+
+            //logger.LogInformation("Running RunWorkflows second time");
+            //workflowService.RunWorkflows();
 
 
-        //    var workflowService2 = ServiceProvider.GetRequiredService<IWorkflowService>();
-        //    workflowService2.Execute(list);
+            Task.Delay(5 * 1000).Wait();
 
-        //}
+
+
+            //    Assert.IsNotNull(workflow);
+            //    list.Add(workflow);
+
+            //    workflowService.Execute(list);
+            //    Assert.AreEqual(WorkflowStatusType.Finished.ToString(), workflow.State);
+            //    workflow.State = WorkflowStatusType.Running.ToString();
+
+
+            //    var workflowService2 = ServiceProvider.GetRequiredService<IWorkflowService>();
+            //    workflowService2.Execute(list);
+
+        }
 
 
     }

@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
+using UnitTest.TrustchainCore.Workflows;
 
 namespace UnitTest
 {
@@ -20,9 +23,12 @@ namespace UnitTest
             var services = new ServiceCollection();
             ConfigureServices(services);
             services.AddTransient<IConfiguration>(p => new ConfigurationBuilder().Build());
+            services.AddTransient<IBlockingWorkflowStep, BlockingWorkflowStep>();
 
             ServiceScope = services.BuildServiceProvider(false).CreateScope();
             ServiceProvider = ServiceScope.ServiceProvider;
+            ILoggerFactory loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
+            loggerFactory.AddConsole();
         }
 
         [TestCleanup]
@@ -45,6 +51,11 @@ namespace UnitTest
                 options.UseInMemoryDatabase("UnitTest")
             );
             
+        }
+
+        public override void ConfigureTimers(IApplicationBuilder app)
+        {
+            // Do not create timers here!
         }
 
         public static StartupTest CreateStartupTest()
