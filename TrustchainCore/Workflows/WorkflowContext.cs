@@ -20,6 +20,7 @@ namespace TrustchainCore.Workflows
         public string Tag { get; set; }
 
 
+        public DateTime NextExecution { get; set; }
         public int CurrentStepIndex { get; set; }
 
         [JsonProperty(PropertyName = "steps", NullValueHandling = NullValueHandling.Ignore)]
@@ -36,16 +37,25 @@ namespace TrustchainCore.Workflows
         public WorkflowContext(IWorkflowService workflowService) 
         {
             _workflowService = workflowService;
+            NextExecution = DateTime.MinValue;
+            Steps = new List<IWorkflowStep>();
+            Logs = new List<IWorkflowLog>();
+
         }
 
         public virtual void Initialize()
         {
-            Steps = new List<IWorkflowStep>();
-            Logs = new List<IWorkflowLog>();
+            foreach (var step in Steps)
+            {
+                step.Context = this;
+            }
         }
 
         public virtual async Task Execute()
         {
+            if (!DoExecution())
+                return; 
+
             await Task.Run(() =>
             {
                 while (TryGetNextStep(out IWorkflowStep step))
@@ -55,6 +65,9 @@ namespace TrustchainCore.Workflows
                         ExecutedStep(step);
 
                         CurrentStepIndex++;
+
+                        if (!DoExecution())
+                            break;
                     }
                     catch (Exception ex)
                     {
@@ -69,7 +82,8 @@ namespace TrustchainCore.Workflows
                 }
             });
 
-            Success();
+            if(CurrentStepIndex > Steps.Count)
+                Success();
         }
 
         public T GetStep<T>()
@@ -81,6 +95,13 @@ namespace TrustchainCore.Workflows
             }
 
             return default(T);
+        }
+
+        public virtual bool DoExecution()
+        {
+            if (NextExecution > DateTime.Now)
+                return false;
+            return true;
         }
 
         public virtual void Save()
@@ -97,6 +118,17 @@ namespace TrustchainCore.Workflows
             step = Steps[CurrentStepIndex];
 
             return true;
+        }
+
+        public virtual void Wait(int seconds)
+        {
+            NextExecution = DateTime.Now.AddSeconds(seconds);
+        }
+
+        public virtual void RunStepAgain(int seconds)
+        {
+            Wait(seconds);
+            CurrentStepIndex--;
         }
 
         private void ExecutedStep(IWorkflowStep step)

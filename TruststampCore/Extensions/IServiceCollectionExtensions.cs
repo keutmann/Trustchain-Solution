@@ -10,8 +10,9 @@ namespace TruststampCore.Extensions
     {
         public static void TruststrampCore(this IServiceCollection services)
         {
-            services.AddSingleton<ITimestampWorkflowService, TimestampWorkflowService>();
+            services.AddSingleton<ITimestampSynchronizationService, TimestampSynchronizationService>();
 
+            services.AddTransient<ITimestampWorkflowService, TimestampWorkflowService>();
             services.AddTransient<IProofService, ProofService>();
 
             services.AddTransient<IMerkleStep, MerkleStep>();

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using TrustchainCore.Services;
 using TrustchainCore.Workflows;
+using TruststampCore.Services;
 
 namespace TruststampCore.Workflows
 {
@@ -17,13 +17,8 @@ namespace TruststampCore.Workflows
 
         public override void Initialize()
         {
+            Steps.Add(_serviceProvider.GetRequiredService<IRunTimestampStep>());
             base.Initialize();
-            //Steps.Add(_serviceProvider.GetRequiredService<IMerkleStep>());
-
-            foreach (var step in Steps)
-            {
-                step.Context = this;
-            }
         }
 
     }

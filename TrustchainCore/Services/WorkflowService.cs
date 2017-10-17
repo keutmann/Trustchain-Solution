@@ -16,6 +16,7 @@ namespace TrustchainCore.Services
     public class WorkflowService : IWorkflowService
     {
         private ITrustDBService _trustDBService;
+        private IExecutionSynchronizationService _executionSynchronizationService;
         public IServiceProvider ServiceProvider { get; set; }
 
         public IQueryable<WorkflowContainer> Workflows {
@@ -25,9 +26,10 @@ namespace TrustchainCore.Services
             }
         }
 
-        public WorkflowService(ITrustDBService trustDBService, IServiceProvider serviceProvider)
+        public WorkflowService(ITrustDBService trustDBService, IServiceProvider serviceProvider, IExecutionSynchronizationService executionSynchronizationService)
         {
             _trustDBService = trustDBService;
+            _executionSynchronizationService = executionSynchronizationService;
             ServiceProvider = serviceProvider;
         }
 
@@ -95,9 +97,16 @@ namespace TrustchainCore.Services
         public void Execute(IList<IWorkflowContext> workflows)
         {
             var executing = new List<Task>();
-            foreach (var context in workflows)
+            foreach (var workflow in workflows)
             {
-                executing.Add(context.Execute());
+                if (_executionSynchronizationService.Workflows.ContainsKey(workflow.ID))
+                    continue; // Ignore the workflow, because its allready running!
+
+                _executionSynchronizationService.Workflows.TryAdd(workflow.ID, workflow);
+                var task = workflow.Execute();
+                task.ContinueWith(t => _executionSynchronizationService.Workflows.TryRemove(workflow.ID, out IWorkflowContext value));
+
+                executing.Add(task);
             }
 
             Task.WaitAll(executing.ToArray());
@@ -168,16 +177,8 @@ namespace TrustchainCore.Services
                 var scopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
                 using (var scope = scopeFactory.CreateScope())
                 {
-                    //var timestampWorkflowService = scope.ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
-                    //timestampWorkflowService.CreateNextWorkflow(); // Ensure a workflow for proofs
-
                     var workflows = GetRunningWorkflows();
-
-                    foreach (var workflow in workflows)
-                    {
-                        var task = workflow.Execute();
-                        task.Wait(); // Timestamp workflow need to be syncron because of blockchain TX output
-                    }
+                    Execute(workflows);
                 }
             };
             taskProcessor.Start();

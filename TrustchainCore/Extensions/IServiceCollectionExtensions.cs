@@ -13,6 +13,7 @@ namespace TrustchainCore.Extensions
     {
         public static void TrustchainCore(this IServiceCollection services)
         {
+            services.AddSingleton<IExecutionSynchronizationService, ExecutionSynchronizationService>();
             services.AddScoped<ITrustBinary, TrustBinary>();
             services.AddScoped<ITrustDBService, TrustDBService>();
             services.AddScoped<IWorkflowService, WorkflowService>();
@@ -28,6 +29,7 @@ namespace TrustchainCore.Extensions
             });
             services.AddTransient<IContractResolver, DIContractResolver>();
             services.AddTransient<IConfigureOptions<MvcJsonOptions>, JsonOptionsSetup>();
+
 
             // ---------------------------------------------------------------------------------------------------------------
         }

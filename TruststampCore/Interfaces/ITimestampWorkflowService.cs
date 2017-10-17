@@ -6,8 +6,8 @@ namespace TruststampCore.Interfaces
 {
     public interface ITimestampWorkflowService
     {
-        int CurrentWorkflowID { get; }
-        void CreateNextWorkflow();
+        int CountCurrentProofs();
+        void CreateNextTimestampWorkflow();
         void EnsureTimestampWorkflow();
     }
 }

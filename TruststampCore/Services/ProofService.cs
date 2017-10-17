@@ -8,12 +8,12 @@ namespace TruststampCore.Services
 {
     public class ProofService : IProofService
     {
-        private ITimestampWorkflowService _timestampWorkflowService;
+        private ITimestampSynchronizationService _timestampSynchronizationService;
         private ITrustDBService _trustDBService;
 
-        public ProofService(ITimestampWorkflowService timestampWorkflowService, ITrustDBService trustDBService)
+        public ProofService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService)
         {
-            _timestampWorkflowService = timestampWorkflowService;
+            _timestampSynchronizationService = timestampSynchronizationService;
             _trustDBService = trustDBService;
         }
 
@@ -24,7 +24,7 @@ namespace TruststampCore.Services
             {
                 proof = new ProofEntity
                 {
-                    WorkflowID = _timestampWorkflowService.CurrentWorkflowID,
+                    WorkflowID = _timestampSynchronizationService.CurrentWorkflowID,
                     Source = source,
                     Registered = DateTime.Now
                 };

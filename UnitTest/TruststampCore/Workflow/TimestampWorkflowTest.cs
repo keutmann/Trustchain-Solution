@@ -30,6 +30,7 @@ namespace UnitTest.TruststampCore.Workflow
             settings.Converters.Add(new DICustomConverter<TimestampWorkflow>(ServiceProvider));
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             var workflow = new TimestampWorkflow(workflowService);
             workflow.Initialize();
             workflow.CurrentStepIndex = 2;

@@ -14,6 +14,10 @@ namespace TrustchainCore.Interfaces
         IList<IWorkflowStep> Steps { get; set; }
         string Tag { get; set; }
 
+        bool DoExecution();
+        void RunStepAgain(int seconds);
+        void Wait(int seconds);
+
         void Initialize();
         Task Execute();
         T GetStep<T>();

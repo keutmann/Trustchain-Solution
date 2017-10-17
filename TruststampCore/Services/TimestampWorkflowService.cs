@@ -12,32 +12,28 @@ namespace TruststampCore.Services
 {
     public class TimestampWorkflowService : ITimestampWorkflowService
     {
-        private int _currentWorkflowID = 0; // Field for atomic access
-        public int CurrentWorkflowID
-        {
-            get
-            {
-                return _currentWorkflowID;
-            }
-        }
-
 
         private IWorkflowService _workflowService;
-        private IServiceProvider _serviceProvider;
+        private ITrustDBService _trustDBService;
+        private ITimestampSynchronizationService _timestampSynchronizationService;
 
-        public TimestampWorkflowService(IWorkflowService workflowService, IServiceProvider serviceProvider)
+        public TimestampWorkflowService(IWorkflowService workflowService, ITrustDBService trustDBService, ITimestampSynchronizationService timestampSynchronizationService)
         {
             _workflowService = workflowService;
-            _serviceProvider = serviceProvider;
+            _trustDBService = trustDBService;
+            _timestampSynchronizationService = timestampSynchronizationService;
         }
 
-        public void CreateNextWorkflow()
+        public int CountCurrentProofs()
         {
-            var workflowService = _serviceProvider.GetRequiredService<IWorkflowService>();
-            var wf = workflowService.Create<TimestampWorkflow>();
-            _currentWorkflowID = workflowService.Save(wf);
+            return _trustDBService.Proofs.Where(p => p.WorkflowID == _timestampSynchronizationService.CurrentWorkflowID).Count();
         }
 
+        public void CreateNextTimestampWorkflow()
+        {
+            var wf = _workflowService.Create<TimestampWorkflow>();
+            _timestampSynchronizationService.CurrentWorkflowID = _workflowService.Save(wf);
+        }
 
         public void EnsureTimestampWorkflow()
         {

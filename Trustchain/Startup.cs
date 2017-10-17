@@ -72,6 +72,7 @@ namespace Trustchain
             }
 
             //app.LoadGraph(); // Load the Trust Graph from Database
+            app.Trustchain();
             app.Truststamp();
 
             app.UseStaticFiles();
@@ -88,27 +89,11 @@ namespace Trustchain
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
+                    template: "v1/{controller}/{action=Index}/{id?}");
             });
 
-            //app.Map("/allservices", builder => builder.Run(async context =>
-            //{
-            //    var sb = new StringBuilder();
-            //    sb.Append("<h1>All Services</h1>");
-            //    sb.Append("<table><thead>");
-            //    sb.Append("<tr><th>Type</th><th>Lifetime</th><th>Instance</th></tr>");
-            //    sb.Append("</thead><tbody>");
-            //    foreach (var svc in _services)
-            //    {
-            //        sb.Append("<tr>");
-            //        sb.Append($"<td>{svc.ServiceType.FullName}</td>");
-            //        sb.Append($"<td>{svc.Lifetime}</td>");
-            //        sb.Append($"<td>{svc.ImplementationType?.FullName}</td>");
-            //        sb.Append("</tr>");
-            //    }
-            //    sb.Append("</tbody></table>");
-            //    await context.Response.WriteAsync(sb.ToString());
-            //}));
+            app.AllServices(_services);
         }
+
     }
 }
