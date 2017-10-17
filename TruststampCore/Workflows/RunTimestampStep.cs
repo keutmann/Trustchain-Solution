@@ -1,8 +1,7 @@
-﻿using System.Linq;
-using Microsoft.Extensions.Configuration;
-using TrustchainCore.Interfaces;
+﻿using Microsoft.Extensions.Configuration;
 using TrustchainCore.Workflows;
 using TruststampCore.Interfaces;
+using TruststampCore.Services;
 
 namespace TruststampCore.Workflows
 {
@@ -19,13 +18,13 @@ namespace TruststampCore.Workflows
 
         public override void Execute()
         {
-            if(_timestampWorkflowService.CountCurrentProofs() > 0)
+            if(_timestampWorkflowService.CountCurrentProofs() > 0) 
             {
-                _timestampWorkflowService.CreateNextTimestampWorkflow();
+                _timestampWorkflowService.CreateNextTimestampWorkflow(); // There are proofs to be timestamp'ed
             }
 
-            // Rerun this step after 10 min, never to exit
-            Context.RunStepAgain(_configuration.GetValue<int>("TimestampInterval", 60 * 10));
+            // Rerun this step after x time, never to exit
+            Context.RunStepAgain(_configuration.GetValue<int>("TimestampInterval", 60 * 10)); // Default 10 min
         }
     }
 }
