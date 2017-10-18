@@ -24,11 +24,11 @@ namespace TrustchainCore.Extensions
             services.AddTransient<IMerkleTree, MerkleTreeSorted>();
             // ---------------------------------------------------------------------------------------------------------------
             // http://www.dotnet-programming.com/post/2017/05/08/Aspnet-core-Deserializing-Json-with-Dependency-Injection.aspx
-            services.AddSingleton<IDIMeta>(s =>
-            {
-                return new DIMetaDefault(services);
-            });
+            services.AddSingleton<IDIMeta>(s => { return new DIMetaDefault(services); });
+            services.AddSingleton<IDIReverseMeta>(s => { return new DIMetaReverseDefault(services); });
             services.AddTransient<IContractResolver, DIContractResolver>();
+            services.AddTransient<IContractReverseResolver, DIContractReverseResolver>();
+            
             services.AddTransient<IConfigureOptions<MvcJsonOptions>, JsonOptionsSetup>();
 
             services.AddTransient<IWorkflowContext, WorkflowContext>();

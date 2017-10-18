@@ -1,16 +1,19 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TrustchainCore.Enumerations;
+using TrustchainCore.Services;
 
 namespace TrustchainCore.Interfaces
 {
     public interface IWorkflowContext 
     {
+        [JsonIgnore]
+        IWorkflowService WorkflowService { get; set; }
+
         int ID { get; set; }
         List<IWorkflowLog> Logs { get; set; }
         string State { get; set; }
-        //WorkflowStatusType Status { get; set; }
         IList<IWorkflowStep> Steps { get; set; }
         int CurrentStepIndex { get; set; }
         string Tag { get; set; }

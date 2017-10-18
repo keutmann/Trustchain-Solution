@@ -21,7 +21,9 @@ namespace TruststampCore.Extensions
             services.AddTransient<TimestampWorkflow>();
             services.AddTransient<IBlockchainRepository, SoChainTransactionRepository>();
             services.AddTransient<IBlockchainService, BitcoinService>();
-            
+
+            //services.AddTransient<MerkleStep>();
+
         }
     }
 }

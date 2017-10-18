@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TrustchainCore.Interfaces;
@@ -9,6 +10,7 @@ namespace TrustchainCore.Services
     public interface IWorkflowService
     {
         //ITrustDBService DBService { get; set; }
+        [JsonIgnore]
         IServiceProvider ServiceProvider { get; set; }
         IQueryable<WorkflowContainer> Workflows { get;  }
 

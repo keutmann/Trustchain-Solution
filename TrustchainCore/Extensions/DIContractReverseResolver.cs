@@ -8,19 +8,19 @@ namespace TrustchainCore.Extensions
     /// <summary>
     /// http://www.dotnet-programming.com/post/2017/05/08/Aspnet-core-Deserializing-Json-with-Dependency-Injection.aspx
     /// </summary>
-    public class DIContractResolver : CamelCasePropertyNamesContractResolver
+    public class DIContractReverseResolver : CamelCasePropertyNamesContractResolver, IContractReverseResolver
     {
-        IDIMeta _diMeta;
+        IDIReverseMeta _diReverseMeta;
         IServiceProvider _serviceProvider;
 
-        public DIContractResolver(IDIMeta diMeta, IServiceProvider serviceProvider)
+        public DIContractReverseResolver(IDIReverseMeta diReverseMeta, IServiceProvider serviceProvider)
         {
-            _diMeta = diMeta;
+            _diReverseMeta = diReverseMeta;
             _serviceProvider = serviceProvider;
         }
         protected override JsonObjectContract CreateObjectContract(Type objectType)
         {
-            if (_diMeta.IsRegistred(objectType))
+            if (_diReverseMeta.IsRegistred(objectType))
             {
                 JsonObjectContract contract = DIResolveContract(objectType);
                 contract.DefaultCreator = () => _serviceProvider.GetRequiredService(objectType);
@@ -33,7 +33,7 @@ namespace TrustchainCore.Extensions
 
         private JsonObjectContract DIResolveContract(Type objectType)
         {
-            var fType = _diMeta.RegistredTypeFor(objectType);
+            var fType = _diReverseMeta.RegistredTypeFor(objectType);
             if (fType != null)
                 return base.CreateObjectContract(fType);
             else

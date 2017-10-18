@@ -33,11 +33,12 @@ namespace TrustchainCore.Workflows
         [JsonProperty(PropertyName = "logs", NullValueHandling = NullValueHandling.Ignore)]
         public List<IWorkflowLog> Logs { get; set; }
 
-        protected IWorkflowService _workflowService;
+        [JsonIgnore]
+        public IWorkflowService WorkflowService { get; set; }
 
         public WorkflowContext(IWorkflowService workflowService) 
         {
-            _workflowService = workflowService;
+            WorkflowService = workflowService;
             NextExecution = DateTime.MinValue;
             Steps = new List<IWorkflowStep>();
             Logs = new List<IWorkflowLog>();
@@ -115,7 +116,7 @@ namespace TrustchainCore.Workflows
 
         public virtual void Save()
         {
-            _workflowService.Save(this);
+            WorkflowService.Save(this);
         }
 
         public virtual bool TryGetNextStep(out IWorkflowStep step)

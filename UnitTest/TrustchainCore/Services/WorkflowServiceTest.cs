@@ -73,6 +73,22 @@ namespace UnitTest.TrustchainCore.Workflow
 
 
         [TestMethod]
+        public void CreateFromDB()
+        {
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = workflowService.Create<WorkflowContext>();
+            Assert.IsNotNull(workflow);
+
+            var id = workflowService.Save(workflow);
+            Assert.AreEqual(id, workflow.ID);
+            var results = workflowService.GetRunningWorkflows();
+            var wf = results[0];
+            Assert.IsNotNull(wf.WorkflowService);
+
+
+        }
+
+        [TestMethod]
         public void ExecuteOne()
         {
             var executionSynchronizationService = ServiceProvider.GetService<IExecutionSynchronizationService>();
@@ -136,12 +152,16 @@ namespace UnitTest.TrustchainCore.Workflow
             var results = workflowService.GetRunningWorkflows();
 
             // Verify
-            Assert.AreEqual(count, results.Count);
+            //Assert.AreEqual(count, results.Count);
+            //foreach (var item in results)
+            //{
+            //    item.ser
+            //}
         }
 
 
         [TestMethod]
-        public void RunWorkflows()
+        public void RunWorkflowsOne()
         {
 
             var logger = ServiceProvider.GetRequiredService<ILogger<WorkflowServiceTest>>();
@@ -155,26 +175,29 @@ namespace UnitTest.TrustchainCore.Workflow
 
             logger.LogInformation("Running RunWorkflows");
             workflowService.RunWorkflows();
+            Task.Delay(10500).Wait();
+        }
 
-            //logger.LogInformation("Running RunWorkflows second time");
-            //workflowService.RunWorkflows();
+        [TestMethod]
+        public void RunWorkflowsMany()
+        {
 
+            var logger = ServiceProvider.GetRequiredService<ILogger<WorkflowServiceTest>>();
 
-            Task.Delay(5 * 1000).Wait();
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = workflowService.Create<WorkflowContext>();
 
+            for (int i = 0; i < 5; i++)
+            {
+                var step = new BlockingWorkflowStep();
+                step.Seconds = i;
+                workflow.Steps.Add(step);
+                var id = workflowService.Save(workflow);
+            }
+            logger.LogInformation("Running RunWorkflows");
+            workflowService.RunWorkflows();
 
-
-            //    Assert.IsNotNull(workflow);
-            //    list.Add(workflow);
-
-            //    workflowService.Execute(list);
-            //    Assert.AreEqual(WorkflowStatusType.Finished.ToString(), workflow.State);
-            //    workflow.State = WorkflowStatusType.Running.ToString();
-
-
-            //    var workflowService2 = ServiceProvider.GetRequiredService<IWorkflowService>();
-            //    workflowService2.Execute(list);
-
+            Task.Delay(5500).Wait();
         }
 
 
