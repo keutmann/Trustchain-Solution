@@ -32,7 +32,7 @@ namespace TruststampCore.Workflows
             var keyName = _configuration.GetValue("blockchain", "btctest").ToLowerInvariant() + "_serverkey";
             var serverKeyWIF = _configuration.GetValue(keyName, string.Empty);
 
-            if (RetryAttempts == 0 && Key != null && Address != null)
+            if (Key == null)
             {
                 var merkleStep = Context.GetStep<IMerkleStep>();
 
