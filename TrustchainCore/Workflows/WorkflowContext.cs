@@ -86,8 +86,11 @@ namespace TrustchainCore.Workflows
                 }
             });
 
-            if(CurrentStepIndex >= Steps.Count)
+            if (CurrentStepIndex >= Steps.Count)
+            {
                 Success();
+                Save();
+            }
         }
 
         public T GetStep<T>()

@@ -153,10 +153,10 @@ namespace UnitTest.TrustchainCore.Workflow
 
             // Verify
             //Assert.AreEqual(count, results.Count);
-            //foreach (var item in results)
-            //{
-            //    item.ser
-            //}
+            foreach (var item in results)
+            {
+                Assert.IsNotNull(item.WorkflowService);
+            }
         }
 
 
@@ -175,20 +175,19 @@ namespace UnitTest.TrustchainCore.Workflow
 
             logger.LogInformation("Running RunWorkflows");
             workflowService.RunWorkflows();
-            Task.Delay(10500).Wait();
+            Task.Delay(5500).Wait();
         }
 
         [TestMethod]
         public void RunWorkflowsMany()
         {
-
             var logger = ServiceProvider.GetRequiredService<ILogger<WorkflowServiceTest>>();
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>();
 
             for (int i = 0; i < 5; i++)
             {
+                var workflow = workflowService.Create<WorkflowContext>();
                 var step = new BlockingWorkflowStep();
                 step.Seconds = i;
                 workflow.Steps.Add(step);
@@ -197,7 +196,7 @@ namespace UnitTest.TrustchainCore.Workflow
             logger.LogInformation("Running RunWorkflows");
             workflowService.RunWorkflows();
 
-            Task.Delay(5500).Wait();
+            Task.Delay(6500).Wait();
         }
 
 
