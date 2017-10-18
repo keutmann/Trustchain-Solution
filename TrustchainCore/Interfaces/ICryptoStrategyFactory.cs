@@ -4,6 +4,6 @@ namespace TrustchainCore.Interfaces
 {
     public interface ICryptoStrategyFactory
     {
-        ICryptoStrategy Create(string name);
+        ICryptoStrategy GetService(string name);
     }
 }

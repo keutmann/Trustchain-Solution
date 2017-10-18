@@ -13,7 +13,7 @@ using TrustchainCore.Factories;
 namespace UnitTest.TrustchainCore.Builders
 {
     [TestClass]
-    public class ReadWriteTest
+    public class ReadWriteTest : StartupTest
     {
         [TestMethod]
         public void ReadWritePackage()
@@ -30,7 +30,7 @@ namespace UnitTest.TrustchainCore.Builders
             builder.AddTrust("testissuer2", "testsubject1", TrustBuilder.CreateTrustTrue("The subject trusted person"));
             builder.Sign();
 
-            var schemaService = new TrustSchemaService(new CryptoStrategyFactory());
+            var schemaService = new TrustSchemaService(new CryptoStrategyFactory(ServiceProvider));
             var result = schemaService.Validate(builder.Package);
 
             Console.WriteLine(result.ToString());

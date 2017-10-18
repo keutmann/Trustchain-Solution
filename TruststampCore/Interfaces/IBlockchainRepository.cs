@@ -10,7 +10,7 @@ namespace TruststampCore.Interfaces
         Task BroadcastAsync(Transaction tx);
         Task<Transaction> GetTransactionAsync(uint256 txId);
         JObject GetAddressInfo(string address);
-        Task<List<Coin>> GetUnspentAsync(string Address);
+        Task<JObject> GetUnspentAsync(string Address);
         FeeRate GetEstimatedFee();
     }
 }

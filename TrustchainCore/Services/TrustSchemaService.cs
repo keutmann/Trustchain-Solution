@@ -21,7 +21,7 @@ namespace TrustchainCore.Services
         public SchemaValidationResult Validate(PackageModel package)
         {
             package = TrustBuilder.EnsureHead(package);
-            var cryptoService = _cryptoServiceFactory.Create(package.Head.Script);
+            var cryptoService = _cryptoServiceFactory.GetService(package.Head.Script);
             var engine = new ValidationEngine(cryptoService);
             return engine.Validate(package);
         }

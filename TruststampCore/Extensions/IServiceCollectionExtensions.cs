@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TruststampCore.Factories;
 using TruststampCore.Interfaces;
 using TruststampCore.Repository;
 using TruststampCore.Services;
@@ -22,7 +23,11 @@ namespace TruststampCore.Extensions
             services.AddTransient<IBlockchainRepository, SoChainTransactionRepository>();
             services.AddTransient<IBlockchainService, BitcoinService>();
 
-            //services.AddTransient<MerkleStep>();
+            services.AddTransient<IBlockchainServiceFactory, BlockchainServiceFactory>();
+            
+            services.AddTransient<BitcoinService>();
+            services.AddTransient<BitcoinTestService>();
+            
 
         }
     }

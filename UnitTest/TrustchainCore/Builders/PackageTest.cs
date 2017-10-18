@@ -10,7 +10,7 @@ using TrustchainCore.Strategy;
 namespace UnitTest.TrustchainCore.Builders
 {
     [TestClass]
-    public class PackageTest
+    public class PackageTest : StartupTest
     {
         [TestMethod]
         public void Build()
@@ -27,7 +27,7 @@ namespace UnitTest.TrustchainCore.Builders
             builder.AddTrust("testissuer2", "testsubject1", TrustBuilder.CreateTrustTrue("The subject trusted person"));
             builder.Sign();
 
-            var schemaService = new TrustSchemaService(new CryptoStrategyFactory());
+            var schemaService = new TrustSchemaService(new CryptoStrategyFactory(ServiceProvider));
 
             var result = schemaService.Validate(builder.Package);
 

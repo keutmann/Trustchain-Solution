@@ -7,7 +7,6 @@
   <ItemGroup>
     <Compile Remove="Extensions\ByteExtensions.cs" />
     <Compile Remove="Extensions\EncoderExtensions.cs" />
-    <Compile Remove="Factories\BlockchainFactory.cs" />
     <Compile Remove="Repository\BlockrRepository.cs" />
     <Compile Remove="Services\Batch.cs" />
     <Compile Remove="Services\Crypto.cs" />
@@ -35,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Factories\" />
     <Folder Include="Model\" />
     <Folder Include="Strategies\" />
   </ItemGroup>

@@ -14,7 +14,7 @@ using TrustchainCore.Factories;
 namespace UnitTest.TrustchainCore.Builders
 {
     [TestClass]
-    public class TrustControllerTest
+    public class TrustControllerTest : StartupTest
     {
         [TestMethod]
         public void TrustController_Add()
@@ -34,7 +34,7 @@ namespace UnitTest.TrustchainCore.Builders
 
             var graphTrustService = new GraphTrustService(new GraphModelService(new GraphModel()));
 
-            var schemaService = new TrustSchemaService(new CryptoStrategyFactory());
+            var schemaService = new TrustSchemaService(new CryptoStrategyFactory(ServiceProvider));
 
             var result = schemaService.Validate(builder.Package);
 

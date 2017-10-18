@@ -30,9 +30,8 @@ namespace TrustchainCore.Extensions
             services.AddTransient<IContractReverseResolver, DIContractReverseResolver>();
             
             services.AddTransient<IConfigureOptions<MvcJsonOptions>, JsonOptionsSetup>();
-
             services.AddTransient<IWorkflowContext, WorkflowContext>();
-
+            
 
             // ---------------------------------------------------------------------------------------------------------------
         }

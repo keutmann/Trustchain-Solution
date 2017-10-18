@@ -1,21 +1,28 @@
-﻿using TrustchainCore.Interfaces;
-using TrustchainCore.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TrustchainCore.Interfaces;
 using TrustchainCore.Strategy;
+using System;
 
 namespace TrustchainCore.Factories
 {
     public class CryptoStrategyFactory : ICryptoStrategyFactory
     {
-        public CryptoStrategyFactory()
+        private IServiceProvider _serviceProvider;
+
+        public CryptoStrategyFactory(IServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
         }
 
-        public ICryptoStrategy Create(string name = "btc-pkh")
+        public ICryptoStrategy GetService(string name = "btcpkh")
         {
-            if("btc-pkh".EqualsIgnoreCase(name))
-                return new CryptoBTCPKH();
+            Type type = null;
+            switch(name.ToLower())
+            {
+                case "btcpkh": type = typeof(CryptoBTCPKH); break; 
+            }
 
-            return null;
+            return (ICryptoStrategy)_serviceProvider.GetRequiredService(type);
         }
 
     }

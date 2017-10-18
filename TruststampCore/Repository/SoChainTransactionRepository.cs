@@ -74,7 +74,7 @@ namespace TruststampCore.Repository
             }
         }
 
-        public async Task<List<Coin>> GetUnspentAsync(string address)
+        public async Task<JObject> GetUnspentAsync(string address)
         {
             while (true)
             {
@@ -89,12 +89,7 @@ namespace TruststampCore.Repository
                     {
                         throw new SoChainException(json);
                     }
-                    List<Coin> list = new List<Coin>();
-                    foreach (var element in json["data"]["txs"])
-                    {
-                        list.Add(new Coin(uint256.Parse(element["txid"].ToString()), (uint)element["output_no"], new Money((decimal)element["value"], MoneyUnit.BTC), new Script(NBitcoin.DataEncoders.Encoders.Hex.DecodeData(element["script_hex"].ToString()))));
-                    }
-                    return list;
+                    return json;
                 }
             }
         }
