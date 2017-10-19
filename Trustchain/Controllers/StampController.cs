@@ -8,17 +8,17 @@ namespace Trustchain.Controllers
     public class StampController : Controller
     {
 
-        private IProofService _timestampService;
+        private IProofService _proofService;
 
-        public StampController(IProofService timestampService)
+        public StampController(IProofService proofService)
         {
-            _timestampService = timestampService;
+            _proofService = proofService;
         }
         
         [HttpPost]
         public ActionResult Add([FromBody]byte[] source)
         {
-            return Ok(_timestampService.AddProof(source));
+            return Ok(_proofService.AddProof(source));
         }
 
 
@@ -27,7 +27,7 @@ namespace Trustchain.Controllers
         [HttpGet]
         public ActionResult Get([FromQuery]byte[] source)
         {
-            return Ok(_timestampService.GetProof(source));
+            return Ok(_proofService.GetTimestampProof(source));
         }
 
         //[HttpGet]

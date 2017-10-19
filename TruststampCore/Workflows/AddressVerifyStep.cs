@@ -64,7 +64,7 @@ namespace TruststampCore.Workflows
             }
         }
 
-        private void TimestampMerkeRoot(TimestampProof timestampProof, IBlockchainService blockchainService)
+        private void TimestampMerkeRoot(BlockchainProof timestampProof, IBlockchainService blockchainService)
         {
             var fundingKeyWIF = _configuration.FundingKey(timestampProof.Blockchain);
             if (String.IsNullOrWhiteSpace(fundingKeyWIF))

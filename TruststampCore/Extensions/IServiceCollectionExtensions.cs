@@ -27,14 +27,10 @@ namespace TruststampCore.Extensions
             services.AddTransient<IBlockchainService, BitcoinService>();
 
             services.AddTransient<IBlockchainServiceFactory, BlockchainServiceFactory>();
-            
+            services.AddTransient<ITimestampProofFactory, TimestampProofFactory>();
+
             services.AddTransient<BitcoinService>();
             services.AddTransient<BitcoinTestService>();
-
-            
-
-
-
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TruststampCore.Interfaces;
+using TruststampCore.Model;
 
 namespace TruststampCore.Services
 {
@@ -10,11 +11,13 @@ namespace TruststampCore.Services
     {
         private ITimestampSynchronizationService _timestampSynchronizationService;
         private ITrustDBService _trustDBService;
+        private ITimestampProofFactory _timestampProofFactory;
 
-        public ProofService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService)
+        public ProofService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService, ITimestampProofFactory timestampProofFactory)
         {
             _timestampSynchronizationService = timestampSynchronizationService;
             _trustDBService = trustDBService;
+            _timestampProofFactory = timestampProofFactory;
         }
 
         public ProofEntity AddProof(byte[] source)
@@ -40,6 +43,10 @@ namespace TruststampCore.Services
             return proof;
         }
 
-
+        public TimestampProof GetTimestampProof(byte[] source)
+        {
+            var entity = GetProof(source);
+            return _timestampProofFactory.Create(entity);
+        }
     }
 }

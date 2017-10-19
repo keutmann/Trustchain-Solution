@@ -1,4 +1,5 @@
 ﻿using TrustchainCore.Model;
+using TruststampCore.Model;
 
 namespace TruststampCore.Interfaces
 {
@@ -6,5 +7,6 @@ namespace TruststampCore.Interfaces
     {
         ProofEntity AddProof(byte[] source);
         ProofEntity GetProof(byte[] source);
+        TimestampProof GetTimestampProof(byte[] source);
     }
 }

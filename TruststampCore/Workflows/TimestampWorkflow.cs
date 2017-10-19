@@ -14,7 +14,7 @@ namespace TruststampCore.Workflows
     {
 
         [JsonProperty(PropertyName = "proof", NullValueHandling = NullValueHandling.Ignore)]
-        public TimestampProof Proof { get; set; }
+        public BlockchainProof Proof { get; set; }
 
         private IServiceProvider _serviceProvider;
         private ITimestampSynchronizationService _timestampSynchronizationService;
@@ -29,7 +29,7 @@ namespace TruststampCore.Workflows
         {
 
             AddStep<IMerkleStep>();
-            Proof = new TimestampProof();
+            Proof = new BlockchainProof();
             var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
             Proof.Blockchain = configuration.Blockchain();
             base.Initialize();

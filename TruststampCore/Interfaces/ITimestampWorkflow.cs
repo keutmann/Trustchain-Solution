@@ -7,6 +7,6 @@ namespace TruststampCore.Interfaces
     public interface ITimestampWorkflow: IWorkflowContext
     {
         [JsonProperty(PropertyName = "proof", NullValueHandling = NullValueHandling.Ignore)]
-        TimestampProof Proof { get; set; }
+        BlockchainProof Proof { get; set; }
     }
 }
