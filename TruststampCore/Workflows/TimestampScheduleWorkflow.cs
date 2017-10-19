@@ -18,7 +18,7 @@ namespace TruststampCore.Workflows
 
         public override void Initialize()
         {
-            Steps.Add(_serviceProvider.GetRequiredService<IRunTimestampStep>());
+            Steps.Add(_serviceProvider.GetRequiredService<ITimestampScheduleStep>());
             base.Initialize();
         }
 

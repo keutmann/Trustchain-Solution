@@ -5,12 +5,12 @@ using TruststampCore.Services;
 
 namespace TruststampCore.Workflows
 {
-    public class RunTimestampStep : WorkflowStep, IRunTimestampStep
+    public class TimestampScheduleStep : WorkflowStep, ITimestampScheduleStep
     {
         private ITimestampWorkflowService _timestampWorkflowService;
         private IConfiguration _configuration;
 
-        public RunTimestampStep(ITimestampWorkflowService timestampWorkflowService, IConfiguration configuration)
+        public TimestampScheduleStep(ITimestampWorkflowService timestampWorkflowService, IConfiguration configuration)
         {
             _timestampWorkflowService = timestampWorkflowService;
             _configuration = configuration;

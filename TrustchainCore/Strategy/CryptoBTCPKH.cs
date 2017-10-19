@@ -24,6 +24,12 @@ namespace TrustchainCore.Strategy
             return Hashes.SHA256(Hashes.SHA256(data));
         }
 
+        public byte[] KeyFromString(string wif)
+        {
+            var key = Key.Parse(wif);
+            return key.ToBytes();
+        }
+
         public byte[] GetKey(byte[] seed)
         {
             return new Key(HashOf(seed)).ToBytes();

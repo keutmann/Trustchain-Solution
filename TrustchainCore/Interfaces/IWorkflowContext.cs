@@ -20,12 +20,14 @@ namespace TrustchainCore.Interfaces
         DateTime NextExecution { get; set; }
 
         bool DoExecution();
-        void RunStepAgain(int seconds);
         void Wait(int seconds);
 
         void Initialize();
         Task Execute();
         T GetStep<T>();
+        T AddStep<T>() where T : IWorkflowStep;
+        void RunStep<T>() where T : IWorkflowStep;
+        void RunStepAgain(int seconds);
         void Log(string message);
     }
 }

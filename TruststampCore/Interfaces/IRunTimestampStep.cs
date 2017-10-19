@@ -2,7 +2,7 @@
 
 namespace TruststampCore.Interfaces
 {
-    public interface IRunTimestampStep : IWorkflowStep
+    public interface ITimestampScheduleStep : IWorkflowStep
     {
     }
 }

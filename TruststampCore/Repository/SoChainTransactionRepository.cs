@@ -52,28 +52,6 @@ namespace TruststampCore.Repository
 
         #region ITransactionRepository Members
 
-        public async Task<Transaction> GetTransactionAsync(uint256 txId)
-        {
-            while (true)
-            {
-                using (var response = await Client.GetAsync($"{SoChainAddress}/get_tx/{BlockchainName}/{txId}").ConfigureAwait(false))
-                {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                        return null;
-
-                    var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    var json = JObject.Parse(result);
-                    var status = json["status"];
-                    if (status != null && status.ToString() == "error")
-                    {
-                        throw new SoChainException(json);
-                    }
-                    var tx = Transaction.Parse(json["data"]["tx_hex"].ToString());
-                    return tx;
-                }
-            }
-        }
-
         public async Task<JObject> GetUnspentAsync(string address)
         {
             while (true)
@@ -94,20 +72,23 @@ namespace TruststampCore.Repository
             }
         }
 
-        public JObject GetAddressInfo(string address)
+        public async Task<JObject> GetReceivedAsync(string address)
         {
-            using (var response = Client.GetAsync($"{SoChainAddress}/api/v2/get_address_balance/{BlockchainName}/{address}").Result)
+            while (true)
             {
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                    return null;
-                var result = response.Content.ReadAsStringAsync().Result;
-                var json = JObject.Parse(result);
-                var status = json["status"];
-                if ((status != null && status.ToString() == "fail") || (json["data"]["address"].ToString() != address))
+                using (var response = await Client.GetAsync($"{SoChainAddress}/get_tx_received/{BlockchainName}/{address}").ConfigureAwait(false))
                 {
-                    throw new SoChainException(json);
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                        return null;
+                    var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    var json = JObject.Parse(result);
+                    var status = json["status"];
+                    if ((status != null && status.ToString() == "error") || (json["data"]["address"].ToString() != address))
+                    {
+                        throw new SoChainException(json);
+                    }
+                    return json;
                 }
-                return json;
             }
         }
 

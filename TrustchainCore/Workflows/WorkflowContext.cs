@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -102,6 +103,35 @@ namespace TrustchainCore.Workflows
             }
 
             return default(T);
+        }
+
+        public void RunStep<T>() where T : IWorkflowStep
+        {
+            var found = false;
+            for(int i = 0; i< Steps.Count; i++)
+            {
+                var step = Steps[i];
+                if (typeof(T).IsAssignableFrom(step.GetType()))
+                {
+                    CurrentStepIndex = i - 1;
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found)
+            {
+                AddStep<T>();
+            }
+        }
+
+
+        public virtual T AddStep<T>() where T: IWorkflowStep
+        {
+            var instance = WorkflowService.ServiceProvider.GetRequiredService<T>();
+            instance.Context = this;
+            Steps.Add(instance);
+            return instance; 
         }
 
         public virtual bool DoExecution()

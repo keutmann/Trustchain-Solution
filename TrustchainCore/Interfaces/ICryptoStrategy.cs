@@ -6,6 +6,7 @@
         string ScriptName { get; }
 
         byte[] HashOf(byte[] data);
+        byte[] KeyFromString(string wif);
         byte[] GetKey(byte[] seed);
         byte[] GetAddress(byte[] key);
         byte[] SignMessage(byte[] key, byte[] data);

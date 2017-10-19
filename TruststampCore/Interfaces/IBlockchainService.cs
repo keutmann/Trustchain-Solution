@@ -1,6 +1,4 @@
-﻿using NBitcoin;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TrustchainCore.Interfaces;
 
 namespace TruststampCore.Interfaces
@@ -9,6 +7,7 @@ namespace TruststampCore.Interfaces
     {
         ICryptoStrategy CryptoStrategy { get; set; }
         int VerifyFunds(byte[] key, IList<byte[]> previousTx = null);
+        int AddressTimestamped(byte[] merkleRoot);
         IList<byte[]> Send(byte[] hash, byte[] key, IList<byte[]> previousTx = null);
     }
 }
