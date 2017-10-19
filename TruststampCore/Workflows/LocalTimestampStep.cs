@@ -11,28 +11,25 @@ namespace TruststampCore.Workflows
 {
     public class LocalTimestampStep : WorkflowStep, ILocalTimestampStep
     {
-
         public int RetryAttempts { get; set; }
         public IList<byte[]> OutTx { get; set; }
-        //public byte[] Key { get; set; }
-        //public byte[] Address { get; set; }
 
         private IBlockchainServiceFactory _blockchainServiceFactory;
         private IConfiguration _configuration;
         private ILogger<LocalTimestampStep> _logger;
-        private IBlockchainService _blockchainService;
 
         public LocalTimestampStep(IBlockchainServiceFactory blockchainServiceFactory, IConfiguration configuration, ILogger<LocalTimestampStep> logger)
         {
             _blockchainServiceFactory = blockchainServiceFactory;
             _configuration = configuration;
             _logger = logger;
-            _blockchainService = _blockchainServiceFactory.GetService(_configuration.Blockchain());
         }
 
         public override void Execute()
         {
-            var fundingKeyWIF = _configuration.FundingKey();
+            var timestampProof = ((ITimestampWorkflow)Context).Proof;
+
+            var fundingKeyWIF = _configuration.FundingKey(timestampProof.Blockchain);
             if (String.IsNullOrWhiteSpace(fundingKeyWIF))
             {
                 _logger.DateInformation(Context.ID, $"No server key provided, using remote timestamping");
@@ -40,13 +37,14 @@ namespace TruststampCore.Workflows
                 return;
             }
 
-            var merkleStep = Context.GetStep<IMerkleStep>();
 
-            var fundingKey = _blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
+            var blockchainService = _blockchainServiceFactory.GetService(timestampProof.Blockchain);
+            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
 
-            OutTx = _blockchainService.Send(merkleStep.RootHash, fundingKey, null);
+            OutTx = blockchainService.Send(timestampProof.MerkleRoot, fundingKey, null);
+            // OutTX needs to go to a central store for that blockchain
 
-            Context.RunStep<IAddressVerifyStep>();
+            Context.RunStep<IAddressVerifyStep>(_configuration.ConfirmationWait(timestampProof.Blockchain));
         }
     }
 }

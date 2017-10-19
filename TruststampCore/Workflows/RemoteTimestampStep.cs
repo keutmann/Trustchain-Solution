@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TrustchainCore.Workflows;
+using TruststampCore.Enumerations;
 using TruststampCore.Extensions;
 using TruststampCore.Interfaces;
 
@@ -26,7 +27,9 @@ namespace TruststampCore.Workflows
         }
         public override void Execute()
         {
-            
+            var timestampProof = ((ITimestampWorkflow)Context).Proof;
+            timestampProof.Status = TimestampProofStatusType.Done.ToString();
+
         }
     }
 }

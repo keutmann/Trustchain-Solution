@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using System;
 using TrustchainCore.Extensions;
+using TrustchainCore.Model;
 using TrustchainCore.Workflows;
+using TruststampCore.Enumerations;
 using TruststampCore.Extensions;
 using TruststampCore.Interfaces;
 
@@ -11,19 +13,17 @@ namespace TruststampCore.Workflows
     public class AddressVerifyStep : WorkflowStep, IAddressVerifyStep
     {
         public int RetryAttempts { get; set; }
-        public int Confimations { get; set; }
 
         private IBlockchainServiceFactory _blockchainServiceFactory;
         private IConfiguration _configuration;
         private ILogger<AddressVerifyStep> _logger;
-        private IBlockchainService _blockchainService;
 
         public AddressVerifyStep(IBlockchainServiceFactory blockchainServiceFactory, IConfiguration configuration, ILogger<AddressVerifyStep> logger)
         {
             _blockchainServiceFactory = blockchainServiceFactory;
             _configuration = configuration;
             _logger = logger;
-            _blockchainService = _blockchainServiceFactory.GetService(_configuration.Blockchain());
+            
         }
 
         public override void Execute()
@@ -32,19 +32,23 @@ namespace TruststampCore.Workflows
             {
                 RetryAttempts++;
 
-                var merkleStep = Context.GetStep<IMerkleStep>();
+                var timestampProof = ((ITimestampWorkflow)Context).Proof;
+                timestampProof.Status = TimestampProofStatusType.Waiting.ToString();
+                var blockchainService = _blockchainServiceFactory.GetService(timestampProof.Blockchain);
 
-                Confimations = _blockchainService.AddressTimestamped(merkleStep.RootHash);
-                if(Confimations == -1) // No timestamp on merkleRoot
+                timestampProof.Confirmations = blockchainService.AddressTimestamped(timestampProof.MerkleRoot);
+                if(timestampProof.Confirmations == -1) // No timestamp on merkleRoot
                 {
-                    TimestampMerkeRoot();
+                    TimestampMerkeRoot(timestampProof, blockchainService);
                     return;
                 }
 
-                if(Confimations >= 0)
+                if(timestampProof.Confirmations >= 0)
                 {
-                    if (Confimations < _configuration.ConfirmationThreshold())
-                        Context.RunStepAgain(_configuration.ConfirmationWait());
+                    if (timestampProof.Confirmations < _configuration.ConfirmationThreshold(timestampProof.Blockchain))
+                        Context.RunStepAgain(_configuration.ConfirmationWait(timestampProof.Blockchain));
+                    else
+                        timestampProof.Status = TimestampProofStatusType.Done.ToString();
 
                     return;
                 }
@@ -60,9 +64,9 @@ namespace TruststampCore.Workflows
             }
         }
 
-        private void TimestampMerkeRoot()
+        private void TimestampMerkeRoot(TimestampProof timestampProof, IBlockchainService blockchainService)
         {
-            var fundingKeyWIF = _configuration.FundingKey();
+            var fundingKeyWIF = _configuration.FundingKey(timestampProof.Blockchain);
             if (String.IsNullOrWhiteSpace(fundingKeyWIF))
             {
                 _logger.DateInformation(Context.ID, $"No server key provided, using remote timestamping");
@@ -70,8 +74,8 @@ namespace TruststampCore.Workflows
                 return;
             }
 
-            var fundingKey = _blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
-            if (_blockchainService.VerifyFunds(fundingKey, null) == 0)
+            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
+            if (blockchainService.VerifyFunds(fundingKey, null) == 0)
             {
                 // There are funds on the key
                 Context.RunStep<ILocalTimestampStep>();

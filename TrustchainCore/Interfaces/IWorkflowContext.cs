@@ -26,7 +26,7 @@ namespace TrustchainCore.Interfaces
         Task Execute();
         T GetStep<T>();
         T AddStep<T>() where T : IWorkflowStep;
-        void RunStep<T>() where T : IWorkflowStep;
+        void RunStep<T>(int seconds = 0) where T : IWorkflowStep;
         void RunStepAgain(int seconds);
         void Log(string message);
     }

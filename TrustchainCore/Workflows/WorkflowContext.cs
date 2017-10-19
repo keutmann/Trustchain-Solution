@@ -105,7 +105,7 @@ namespace TrustchainCore.Workflows
             return default(T);
         }
 
-        public void RunStep<T>() where T : IWorkflowStep
+        public void RunStep<T>(int waitSeconds = 0) where T : IWorkflowStep
         {
             var found = false;
             for(int i = 0; i< Steps.Count; i++)
@@ -122,6 +122,11 @@ namespace TrustchainCore.Workflows
             if(!found)
             {
                 AddStep<T>();
+            }
+
+            if(waitSeconds > 0 )
+            {
+                Wait(waitSeconds);
             }
         }
 

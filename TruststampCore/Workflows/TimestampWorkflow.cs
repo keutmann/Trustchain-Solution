@@ -3,11 +3,19 @@ using Microsoft.Extensions.DependencyInjection;
 using TrustchainCore.Workflows;
 using TrustchainCore.Services;
 using TruststampCore.Interfaces;
+using TrustchainCore.Model;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+using TruststampCore.Extensions;
 
 namespace TruststampCore.Workflows
 {
-    public class TimestampWorkflow : WorkflowContext
+    public class TimestampWorkflow : WorkflowContext, ITimestampWorkflow
     {
+
+        [JsonProperty(PropertyName = "proof", NullValueHandling = NullValueHandling.Ignore)]
+        public TimestampProof Proof { get; set; }
+
         private IServiceProvider _serviceProvider;
         private ITimestampSynchronizationService _timestampSynchronizationService;
 
@@ -19,7 +27,11 @@ namespace TruststampCore.Workflows
 
         public override void Initialize()
         {
-            Steps.Add(_serviceProvider.GetRequiredService<IMerkleStep>());
+
+            AddStep<IMerkleStep>();
+            Proof = new TimestampProof();
+            var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
+            Proof.Blockchain = configuration.Blockchain();
             base.Initialize();
         }
 

@@ -4,13 +4,12 @@ using TrustchainCore.Interfaces;
 using TruststampCore.Interfaces;
 using Microsoft.Extensions.Logging;
 using TrustchainCore.Extensions;
+using TruststampCore.Enumerations;
 
 namespace TruststampCore.Workflows
 {
     public class MerkleStep : WorkflowStep, IMerkleStep
     {
-        public byte[] RootHash { get; set; }
-
         private ITrustDBService _trustDBService;
         private IMerkleTree _merkleTree;
         private ILogger<MerkleStep> _logger;
@@ -34,11 +33,14 @@ namespace TruststampCore.Workflows
             }
             _logger.DateInformation(Context.ID, $"Found {proofs.Count} proofs");
 
-            RootHash = _merkleTree.Build().Hash;
+            var timestampProof = ((ITimestampWorkflow)Context).Proof;
+            timestampProof.Status = TimestampProofStatusType.Waiting.ToString();
+
+            timestampProof.MerkleRoot = _merkleTree.Build().Hash;
 
             _trustDBService.DBContext.SaveChanges();
 
-            _logger.DateInformation(Context.ID, $"Merkle root of {proofs.Count} proofs : {RootHash.ConvertToHex()}");
+            _logger.DateInformation(Context.ID, $"Merkle root of {proofs.Count} proofs : {timestampProof.MerkleRoot.ConvertToHex()}");
 
         }
     }

@@ -29,11 +29,11 @@ namespace UnitTest.TruststampCore.Workflows
             var workflow = workflowService.Create<TimestampWorkflow>();
 
             var step = (MerkleStep)workflow.Steps[0];
-            Assert.IsNull(step.RootHash);
+            Assert.IsNotNull(step);
 
             step.Execute();
 
-            Assert.IsNotNull(step.RootHash);
+            Assert.IsNotNull(step);
 
         }
     }
