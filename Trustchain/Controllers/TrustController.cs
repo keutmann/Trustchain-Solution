@@ -27,6 +27,7 @@ namespace Trustchain.Controllers
         }
 
         [HttpGet]
+        [Route("api/[controller]/{issuerId}/{subjectId}/{scope}")]
         public ActionResult Get(byte[] issuerId, byte[] subjectId, string scope)
         {
             if (!_graphTrustService.ModelService.Graph.IssuersIndex.ContainsKey(issuerId))

@@ -12,6 +12,8 @@ using System.Text;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Trustchain
 {
@@ -40,6 +42,7 @@ namespace Trustchain
                     Version = "v1",
                 });
             });
+
 
             services.TrustchainCore();
             services.TrustgraphCore();
@@ -92,13 +95,18 @@ namespace Trustchain
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
- 
+
             app.UseMvc(routes =>
             {
+                //routes.MapRoute(
+                //    name: "stamp",
+                //    template: "v1/stamp/{blockchain}/{action=Index}/{source?}");
+
                 routes.MapRoute(
                     name: "default",
                     template: "v1/{controller}/{action=Index}/{id?}");
             });
+
 
             app.AllServices(_services);
         }

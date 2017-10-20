@@ -11,9 +11,9 @@ namespace TruststampCore.Workflows
     {
         private IServiceProvider _serviceProvider;
 
-        public TimestampScheduleWorkflow(IWorkflowService workflowService) : base(workflowService)
+        public TimestampScheduleWorkflow(IWorkflowService workflowService, IServiceProvider serviceProvider) : base(workflowService)
         {
-            _serviceProvider = workflowService.ServiceProvider;
+            _serviceProvider = serviceProvider;
         }
 
         public override void Initialize()

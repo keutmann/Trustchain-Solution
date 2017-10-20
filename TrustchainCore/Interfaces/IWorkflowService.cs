@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 
@@ -21,6 +22,6 @@ namespace TrustchainCore.Services
         //WorkflowContainer Load();
         WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);
         IList<IWorkflowContext> GetRunningWorkflows();
-        void RunWorkflows();
+        Task RunWorkflows();
     }
 }

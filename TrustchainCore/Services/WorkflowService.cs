@@ -20,7 +20,10 @@ namespace TrustchainCore.Services
         private ITrustDBService _trustDBService;
         private IExecutionSynchronizationService _executionSynchronizationService;
         public IServiceProvider ServiceProvider { get; set; }
+        private IContractResolver _contractResolver;
+        private IContractReverseResolver _contractReverseResolver;
         private ILogger _logger;
+        private IConfiguration _configuration;
 
         public IQueryable<WorkflowContainer> Workflows {
             get
@@ -29,26 +32,28 @@ namespace TrustchainCore.Services
             }
         }
 
-        public WorkflowService(ITrustDBService trustDBService, IServiceProvider serviceProvider, IExecutionSynchronizationService executionSynchronizationService, ILogger<WorkflowService> logger)
+        public WorkflowService(ITrustDBService trustDBService, IContractResolver contractResolver, IContractReverseResolver contractReverseResolver, 
+            IExecutionSynchronizationService executionSynchronizationService, ILogger<WorkflowService> logger, IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _trustDBService = trustDBService;
             _executionSynchronizationService = executionSynchronizationService;
-            ServiceProvider = serviceProvider;
+            _contractResolver = contractResolver;
+            _contractReverseResolver = contractReverseResolver;
             _logger = logger;
+            _configuration = configuration;
+            ServiceProvider = serviceProvider;
         }
 
         public IWorkflowContext Create(WorkflowContainer container) 
         {
             var settings = new JsonSerializerSettings
             {
-                ContractResolver = ServiceProvider.GetService<IContractResolver>(),
+                ContractResolver = _contractResolver,
                 TypeNameHandling = TypeNameHandling.Objects
             };
-            settings.Converters.Add(new DICustomConverter<IWorkflowContext>(ServiceProvider));
-
 
             var instance = (WorkflowContext)JsonConvert.DeserializeObject(container.Data, settings);
-            instance.WorkflowService = this;
+            //instance.WorkflowService = this;
             foreach (var step in instance.Steps)
             {
                 step.Context = instance;
@@ -63,7 +68,17 @@ namespace TrustchainCore.Services
 
         public T Create<T>() where T : class, IWorkflowContext
         {
-            T instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
+
+            //T instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = _contractResolver,
+                TypeNameHandling = TypeNameHandling.Objects
+            };
+
+            var instance = JsonConvert.DeserializeObject<T>("{}", settings);
+
+            //T instance =  (T)Activator.CreateInstance(typeof(T), new object[] { this });
             instance.Initialize(); // Initialize new workflow
                 
             return instance;
@@ -82,10 +97,9 @@ namespace TrustchainCore.Services
                     entity.State = workflow.State;
                     entity.Tag = workflow.Tag;
 
-                    var reverseResolver = ServiceProvider.GetService<IContractReverseResolver>();
                     var settings = new JsonSerializerSettings
                     {
-                        ContractResolver = reverseResolver,
+                        ContractResolver = _contractReverseResolver,
                         TypeNameHandling = TypeNameHandling.Objects
                     };
 
@@ -106,8 +120,8 @@ namespace TrustchainCore.Services
         {
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
-                ContractResolver = ServiceProvider.GetService<IContractResolver>(),
-                TypeNameHandling = TypeNameHandling.Objects | TypeNameHandling.Arrays
+                ContractResolver = _contractReverseResolver,
+                TypeNameHandling = TypeNameHandling.Objects
             };
 
             var entity = new WorkflowContainer
@@ -120,26 +134,67 @@ namespace TrustchainCore.Services
             return entity;
         }
 
-        public void RunWorkflows()
+        //public void RunWorkflows()
+        //{
+        //    int id = 0;
+        //    var taskProcessor = new System.Timers.Timer { Interval = _configuration.WorkflowInterval() }; // Run the interval 1 sec
+        //    taskProcessor.Elapsed += (sender, e) =>
+        //    {
+        //        taskProcessor.Enabled = false;
+        //        var localID = id++;
+        //        var scopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
+        //        using (var scope = scopeFactory.CreateScope())
+        //        {
+        //            var logger = scope.ServiceProvider.GetRequiredService<ILogger<WorkflowService>>();
+
+        //            logger.DateInformation(localID, $"TaskProcessor started");
+
+        //            var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
+
+        //            var workflows = workflowService.GetRunningWorkflows();
+        //            logger.DateInformation(localID, $"Workflows found: {workflows.Count}");
+
+        //            workflowService.Execute(workflows, localID);
+
+        //            logger.DateInformation(localID, $"TaskProcessor done");
+        //        }
+        //        taskProcessor.Enabled = true;
+        //    };
+        //    taskProcessor.Start();
+        //}
+
+        public Task RunWorkflows()
         {
-            var configuration = ServiceProvider.GetRequiredService<IConfiguration>();
-            int id = 0;
-            var taskProcessor = new System.Timers.Timer { Interval = configuration.GetValue<int>("WorkflowInterval", 1000) }; // Run the interval 1 sec
-            taskProcessor.Elapsed += (sender, e) =>
-            {
-                taskProcessor.Enabled = false;
-                var localID = id++;
-                _logger.DateInformation(localID, $"TaskProcessor started");
+            return Task.Run(() => {
 
-                var workflows = GetRunningWorkflows();
-                _logger.DateInformation(localID, $"Workflows found: {workflows.Count}");
+                while (true)
+                {
+                    int id = 0;
+                    var localID = id++;
 
-                Execute(workflows, localID);
+                    var scopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
+                    using (var scope = scopeFactory.CreateScope())
+                    {
+                        Task.Run(() =>
+                        {
+                            var logger = scope.ServiceProvider.GetRequiredService<ILogger<WorkflowService>>();
 
-                _logger.DateInformation(localID, $"TaskProcessor done");
-                taskProcessor.Enabled = true;
-            };
-            taskProcessor.Start();
+                            logger.DateInformation(localID, $"TaskProcessor started");
+
+                            var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
+
+                            var workflows = workflowService.GetRunningWorkflows();
+                            logger.DateInformation(localID, $"Workflows found: {workflows.Count}");
+
+                            workflowService.Execute(workflows, localID);
+
+                            logger.DateInformation(localID, $"TaskProcessor done");
+                        }).Wait();
+                    }
+
+                    Task.Delay(_configuration.WorkflowInterval()).Wait();
+                }
+            });
         }
 
         public IList<IWorkflowContext> GetRunningWorkflows()
@@ -162,14 +217,17 @@ namespace TrustchainCore.Services
             foreach (var workflow in workflows)
             {
                 _logger.DateInformation(localID, $"Executing workflow id : {workflow.ID}");
-                var task = workflow.Execute().ContinueWith(t => {
-                    _logger.DateInformation(localID, $"ContinueWith -> Done executing workflow id {workflow.ID}");
-                });
+                //var task = workflow.Execute().ContinueWith(t => {
+                //    _logger.DateInformation(localID, $"ContinueWith -> Done executing workflow id {workflow.ID}");
+                //});
 
-                executing.Add(task);
+                workflow.Execute().Wait();
+                _logger.DateInformation(localID, $"ContinueWith -> Done executing workflow id {workflow.ID}");
+                //executing.Add(task);
             }
 
-            Task.WaitAll(executing.ToArray());
+            //Task.WaitAll(executing.ToArray());
         }
     }
 }
+

@@ -29,7 +29,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
-            var workflow = new TimestampWorkflow(workflowService);
+            var workflow = new TimestampWorkflow(workflowService, timestampSynchronizationService, ServiceProvider);
             workflow.Initialize();
             workflow.CurrentStepIndex = 2;
             var merkleStep = (IMerkleStep)workflow.Steps[0];

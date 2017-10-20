@@ -8,8 +8,13 @@ namespace TrustchainCore.Extensions
     {
         public static void Trustchain(this IApplicationBuilder app)
         {
-            var workflowService = app.ApplicationServices.GetRequiredService<IWorkflowService>();
-            workflowService.RunWorkflows();
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using (var scope = scopeFactory.CreateScope())
+            {
+                var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
+                workflowService.RunWorkflows();
+            }
+
+        }
     }
-}
 }

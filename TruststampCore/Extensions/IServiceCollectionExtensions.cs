@@ -22,6 +22,7 @@ namespace TruststampCore.Extensions
             services.AddTransient<ILocalTimestampStep, LocalTimestampStep>();
             services.AddTransient<IRemoteTimestampStep, RemoteTimestampStep>();
 
+            services.AddTransient<TimestampScheduleWorkflow>();
             services.AddTransient<TimestampWorkflow>();
             services.AddTransient<IBlockchainRepository, SoChainTransactionRepository>();
             services.AddTransient<IBlockchainService, BitcoinService>();

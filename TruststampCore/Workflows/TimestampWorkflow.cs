@@ -19,10 +19,11 @@ namespace TruststampCore.Workflows
         private IServiceProvider _serviceProvider;
         private ITimestampSynchronizationService _timestampSynchronizationService;
 
-        public TimestampWorkflow(IWorkflowService workflowService) : base(workflowService)
+        public TimestampWorkflow(IWorkflowService workflowService, ITimestampSynchronizationService timestampSynchronizationService, IServiceProvider serviceProvider) : base(workflowService)
         {
-            _serviceProvider = workflowService.ServiceProvider;
-            _timestampSynchronizationService = _serviceProvider.GetRequiredService<ITimestampSynchronizationService>();
+
+            _serviceProvider = serviceProvider;
+            _timestampSynchronizationService = timestampSynchronizationService;
         }
 
         public override void Initialize()

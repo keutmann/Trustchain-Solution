@@ -33,7 +33,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
-            var workflow = new TimestampScheduleWorkflow(workflowService);
+            var workflow = new TimestampScheduleWorkflow(workflowService, ServiceProvider);
             workflow.Initialize();
 
             var data = JsonConvert.SerializeObject(workflow, settings);

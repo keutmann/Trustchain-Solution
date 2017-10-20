@@ -5,6 +5,7 @@ using TruststampCore.Interfaces;
 namespace Trustchain.Controllers
 {
 
+    [Route("api/{blockchain}/[controller]")]
     public class StampController : Controller
     {
 
@@ -15,8 +16,8 @@ namespace Trustchain.Controllers
             _proofService = proofService;
         }
         
-        [HttpPost]
-        public ActionResult Add([FromBody]byte[] source)
+        [HttpPost] // string blockchain, 
+        public ActionResult Add([FromBody]byte[] source, string blockchain)
         {
             return Ok(_proofService.AddProof(source));
         }
@@ -25,9 +26,9 @@ namespace Trustchain.Controllers
 
         // GET api/
         [HttpGet]
-        public ActionResult Get([FromQuery]byte[] source)
+        public ActionResult Get(string blockchain, [FromQuery]byte[] id)
         {
-            return Ok(_proofService.GetTimestampProof(source));
+            return Ok(_proofService.GetTimestampProof(id));
         }
 
         //[HttpGet]
