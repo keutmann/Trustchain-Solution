@@ -134,35 +134,6 @@ namespace TrustchainCore.Services
             return entity;
         }
 
-        //public void RunWorkflows()
-        //{
-        //    int id = 0;
-        //    var taskProcessor = new System.Timers.Timer { Interval = _configuration.WorkflowInterval() }; // Run the interval 1 sec
-        //    taskProcessor.Elapsed += (sender, e) =>
-        //    {
-        //        taskProcessor.Enabled = false;
-        //        var localID = id++;
-        //        var scopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
-        //        using (var scope = scopeFactory.CreateScope())
-        //        {
-        //            var logger = scope.ServiceProvider.GetRequiredService<ILogger<WorkflowService>>();
-
-        //            logger.DateInformation(localID, $"TaskProcessor started");
-
-        //            var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
-
-        //            var workflows = workflowService.GetRunningWorkflows();
-        //            logger.DateInformation(localID, $"Workflows found: {workflows.Count}");
-
-        //            workflowService.Execute(workflows, localID);
-
-        //            logger.DateInformation(localID, $"TaskProcessor done");
-        //        }
-        //        taskProcessor.Enabled = true;
-        //    };
-        //    taskProcessor.Start();
-        //}
-
         public Task RunWorkflows()
         {
             return Task.Run(() => {
