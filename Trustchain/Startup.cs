@@ -31,12 +31,7 @@ namespace Trustchain
         {
             ConfigureDbContext(services);
             
-            services.AddMvc(options =>
-            {
-                options.Filters.Add(new ApiExceptionFilterAttribute());
-                //options.Filters.Add(new EnableCors());
-                //[EnableCors("CorsPolicy")]
-            });
+            services.AddMvc();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info

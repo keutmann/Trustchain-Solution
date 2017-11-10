@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using TrustchainCore.Attributes;
 
 namespace TrustchainCore.Controllers
 {
     [Route("api/[controller]")]
-    public class ThrowController : Controller
+    public class ThrowController : ApiController
     {
         [HttpGet]
         public object Get()
@@ -15,12 +14,15 @@ namespace TrustchainCore.Controllers
     }
 
     [Route("api/[controller]")]
-    public class PingController : Controller
+    public class PingController : ApiController
     {
         [HttpGet]
         public ActionResult Get()
         {
-            return Ok("OK");
+            return ApiOk("OK");
         }
+
     }
+
+
 }

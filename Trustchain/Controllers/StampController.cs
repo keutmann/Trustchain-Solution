@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TrustchainCore.Attributes;
 using TrustchainCore.Builders;
+using TrustchainCore.Controllers;
 using TruststampCore.Interfaces;
 
 namespace Trustchain.Controllers
@@ -19,7 +20,7 @@ namespace Trustchain.Controllers
         [Route("api/{blockchain}/[controller]")]
         public ActionResult Add(string blockchain, [FromBody]byte[] source)
         {
-            return Ok(HttpResultBuilder.Success(_proofService.AddProof(source)));
+            return Ok(_proofService.AddProof(source));
         }
 
 
@@ -29,7 +30,7 @@ namespace Trustchain.Controllers
         [Route("api/{blockchain}/[controller]/{source}")]
         public ActionResult Get(string blockchain, byte[] source)
         {
-            return Ok(HttpResultBuilder.Success(_proofService.GetTimestampProof(source)));
+            return Ok(_proofService.GetTimestampProof(source));
         }
 
         //[HttpGet]
