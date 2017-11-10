@@ -19,7 +19,7 @@ namespace UnitTest.TrustchainCore.Workflow
         public void Create()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>();
+            var workflow = workflowService.Create<IWorkflowContext>();
             Assert.IsNotNull(workflow);
 
             var container = workflowService.CreateWorkflowContainer(workflow);
@@ -35,7 +35,7 @@ namespace UnitTest.TrustchainCore.Workflow
         public void CreateGeneric()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>();
+            var workflow = workflowService.Create<IWorkflowContext>();
             Assert.IsNotNull(workflow);
             workflow.CurrentStepIndex = 1;
 
@@ -51,7 +51,7 @@ namespace UnitTest.TrustchainCore.Workflow
         public void CreateWorkflowContainer()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>();
+            var workflow = workflowService.Create<IWorkflowContext>();
             Assert.IsNotNull(workflow);
             var container = workflowService.CreateWorkflowContainer(workflow);
             Assert.IsNotNull(container);
@@ -64,7 +64,7 @@ namespace UnitTest.TrustchainCore.Workflow
         public void Save()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>();
+            var workflow = workflowService.Create<IWorkflowContext>();
             Assert.IsNotNull(workflow);
 
             var id = workflowService.Save(workflow);
@@ -76,7 +76,7 @@ namespace UnitTest.TrustchainCore.Workflow
         public void CreateFromDB()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>();
+            var workflow = workflowService.Create<IWorkflowContext>();
             Assert.IsNotNull(workflow);
 
             var id = workflowService.Save(workflow);
@@ -95,7 +95,7 @@ namespace UnitTest.TrustchainCore.Workflow
 
             var list = new List<IWorkflowContext>();
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>();
+            var workflow = workflowService.Create<IWorkflowContext>();
             Assert.IsNotNull(workflow);
             list.Add(workflow);
 
@@ -113,7 +113,7 @@ namespace UnitTest.TrustchainCore.Workflow
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             for (int i = 0; i < 10; i++)
             {
-                var workflow = workflowService.Create<WorkflowContext>();
+                var workflow = workflowService.Create<IWorkflowContext>();
                 workflow.ID = i;
                 list.Add(workflow);
             }
@@ -136,15 +136,15 @@ namespace UnitTest.TrustchainCore.Workflow
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             for (int i = 0; i < count; i++)
             {
-                var workflow = workflowService.Create<WorkflowContext>();
+                var workflow = workflowService.Create<IWorkflowContext>();
                 var id = workflowService.Save(workflow);
                 list.Add(workflow);
             }
-            var wf = workflowService.Create<WorkflowContext>();
+            var wf = workflowService.Create<IWorkflowContext>();
             wf.State = WorkflowStatusType.Finished.ToString();
             workflowService.Save(wf);
 
-            wf = workflowService.Create<WorkflowContext>();
+            wf = workflowService.Create<IWorkflowContext>();
             wf.State = WorkflowStatusType.Failed.ToString();
             workflowService.Save(wf);
 
@@ -167,7 +167,7 @@ namespace UnitTest.TrustchainCore.Workflow
             var logger = ServiceProvider.GetRequiredService<ILogger<WorkflowServiceTest>>();
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<WorkflowContext>();
+            var workflow = workflowService.Create<IWorkflowContext>();
 
             var step = new BlockingWorkflowStep();
             workflow.Steps.Add(step);
@@ -187,7 +187,7 @@ namespace UnitTest.TrustchainCore.Workflow
 
             for (int i = 0; i < 5; i++)
             {
-                var workflow = workflowService.Create<WorkflowContext>();
+                var workflow = workflowService.Create<IWorkflowContext>();
                 var step = new BlockingWorkflowStep();
                 step.Seconds = i;
                 workflow.Steps.Add(step);

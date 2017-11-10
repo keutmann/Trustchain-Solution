@@ -10,6 +10,7 @@ using TrustgraphCore.Services;
 using TrustchainCore.Extensions;
 using Trustchain.Controllers;
 using TrustchainCore.Factories;
+using TrustgraphCore.Controllers;
 
 namespace UnitTest.TrustchainCore.Builders
 {
@@ -46,7 +47,7 @@ namespace UnitTest.TrustchainCore.Builders
             using (var context = new TrustDBContext(options))
             {
                 var trustDBService = new TrustDBService(context);
-                var trustController = new TrustController(graphTrustService, schemaService, trustDBService);
+                var trustController = new TrustController(graphTrustService);
 
                 trustController.Add(builder.Package);
 

@@ -70,13 +70,16 @@ namespace TrustchainCore.Services
         {
 
             //T instance = (T)Activator.CreateInstance(typeof(T), new object[] { this });
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = _contractResolver,
-                TypeNameHandling = TypeNameHandling.Objects
-            };
+            //var settings = new JsonSerializerSettings
+            //{
+            //    ContractResolver = _contractResolver,
+            //    TypeNameHandling = TypeNameHandling.Objects
+            //};
 
-            var instance = JsonConvert.DeserializeObject<T>("{}", settings);
+
+
+            //var instance = JsonConvert.DeserializeObject<T>("{}", settings);
+            var instance = ServiceProvider.GetRequiredService<T>();
 
             //T instance =  (T)Activator.CreateInstance(typeof(T), new object[] { this });
             instance.Initialize(); // Initialize new workflow
