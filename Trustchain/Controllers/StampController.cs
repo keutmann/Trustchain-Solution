@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
+using TrustchainCore.Attributes;
 using TrustchainCore.Builders;
 using TruststampCore.Interfaces;
 

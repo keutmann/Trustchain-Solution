@@ -8,12 +8,10 @@ using TrustgraphCore.Extensions;
 using TruststampCore.Extensions;
 using TrustchainCore.Repository;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
-
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using TrustchainCore.Attributes;
 
 namespace Trustchain
 {
@@ -32,8 +30,13 @@ namespace Trustchain
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureDbContext(services);
-
-            services.AddMvc();
+            
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new ApiExceptionFilterAttribute());
+                //options.Filters.Add(new EnableCors());
+                //[EnableCors("CorsPolicy")]
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info
