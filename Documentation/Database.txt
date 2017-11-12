@@ -28,6 +28,13 @@ Update-Database
 
 
 
+Scaffold model
+https://docs.microsoft.com/en-us/aspnet/core/tutorials/razor-pages/model
+
+
+dotnet aspnet-codegenerator razorpage -m Workflows -dc TrustDBContext -udl -outDir Pages\Workflow --referenceScriptLibraries
+
+
 Configuration settings
 
 

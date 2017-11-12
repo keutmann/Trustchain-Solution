@@ -12,6 +12,7 @@ using TrustchainCore.Extensions;
 using TrustchainCore.Workflows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace TrustchainCore.Services
 {
@@ -75,8 +76,6 @@ namespace TrustchainCore.Services
             //    ContractResolver = _contractResolver,
             //    TypeNameHandling = TypeNameHandling.Objects
             //};
-
-
 
             //var instance = JsonConvert.DeserializeObject<T>("{}", settings);
             var instance = ServiceProvider.GetRequiredService<T>();
