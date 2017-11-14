@@ -18,6 +18,7 @@ namespace TrustchainCore.Extensions
             services.AddScoped<ITrustBinary, TrustBinary>();
             services.AddScoped<ITrustDBService, TrustDBService>();
             services.AddScoped<IWorkflowService, WorkflowService>();
+            services.AddScoped<IKeyValueService, KeyValueService>();
             
             services.AddTransient<ICryptoStrategyFactory, CryptoStrategyFactory>();
             services.AddTransient<CryptoBTCPKH>();

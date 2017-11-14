@@ -29,6 +29,7 @@ namespace TruststampCore.Workflows
         {
             var timestampProof = ((ITimestampWorkflow)Context).Proof;
             timestampProof.Status = TimestampProofStatusType.Done.ToString();
+            timestampProof.Remote = new TrustchainCore.Model.BlockchainProof();
 
         }
     }
