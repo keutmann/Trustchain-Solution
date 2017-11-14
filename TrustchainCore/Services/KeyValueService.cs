@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
@@ -13,8 +15,7 @@ namespace TrustchainCore.Services
         {
             DBContext = trustDBContext;
         }
-
-        public void Set(string key, byte[] value)
+        public async Task<int> SetAsync(string key, byte[] value)
         {
             var result = DBContext.KeyValues.FirstOrDefault(p => p.Key.Equals(key));
             if (result != null)
@@ -23,23 +24,51 @@ namespace TrustchainCore.Services
             }
             else
             {
-                result = new KeyValue();
-                result.Key = key;
-                result.Value = value;
+                result = new KeyValue
+                {
+                    Key = key,
+                    Value = value
+                };
                 DBContext.KeyValues.Add(result);
             }
 
-            DBContext.SaveChanges();
+            return await DBContext.SaveChangesAsync();
         }
 
-        public byte[] Get(string key)
+        public int Set(string key, byte[] value)
         {
-            var result = DBContext.KeyValues.FirstOrDefault(p => p.Key.Equals(key));
-            if(result != null)
+            return SetAsync(key, value).Result;
+        }
+
+        public async Task<byte[]> GetAsync(string key)
+        {
+            var result = await DBContext.KeyValues.FirstOrDefaultAsync(p => p.Key.Equals(key));
+            if (result != null)
                 return result.Value;
             return null;
         }
 
-        
+        public byte[] Get(string key)
+        {
+            return GetAsync(key).Result;
+        }
+
+
+        public async Task<int> RemoveAsync(string key)
+        {
+            var entity = await DBContext.KeyValues.FirstOrDefaultAsync(p => p.Key.Equals(key));
+            if (entity != null)
+            {
+                DBContext.KeyValues.Remove(entity);
+                return await DBContext.SaveChangesAsync();
+            }
+            return 0;
+        }
+
+        public int Remove(string key)
+        {
+            return RemoveAsync(key).Result;
+        }
+
     }
 }
