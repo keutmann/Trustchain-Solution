@@ -20,6 +20,8 @@ namespace TrustchainCore.Extensions
             services.AddScoped<IWorkflowService, WorkflowService>();
             
             services.AddTransient<ICryptoStrategyFactory, CryptoStrategyFactory>();
+            services.AddTransient<CryptoBTCPKH>();
+            
             services.AddTransient<ITrustSchemaService, TrustSchemaService>();
             services.AddTransient<IMerkleTree, MerkleTreeSorted>();
             // ---------------------------------------------------------------------------------------------------------------
@@ -31,8 +33,8 @@ namespace TrustchainCore.Extensions
             
             services.AddTransient<IConfigureOptions<MvcJsonOptions>, JsonOptionsSetup>();
             services.AddTransient<IWorkflowContext, WorkflowContext>();
-            
 
+            
             // ---------------------------------------------------------------------------------------------------------------
         }
 

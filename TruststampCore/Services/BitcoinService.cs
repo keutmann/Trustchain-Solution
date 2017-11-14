@@ -106,6 +106,7 @@ namespace TruststampCore.Services
                 .SendOP_Return(merkleRoot) // Put batch root on the OP_Return out tx
                 .AddKeys(merkleRootKey)
                 .SendFees(fee)
+                .SetChange(serverAddress)
                 .BuildTransaction(true);
 
             _blockchain.BroadcastAsync(txNota);
@@ -131,7 +132,10 @@ namespace TruststampCore.Services
             if (fee.Satoshi * 2 > sumOfCoins)
             {
                 var unspent = _blockchain.GetUnspentAsync(address.ToString()); //.ToWif());
-                coins = ParseTX(unspent.Result);
+                unspent.Wait();
+                var obj = unspent.Result;
+
+                coins = ParseTX(obj);
             }
 
             return coins;

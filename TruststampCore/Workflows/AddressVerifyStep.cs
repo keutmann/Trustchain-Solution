@@ -23,7 +23,6 @@ namespace TruststampCore.Workflows
             _blockchainServiceFactory = blockchainServiceFactory;
             _configuration = configuration;
             _logger = logger;
-            
         }
 
         public override void Execute()

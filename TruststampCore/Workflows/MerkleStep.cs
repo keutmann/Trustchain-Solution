@@ -38,10 +38,7 @@ namespace TruststampCore.Workflows
 
             timestampProof.MerkleRoot = _merkleTree.Build().Hash;
 
-            _trustDBService.DBContext.SaveChanges();
-
             _logger.DateInformation(Context.ID, $"Merkle root of {proofs.Count} proofs : {timestampProof.MerkleRoot.ConvertToHex()}");
-
         }
     }
 }

@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using UnitTest.TrustchainCore.Workflows;
+using TruststampCore.Interfaces;
+using UnitTest.TruststampCore.Mocks;
 
 namespace UnitTest
 {
@@ -22,8 +24,17 @@ namespace UnitTest
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
-            services.AddTransient<IConfiguration>(p => new ConfigurationBuilder().Build());
+
+            services.AddTransient<IConfiguration>(p => {
+                var config = new ConfigurationBuilder().AddJsonFile("appsettings.json.config", optional: true).Build();
+                config["blockchain"] = "btctest"; // Use bitcoin test net
+                config["btctest_fundingkey"] = "cMcGZkth7ufvQC59NSTSCTpepSxXbig9JfhCYJtn9RppU4DXx4cy"; // btc test net WIF key 
+                return config;
+                });
+
+
             services.AddTransient<IBlockingWorkflowStep, BlockingWorkflowStep>();
+            services.AddTransient<IBlockchainRepository, BlockchainRepositoryMock>();
 
             ServiceScope = services.BuildServiceProvider(false).CreateScope();
             ServiceProvider = ServiceScope.ServiceProvider;
