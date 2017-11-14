@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TrustchainCore.Interfaces;
 
@@ -19,6 +20,7 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "tag", NullValueHandling = NullValueHandling.Ignore)]
         public string Tag { get; set; }
 
+        [UIHint("JSON")]
         [JsonProperty(PropertyName = "data", NullValueHandling = NullValueHandling.Ignore)]
         public string Data { get; set; }
     }
