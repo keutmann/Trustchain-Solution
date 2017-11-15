@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
@@ -18,6 +19,14 @@ namespace TruststampCore.Services
             _timestampSynchronizationService = timestampSynchronizationService;
             _trustDBService = trustDBService;
             _timestampProofFactory = timestampProofFactory;
+        }
+
+        public IQueryable<ProofEntity> Proofs
+        {
+            get
+            {
+                return _trustDBService.Proofs;
+            }
         }
 
         public ProofEntity AddProof(byte[] source)
@@ -48,5 +57,7 @@ namespace TruststampCore.Services
             var entity = GetProof(source);
             return _timestampProofFactory.Create(entity);
         }
+
+        
     }
 }

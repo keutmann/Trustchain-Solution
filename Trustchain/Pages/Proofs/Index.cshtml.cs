@@ -19,11 +19,11 @@ namespace Trustchain.Pages.Proofs
             _context = context;
         }
 
-        public IList<ProofEntity> ProofEntity { get;set; }
+        public ProofEntity Proof { get;set; }
 
-        public async Task OnGetAsync()
+        public void OnGetAsync()
         {
-            ProofEntity = await _context.Proofs.ToListAsync();
+            Proof = new ProofEntity();
         }
     }
 }

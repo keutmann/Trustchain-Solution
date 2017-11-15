@@ -9,11 +9,13 @@ namespace TruststampCore.Factories
 {
     public class TimestampProofFactory : ITimestampProofFactory
     {
-        private ITrustDBService _trustDBService;
+        //private ITrustDBService _trustDBService;
+        private IWorkflowService _workflowService;
 
-        public TimestampProofFactory(ITrustDBService trustDBService)
+        public TimestampProofFactory(IWorkflowService workflowService)
         {
-            _trustDBService = trustDBService;
+            //_trustDBService = trustDBService;
+            _workflowService = workflowService;
         }
 
         public TimestampProof Create(ProofEntity proofEntity)
@@ -25,11 +27,13 @@ namespace TruststampCore.Factories
             proof.Registered = proofEntity.Registered;
             proof.WorkflowID = proofEntity.WorkflowID;
 
-            var workflow = (ITimestampWorkflow)_trustDBService.Workflows.FirstOrDefault(p => p.ID == proofEntity.WorkflowID);
-            if (workflow != null)
-            {
-                proof.Blockchain = workflow.Proof;
-            }
+
+            var workflowContainer = _workflowService.Workflows.FirstOrDefault(p => p.ID == proofEntity.WorkflowID);
+            if (workflowContainer == null)
+                return proof;
+
+            var workflow = (ITimestampWorkflow)_workflowService.Create(workflowContainer);
+            proof.Blockchain = workflow.Proof;
               
             return proof;
         }

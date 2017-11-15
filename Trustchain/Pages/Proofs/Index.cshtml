@@ -1,5 +1,86 @@
 @page
 @model Trustchain.Pages.Proofs.IndexModel
+@{
+    ViewData["Title"] = "Proofs";
+}
+<h2>Proof</h2>
+
+<div id="toolbar" class="btn-group">
+    <button id="btninfo" class="btn btn-default" type="button"><i class="glyphicon glyphicon-info-sign"></i>&nbsp;row info</button>
+</div>
+
+<div class="container-fluid">
+    <table id="table"
+           data-unique-id="ID"
+           data-sort-name="ID"
+           data-sort-order="asc"
+           data-classes="table table-condensed table-hover table-striped"
+           data-toggle="table"
+           data-side-pagination="server"
+           data-url="/api/Proof"
+           data-query-params="extraServerParams"
+           data-pagination="true"
+           data-show-refresh="true"
+           data-search="true"
+           data-toolbar="#toolbar"
+           data-page-size="20"
+           data-page-list="[5,10,20,50,100,All]">
+        <thead>
+            <tr>
+                <th data-field="ID" data-sortable="true">@Html.DisplayNameFor(model => model.Proof.ID)</th>
+                <th data-field="Source" data-sortable="true">@Html.DisplayNameFor(model => model.Proof.Source)</th>
+                <th data-field="WorkflowID" data-sortable="true">@Html.DisplayNameFor(model => model.Proof.WorkflowID)</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@section scripts {
+    @await Html.PartialAsync("bootstraptable")
+
+    <script type="text/javascript">
+
+    function extraServerParams(params) {
+      params.ExtraParam = 2;
+      return params;
+    }
+
+    function highLightRow($tr) {
+      $tr.addClass('highlight').siblings().removeClass('highlight');
+    }
+
+    function getId($element) {
+      var result = $($element).closest('tr').data('uniqueid');
+      return result;
+    }
+
+    $(document).ready(function () {
+      var $table = $('#table');
+
+      $('#btninfo').click(function () {
+        $tr = $table.find('tr.highlight');
+        var id = getId($tr);
+
+        var msg = (id === undefined) ? 'No row selected' : 'Country code : ' + id;
+        alert(msg);
+      });
+
+      // register row-click event
+      $table.on('click-row.bs.table', function ($element, row, $tr) {
+        highLightRow($tr);
+      });
+
+    });
+
+    </script>
+}
+
+
+
+
+
+@*@page
+@model Trustchain.Pages.Proofs.IndexModel
 
 @{
     ViewData["Title"] = "Index";
@@ -37,4 +118,4 @@
         </tr>
 }
     </tbody>
-</table>
+</table>*@

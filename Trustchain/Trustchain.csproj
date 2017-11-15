@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Controllers\StampController.cs" />
     <Compile Remove="Controllers\TrustController.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -25,5 +26,8 @@
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\lib\bootstrap-table\bootstrap-table.js" />
   </ItemGroup>
 </Project>

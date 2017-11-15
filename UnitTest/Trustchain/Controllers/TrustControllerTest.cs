@@ -8,7 +8,6 @@ using TrustchainCore.Strategy;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 using TrustchainCore.Extensions;
-using Trustchain.Controllers;
 using TrustchainCore.Factories;
 using TrustgraphCore.Controllers;
 
