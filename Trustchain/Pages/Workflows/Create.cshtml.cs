@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
 
-namespace Trustchain.Pages.Workflow
+namespace Trustchain.Pages.Workflows
 {
     public class CreateModel : PageModel
     {

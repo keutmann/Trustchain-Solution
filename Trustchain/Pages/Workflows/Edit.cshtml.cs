@@ -4,17 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
 
-namespace Trustchain.Pages.Workflow
+namespace Trustchain.Pages.Workflows
 {
-    public class DeleteModel : PageModel
+    public class EditModel : PageModel
     {
         private readonly TrustchainCore.Repository.TrustDBContext _context;
 
-        public DeleteModel(TrustchainCore.Repository.TrustDBContext context)
+        public EditModel(TrustchainCore.Repository.TrustDBContext context)
         {
             _context = context;
         }
@@ -38,19 +39,22 @@ namespace Trustchain.Pages.Workflow
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
+        public async Task<IActionResult> OnPostAsync()
         {
-            if (id == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return Page();
             }
 
-            WorkflowContainer = await _context.Workflows.FindAsync(id);
+            _context.Attach(WorkflowContainer).State = EntityState.Modified;
 
-            if (WorkflowContainer != null)
+            try
             {
-                _context.Workflows.Remove(WorkflowContainer);
                 await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                
             }
 
             return RedirectToPage("./Index");

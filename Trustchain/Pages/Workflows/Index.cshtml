@@ -1,5 +1,5 @@
 @page
-@model Trustchain.Pages.Workflow.IndexModel
+@model Trustchain.Pages.Workflows.IndexModel
 
 @{
     ViewData["Title"] = "Index";
@@ -13,24 +13,30 @@
 <table class="table">
     <thead>
         <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.WorkflowContainer[0].Type)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.WorkflowContainer[0].State)
-                </th>
-                @*<th>
-                    @Html.DisplayNameFor(model => model.WorkflowContainer[0].Tag)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.WorkflowContainer[0].Data)
-                </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.WorkflowContainer[0].ID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkflowContainer[0].Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkflowContainer[0].State)
+            </th>
+            @*<th>
+                @Html.DisplayNameFor(model => model.WorkflowContainer[0].Tag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkflowContainer[0].Data)
+            </th>*@
             <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model.WorkflowContainer) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ID)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Type)
             </td>

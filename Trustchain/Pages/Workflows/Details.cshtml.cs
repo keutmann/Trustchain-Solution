@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
 
-namespace Trustchain.Pages.Workflow
+namespace Trustchain.Pages.Workflows
 {
     public class DetailsModel : PageModel
     {

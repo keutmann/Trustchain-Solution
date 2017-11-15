@@ -5,12 +5,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using TrustchainCore.Controllers;
+using TrustchainCore.Extensions;
 using TrustchainCore.Model;
 using TruststampCore.Interfaces;
 
 namespace TruststampCore.Controllers
 {
-    public class ProofController : BaseApiController
+    public class ProofController : Controller
     {
 
         private IProofService _proofService;
@@ -63,10 +64,10 @@ namespace TruststampCore.Controllers
             //searchFields.Remove("ISO2");
 
             // Perform filtering
-            IQueryable items = SearchItems(_proofService.Proofs, search, searchFields);
+            IQueryable items = _proofService.Proofs.Search(search, searchFields);
 
             // Sort the filtered items and apply paging
-            return Content(ItemsToJson(items, columnNames, sort, order, limit, offset), "application/json");
+            return Ok(items.Filter(columnNames, sort, order, limit, offset));
         }
         
     }
