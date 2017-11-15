@@ -98,11 +98,11 @@ namespace TruststampCore.Repository
                 throw new ArgumentNullException("tx");
             var jsonTx = new JObject
             {
-                ["hex"] = tx.ToHex()
+                ["tx_hex"] = tx.ToHex()
             };
             var content = new StringContent(jsonTx.ToString(), Encoding.UTF8, "application/json"); 
 
-            using (var response = await Client.PostAsync($"{SoChainAddress}/api/v2/send_tx/{BlockchainName}", content).ConfigureAwait(false))
+            using (var response = await Client.PostAsync($"{SoChainAddress}/send_tx/{BlockchainName}", content).ConfigureAwait(false))
             {
                 var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var json = JObject.Parse(result);

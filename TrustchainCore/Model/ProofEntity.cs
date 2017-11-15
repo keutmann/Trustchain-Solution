@@ -23,7 +23,7 @@ namespace TrustchainCore.Model
         //[JsonProperty(PropertyName = "partition", NullValueHandling = NullValueHandling.Ignore)]
         //public string partition;
 
-        [JsonProperty(PropertyName = "registered", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "registered")]
         public DateTime Registered;
     }
 }

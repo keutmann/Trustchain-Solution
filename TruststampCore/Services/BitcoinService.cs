@@ -24,7 +24,7 @@ namespace TruststampCore.Services
             _cryptoStrategyFactory = cryptoStrategyFactory;
 
             CryptoStrategy = _cryptoStrategyFactory.GetService("btcpkh");
-            Network = Network.Main;
+            Network =  Network.TestNet;
         }
 
         /// <summary>
