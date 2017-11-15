@@ -11,7 +11,7 @@ using TruststampCore.Workflows;
 namespace UnitTest.TruststampCore.Workflows
 {
     [TestClass]
-    public class LocalTimestampStepTest : StartupTest
+    public class LocalTimestampStepTest : StartupMock
     {
         [TestMethod]
         public void Execute()

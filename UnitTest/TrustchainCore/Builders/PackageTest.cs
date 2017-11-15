@@ -10,7 +10,7 @@ using TrustchainCore.Strategy;
 namespace UnitTest.TrustchainCore.Builders
 {
     [TestClass]
-    public class PackageTest : StartupTest
+    public class PackageTest : StartupMock
     {
         [TestMethod]
         public void Build()

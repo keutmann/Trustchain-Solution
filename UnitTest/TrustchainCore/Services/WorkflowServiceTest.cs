@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace UnitTest.TrustchainCore.Workflow
 {
     [TestClass]
-    public class WorkflowServiceTest : StartupTest
+    public class WorkflowServiceTest : StartupMock
     {
 
         [TestMethod]

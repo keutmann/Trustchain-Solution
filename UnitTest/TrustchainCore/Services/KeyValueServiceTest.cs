@@ -6,7 +6,7 @@ using TrustchainCore.Interfaces;
 namespace UnitTest.TrustchainCore.Workflow
 {
     [TestClass]
-    public class KeyValueServiceTest : StartupTest
+    public class KeyValueServiceTest : StartupMock
     {
 
         [TestMethod]

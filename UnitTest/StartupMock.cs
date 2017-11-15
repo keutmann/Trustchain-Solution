@@ -14,7 +14,7 @@ using UnitTest.TruststampCore.Mocks;
 
 namespace UnitTest
 {
-    public class StartupTest : Startup, IDisposable
+    public class StartupMock : Startup, IDisposable
     {
         public IServiceProvider  ServiceProvider { get; set; }
         public IServiceScope ServiceScope { get; set; }
@@ -48,11 +48,11 @@ namespace UnitTest
             ServiceScope.Dispose();
         }
 
-        public StartupTest() : base(null)
+        public StartupMock() : base(null)
         {
         }
 
-        public StartupTest(IConfiguration configuration) : base(configuration)
+        public StartupMock(IConfiguration configuration) : base(configuration)
         {
         }
 
@@ -69,9 +69,9 @@ namespace UnitTest
             // Do not create timers here!
         }
 
-        public static StartupTest CreateStartupTest()
+        public static StartupMock CreateStartupTest()
         {
-            var startup = new StartupTest(null);
+            var startup = new StartupMock(null);
             startup.Init();
             return startup;
         }

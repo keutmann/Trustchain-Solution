@@ -15,7 +15,7 @@ using TruststampCore.Workflows;
 namespace UnitTest.TruststampCore.Workflows
 {
     [TestClass]
-    public class TimestampWorkflowTest : StartupTest
+    public class TimestampWorkflowTest : StartupMock
     {
         [TestMethod]
         public void Serialize()

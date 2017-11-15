@@ -15,7 +15,7 @@ using TrustgraphCore.Controllers;
 namespace UnitTest.TrustchainCore.Builders
 {
     [TestClass]
-    public class TrustControllerTest : StartupTest
+    public class TrustControllerTest : StartupMock
     {
         [TestMethod]
         public void TrustController_Add()

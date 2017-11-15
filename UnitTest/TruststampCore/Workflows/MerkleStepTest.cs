@@ -11,7 +11,7 @@ using TruststampCore.Workflows;
 namespace UnitTest.TruststampCore.Workflows
 {
     [TestClass]
-    public class MerkleStepTest : StartupTest
+    public class MerkleStepTest : StartupMock
     {
         [TestMethod]
         public void Execute()

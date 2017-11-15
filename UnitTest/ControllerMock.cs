@@ -7,7 +7,7 @@ using System;
 
 namespace UnitTest
 {
-    public class ControllerTest
+    public class ControllerMock
     {
         public WebHostBuilder HostBuilder { get; set; }
         public TestServer Server { get; set; }
@@ -16,7 +16,7 @@ namespace UnitTest
         public void Init()
         {
             HostBuilder = new WebHostBuilder();
-            HostBuilder.UseStartup<StartupTest>();
+            HostBuilder.UseStartup<StartupMock>();
             Server = new TestServer(HostBuilder);
         }
 

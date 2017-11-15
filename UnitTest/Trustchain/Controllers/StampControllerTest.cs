@@ -3,7 +3,7 @@
 namespace UnitTest.Trustchain.Controllers
 {
     [TestClass]
-    public class StampControllerTest : ControllerTest
+    public class StampControllerTest : ControllerMock
     {
         [TestMethod]
         public void Add()

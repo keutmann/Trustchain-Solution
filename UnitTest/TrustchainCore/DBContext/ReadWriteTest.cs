@@ -13,7 +13,7 @@ using TrustchainCore.Factories;
 namespace UnitTest.TrustchainCore.Builders
 {
     [TestClass]
-    public class ReadWriteTest : StartupTest
+    public class ReadWriteTest : StartupMock
     {
         [TestMethod]
         public void ReadWritePackage()

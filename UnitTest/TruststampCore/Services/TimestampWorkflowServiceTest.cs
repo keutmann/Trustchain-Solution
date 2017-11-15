@@ -12,7 +12,7 @@ using TrustchainCore.Services;
 namespace UnitTest.TruststampCore.Services
 {
     [TestClass]
-    public class TimestampWorkflowServiceTest : StartupTest
+    public class TimestampWorkflowServiceTest : StartupMock
     {
         [TestMethod]
         public void EnsureTimestampWorkflow()
