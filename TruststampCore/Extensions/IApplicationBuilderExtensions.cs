@@ -15,6 +15,12 @@ namespace TruststampCore.Extensions
             using (var scope = scopeFactory.CreateScope())
             {
                 var timestampWorkflowService = scope.ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
+                var trustDBService = scope.ServiceProvider.GetRequiredService<ITrustDBService>();
+
+                // Do some clean up, because 
+                var workflows = trustDBService.Workflows.Select(p => p);
+                trustDBService.DBContext.Workflows.RemoveRange(workflows.ToArray());
+                trustDBService.DBContext.SaveChanges();
 
                 timestampWorkflowService.EnsureTimestampWorkflow(); // Make sure that there is a Timestamp engine workflow
                 timestampWorkflowService.CreateNextTimestampWorkflow(); // Make sure that the CurrentWorkflowID is set for Proof handling

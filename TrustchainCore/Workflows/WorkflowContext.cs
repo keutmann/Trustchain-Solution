@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TrustchainCore.Enumerations;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Services;
+using TrustchainCore.Extensions;
 
 namespace TrustchainCore.Workflows
 {
@@ -20,8 +21,11 @@ namespace TrustchainCore.Workflows
         [JsonIgnore]
         public string Tag { get; set; }
 
+        [JsonProperty(PropertyName = "nextExecution")]
+        public long NextExecution { get; set; }
 
-        public DateTime NextExecution { get; set; }
+        [JsonProperty(PropertyName = "created")]
+        public long Created { get; set; }
 
         public int CurrentStepIndex { get; set; }
 
@@ -40,7 +44,7 @@ namespace TrustchainCore.Workflows
         public WorkflowContext(IWorkflowService workflowService) 
         {
             WorkflowService = workflowService;
-            NextExecution = DateTime.MinValue;
+            NextExecution = DateTime.MinValue.ToUnixTime();
             Steps = new List<IWorkflowStep>();
             Logs = new List<IWorkflowLog>();
             State = WorkflowStatusType.New.ToString();
@@ -48,6 +52,8 @@ namespace TrustchainCore.Workflows
 
         public virtual void Initialize()
         {
+            Created = DateTime.Now.ToUnixTime();
+
             foreach (var step in Steps)
             {
                 step.Context = this;
@@ -141,7 +147,7 @@ namespace TrustchainCore.Workflows
 
         public virtual bool DoExecution()
         {
-            if (NextExecution > DateTime.Now)
+            if (NextExecution > DateTime.Now.ToUnixTime())
                 return false;
             return true;
         }
@@ -170,7 +176,7 @@ namespace TrustchainCore.Workflows
 
         public virtual void Wait(int seconds)
         {
-            NextExecution = DateTime.Now.AddSeconds(seconds);
+            NextExecution = DateTime.Now.AddSeconds(seconds).ToUnixTime();
         }
 
         public virtual void RunStepAgain(int seconds)

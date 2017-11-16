@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using TrustchainCore.Workflows;
+using TruststampCore.Extensions;
 using TruststampCore.Interfaces;
-using TruststampCore.Services;
 
 namespace TruststampCore.Workflows
 {
@@ -24,7 +24,7 @@ namespace TruststampCore.Workflows
             }
 
             // Rerun this step after x time, never to exit
-            Context.RunStepAgain(_configuration.GetValue<int>("TimestampInterval", 60 * 10)); // Default 10 min
+            Context.RunStepAgain(_configuration.TimestampInterval()); // Default 10 min
         }
     }
 }

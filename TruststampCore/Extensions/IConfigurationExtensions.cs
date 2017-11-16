@@ -16,9 +16,14 @@ namespace TruststampCore.Extensions
             return configuration.GetValue(blockchain + "_fundingkey", defaultValue);
         }
 
-        public static int StepRetryAttemptWait(this IConfiguration configuration, int defaultValue = 60*10)
+        public static int StepRetryAttemptWait(this IConfiguration configuration, int defaultValue = 60 * 10)
         {
             return configuration.GetValue("stepretryattemptwait", defaultValue); // 10 minutes
+        }
+
+        public static int TimestampInterval(this IConfiguration configuration, int defaultValue = 60*10)
+        {
+            return configuration.GetValue("timestampinterval", defaultValue); // 10 minutes
         }
 
         public static int ConfirmationThreshold(this IConfiguration configuration, string blockchain = null, int defaultValue = 6)

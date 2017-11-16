@@ -1,16 +1,21 @@
 ﻿using System;
 using TrustchainCore.Interfaces;
+using TrustchainCore.Extensions;
+using Newtonsoft.Json;
 
 namespace TrustchainCore.Workflows
 {
     public class WorkflowLog : IWorkflowLog
     {
-        public DateTime Time { get; set; }
+        [JsonProperty(PropertyName = "time")]
+        public long Time { get; set; }
+
+        [JsonProperty(PropertyName = "message", NullValueHandling = NullValueHandling.Ignore)]
         public string Message { get; set; }
 
         public WorkflowLog()
         {
-            Time = DateTime.Now;
+            Time = DateTime.Now.ToUnixTime();
         }
     }
 }

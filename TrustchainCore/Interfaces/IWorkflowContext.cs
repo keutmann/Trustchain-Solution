@@ -17,7 +17,8 @@ namespace TrustchainCore.Interfaces
         IList<IWorkflowStep> Steps { get; set; }
         int CurrentStepIndex { get; set; }
         string Tag { get; set; }
-        DateTime NextExecution { get; set; }
+        long NextExecution { get; set; }
+        long Created { get; set; }
 
         bool DoExecution();
         void Wait(int seconds);

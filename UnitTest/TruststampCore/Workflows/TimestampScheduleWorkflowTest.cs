@@ -74,7 +74,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             var proofService = ServiceProvider.GetRequiredService<IProofService>();
             proofService.AddProof(Guid.NewGuid().ToByteArray());
-            workflow.NextExecution = DateTime.MinValue;
+            workflow.NextExecution = DateTime.MinValue.ToUnixTime();
 
             workflow.Execute().Wait();
             Assert.AreNotEqual(saveCurrentID, timestampSynchronizationService.CurrentWorkflowID);

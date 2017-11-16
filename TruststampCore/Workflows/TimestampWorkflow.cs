@@ -30,7 +30,7 @@ namespace TruststampCore.Workflows
         public override void Initialize()
         {
             AddStep<IMerkleStep>();
-            AddStep<ILocalTimestampStep>();
+            //AddStep<ILocalTimestampStep>();
 
             Proof = new BlockchainProof();
             Proof.Registered = DateTime.Now.ToUnixTime();
