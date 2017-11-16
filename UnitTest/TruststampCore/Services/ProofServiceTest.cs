@@ -18,10 +18,11 @@ namespace UnitTest.TruststampCore.Services
 
             var source = Guid.NewGuid().ToByteArray();
             var entity = proofService.AddProof(source);
+
             Assert.IsNotNull(entity);
             Assert.IsTrue(entity.ID > 0);
             Assert.IsTrue(entity.WorkflowID == timestampSynchronizationService.CurrentWorkflowID);
-            Assert.IsTrue(entity.Registered > DateTime.MinValue);
+            Assert.IsTrue(entity.Registered > DateTime.MinValue.ToUnixTime());
             Assert.IsTrue(source.Equals(entity.Source));
         }
 
@@ -39,6 +40,7 @@ namespace UnitTest.TruststampCore.Services
             Assert.AreEqual(addEntity.WorkflowID, getEntity.WorkflowID);
             Assert.IsTrue(addEntity.Source.Equals(getEntity.Source));
             Assert.AreEqual(addEntity.Registered, getEntity.Registered);
+            Assert.IsTrue(getEntity.Registered > DateTime.MinValue.ToUnixTime());
         }
 
     }

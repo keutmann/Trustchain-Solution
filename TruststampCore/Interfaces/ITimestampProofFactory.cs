@@ -1,10 +1,9 @@
 ﻿using TrustchainCore.Model;
-using TruststampCore.Model;
 
 namespace TruststampCore.Interfaces
 {
-    public interface ITimestampProofFactory
+    public interface IBlockchainProofFactory
     {
-        TimestampProof Create(ProofEntity proofEntity);
+        BlockchainProof Create(ProofEntity proofEntity);
     }
 }

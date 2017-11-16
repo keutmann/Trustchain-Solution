@@ -10,9 +10,10 @@ using TrustchainCore.Repository;
 namespace TrustchainCore.Migrations
 {
     [DbContext(typeof(TrustDBContext))]
-    partial class TrustDBContextModelSnapshot : ModelSnapshot
+    [Migration("20171116135939_Registered")]
+    partial class Registered
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,40 +1,36 @@
-﻿using System.Linq;
-using TrustchainCore.Interfaces;
+﻿using System.Collections.Generic;
+using System.Linq;
 using TrustchainCore.Model;
 using TrustchainCore.Services;
 using TruststampCore.Interfaces;
-using TruststampCore.Model;
 
 namespace TruststampCore.Factories
 {
-    public class TimestampProofFactory : ITimestampProofFactory
+    public class BlockchainProofFactory : IBlockchainProofFactory
     {
         //private ITrustDBService _trustDBService;
         private IWorkflowService _workflowService;
 
-        public TimestampProofFactory(IWorkflowService workflowService)
+        public BlockchainProofFactory(IWorkflowService workflowService)
         {
             //_trustDBService = trustDBService;
             _workflowService = workflowService;
         }
 
-        public TimestampProof Create(ProofEntity proofEntity)
+        public BlockchainProof Create(ProofEntity proofEntity)
         {
-            var proof = new TimestampProof();
-            proof.ID = proofEntity.ID;
-            proof.Source = proofEntity.Source;
-            proof.Receipt = proofEntity.Receipt;
-            proof.Registered = proofEntity.Registered;
-            proof.WorkflowID = proofEntity.WorkflowID;
-
-
             var workflowContainer = _workflowService.Workflows.FirstOrDefault(p => p.ID == proofEntity.WorkflowID);
             if (workflowContainer == null)
-                return proof;
+                return null;
 
             var workflow = (ITimestampWorkflow)_workflowService.Create(workflowContainer);
-            proof.Blockchain = workflow.Proof;
-              
+
+            var proof = workflow.Proof;
+            proof.Proofs = new List<ProofEntity>
+            {
+                proofEntity
+            };
+
             return proof;
         }
     }

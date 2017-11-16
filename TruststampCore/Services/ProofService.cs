@@ -1,10 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Linq;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TruststampCore.Interfaces;
-using TruststampCore.Model;
+using TrustchainCore.Extensions;
 
 namespace TruststampCore.Services
 {
@@ -12,9 +11,9 @@ namespace TruststampCore.Services
     {
         private ITimestampSynchronizationService _timestampSynchronizationService;
         private ITrustDBService _trustDBService;
-        private ITimestampProofFactory _timestampProofFactory;
+        private IBlockchainProofFactory _timestampProofFactory;
 
-        public ProofService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService, ITimestampProofFactory timestampProofFactory)
+        public ProofService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService, IBlockchainProofFactory timestampProofFactory)
         {
             _timestampSynchronizationService = timestampSynchronizationService;
             _trustDBService = trustDBService;
@@ -38,7 +37,7 @@ namespace TruststampCore.Services
                 {
                     WorkflowID = _timestampSynchronizationService.CurrentWorkflowID,
                     Source = source,
-                    Registered = DateTime.Now
+                    Registered = DateTime.Now.ToUnixTime()
                 };
                 _trustDBService.DBContext.Proofs.Add(proof);
                 _trustDBService.DBContext.SaveChanges();
@@ -52,9 +51,10 @@ namespace TruststampCore.Services
             return proof;
         }
 
-        public TimestampProof GetTimestampProof(byte[] source)
+        public BlockchainProof GetBlockchainProof(byte[] source)
         {
             var entity = GetProof(source);
+            
             return _timestampProofFactory.Create(entity);
         }
 

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using TrustchainCore.Model;
-using TruststampCore.Model;
 
 namespace TruststampCore.Interfaces
 {
@@ -9,6 +8,6 @@ namespace TruststampCore.Interfaces
         IQueryable<ProofEntity> Proofs { get; }
         ProofEntity AddProof(byte[] source);
         ProofEntity GetProof(byte[] source);
-        TimestampProof GetTimestampProof(byte[] source);
+        BlockchainProof GetBlockchainProof(byte[] source);
     }
 }

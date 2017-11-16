@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using TruststampCore.Enumerations;
 
 namespace TrustchainCore.Model
@@ -25,10 +26,13 @@ namespace TrustchainCore.Model
         public BlockchainProof Remote { get; set; }
 
         [JsonProperty(PropertyName = "registered")]
-        public DateTime Registered;
+        public long Registered { get; set; }
 
         [JsonProperty(PropertyName = "status")]
         public string Status { get; set; }
+
+        [JsonProperty(PropertyName = "proofs", NullValueHandling = NullValueHandling.Ignore)]
+        public List<ProofEntity> Proofs { get; set; }
 
         public BlockchainProof()
         {
@@ -43,7 +47,7 @@ namespace TrustchainCore.Model
 
         public bool ShouldSerializeRegistered()
         {
-            return Registered != DateTime.MinValue;
+            return Registered != 0;
         }
 
     }

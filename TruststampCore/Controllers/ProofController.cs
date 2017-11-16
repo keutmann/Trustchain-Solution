@@ -46,7 +46,7 @@ namespace TruststampCore.Controllers
         [Route("api/{blockchain}/[controller]/{source}")]
         public ActionResult Get(string blockchain, byte[] source)
         {
-            return Ok(_proofService.GetTimestampProof(source));
+            return Ok(_proofService.GetBlockchainProof(source));
         }
 
 

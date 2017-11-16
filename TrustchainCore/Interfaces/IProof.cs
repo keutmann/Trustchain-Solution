@@ -8,5 +8,6 @@ namespace TrustchainCore.Interfaces
     {
         byte[] Source { get; set; }
         byte[] Receipt { get; set; }
+        long Registered { get; set; }
     }
 }
