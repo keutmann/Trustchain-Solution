@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using TrustchainCore.Extensions;
+using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Workflows;
 using TruststampCore.Enumerations;
@@ -31,23 +32,36 @@ namespace TruststampCore.Workflows
             {
                 RetryAttempts++;
 
-                var timestampProof = ((ITimestampWorkflow)Context).Proof;
-                timestampProof.Status = TimestampProofStatusType.Waiting.ToString();
-                var blockchainService = _blockchainServiceFactory.GetService(timestampProof.Blockchain);
+                var proof = ((ITimestampWorkflow)Context).Proof;
+                proof.Status = TimestampProofStatusType.Waiting.ToString();
 
-                timestampProof.Confirmations = blockchainService.AddressTimestamped(timestampProof.MerkleRoot);
-                if(timestampProof.Confirmations == -1) // No timestamp on merkleRoot
+                if(proof.MerkleRoot == null || proof.MerkleRoot.Length == 0)
                 {
-                    TimestampMerkeRoot(timestampProof, blockchainService);
+                    Context.RunStep<IMerkleStep>();
                     return;
                 }
 
-                if(timestampProof.Confirmations >= 0)
+                var blockchainService = _blockchainServiceFactory.GetService(proof.Blockchain);
+                proof.Confirmations = blockchainService.AddressTimestamped(proof.MerkleRoot);
+                if(proof.Confirmations == -1) // No timestamp on merkleRoot
                 {
-                    if (timestampProof.Confirmations < _configuration.ConfirmationThreshold(timestampProof.Blockchain))
-                        Context.RunStepAgain(_configuration.ConfirmationWait(timestampProof.Blockchain));
+                    TimestampMerkeRoot(proof, blockchainService);
+                    return;
+                }
+
+                if(proof.Confirmations >= 0)
+                {
+                    var confirmationThreshold = _configuration.ConfirmationThreshold(proof.Blockchain);
+                    if (proof.Confirmations < confirmationThreshold)
+                    {
+                        CombineLog(_logger, $"Current confirmations {proof.Confirmations} of {confirmationThreshold}");
+                        Context.RunStepAgain(_configuration.ConfirmationWait(proof.Blockchain));
+                    }
                     else
-                        timestampProof.Status = TimestampProofStatusType.Done.ToString();
+                    {
+                        proof.Status = TimestampProofStatusType.Done.ToString();
+                        Context.AddStep<ISuccessStep>(); // Workflow done!
+                    }
 
                     return;
                 }
@@ -68,7 +82,7 @@ namespace TruststampCore.Workflows
             var fundingKeyWIF = _configuration.FundingKey(timestampProof.Blockchain);
             if (String.IsNullOrWhiteSpace(fundingKeyWIF))
             {
-                _logger.DateInformation(Context.ID, $"No server key provided, using remote timestamping");
+                CombineLog(_logger, $"No server key provided, using remote timestamping");
                 Context.RunStep<IRemoteTimestampStep>();
                 return;
             }
@@ -76,6 +90,7 @@ namespace TruststampCore.Workflows
             var fundingKey = blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
             if (blockchainService.VerifyFunds(fundingKey, null) == 0)
             {
+                CombineLog(_logger, $"Available funds detected on funding key, using local timestamping");
                 // There are funds on the key
                 Context.RunStep<ILocalTimestampStep>();
                 return;
@@ -83,7 +98,7 @@ namespace TruststampCore.Workflows
             else
             {
                 // There are no funds, use remote timestamping.
-                _logger.DateInformation(Context.ID, $"There are no funds, using remote timestamping");
+                CombineLog(_logger, $"There are no funds, using remote timestamping");
                 Context.RunStep<IRemoteTimestampStep>();
                 return;
             }

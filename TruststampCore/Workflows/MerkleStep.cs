@@ -40,14 +40,12 @@ namespace TruststampCore.Workflows
             {
                 _merkleTree.Add(proof);
             }
-            _logger.DateInformation(Context.ID, $"Found {proofs.Count} proofs");
 
             var timestampProof = ((ITimestampWorkflow)Context).Proof;
+            timestampProof.MerkleRoot = _merkleTree.Build().Hash;
             timestampProof.Status = TimestampProofStatusType.Waiting.ToString();
 
-            timestampProof.MerkleRoot = _merkleTree.Build().Hash;
-
-            _logger.DateInformation(Context.ID, $"Merkle root of {proofs.Count} proofs : {timestampProof.MerkleRoot.ConvertToHex()}");
+            CombineLog(_logger, $"Proof found {proofs.Count} - Merkleroot: {timestampProof.MerkleRoot.ConvertToHex()}");
 
             Context.RunStep<IAddressVerifyStep>(_configuration.ConfirmationWait(timestampProof.Blockchain));
 

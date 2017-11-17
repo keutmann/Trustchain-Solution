@@ -31,7 +31,7 @@ namespace UnitTest.TruststampCore.Workflows
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             var workflow = new TimestampWorkflow(workflowService, timestampSynchronizationService, ServiceProvider);
             workflow.Initialize();
-            workflow.CurrentStepIndex = 2;
+            //workflow.CurrentStepIndex = 2;
             var merkleStep = (IMerkleStep)workflow.Steps[0];
 
             var reverseResolver = ServiceProvider.GetService<IContractReverseResolver>();
@@ -45,7 +45,7 @@ namespace UnitTest.TruststampCore.Workflows
             var wf2 = (TimestampWorkflow)JsonConvert.DeserializeObject(data, settings);
             merkleStep = (IMerkleStep)wf2.Steps[0];
 
-            Assert.AreEqual(workflow.CurrentStepIndex, wf2.CurrentStepIndex);
+            //Assert.AreEqual(workflow.CurrentStepIndex, wf2.CurrentStepIndex);
             //Assert.AreEqual(((IMerkleStep)workflow.Steps[0]).RootHash[0], ((IMerkleStep)wf2.Steps[0]).RootHash[0]);
         }
 
@@ -56,7 +56,7 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
             Assert.IsNotNull(workflow);
-            workflow.CurrentStepIndex = 1;
+            //workflow.CurrentStepIndex = 1;
 
             var container = workflowService.CreateWorkflowContainer(workflow);
             Assert.IsNotNull(container);
@@ -65,7 +65,7 @@ namespace UnitTest.TruststampCore.Workflows
             var workflow2 = workflowService.Create(container);
             Assert.IsNotNull(workflow2);
             Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
-            Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
+            //Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
             Assert.IsNotNull(workflow);
-            workflow.CurrentStepIndex = 2;
+            //workflow.CurrentStepIndex = 2;
             //((IMerkleStep)workflow.Steps[0]).RootHash = new byte[] { 1 };
             var id = workflowService.Save(workflow);
 
@@ -86,7 +86,7 @@ namespace UnitTest.TruststampCore.Workflows
             var workflow2 = workflowService.Create(container);
             Assert.IsNotNull(workflow2);
             Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
-            Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
+            //Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
             //Assert.AreEqual(((IMerkleStep)workflow.Steps[0]).RootHash[0], ((IMerkleStep)workflow2.Steps[0]).RootHash[0]);
         }
     }

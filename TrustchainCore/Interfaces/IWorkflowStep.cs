@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 
 namespace TrustchainCore.Interfaces
@@ -9,5 +10,6 @@ namespace TrustchainCore.Interfaces
         IWorkflowContext Context { get; set; }
 
         void Execute();
+        void CombineLog(ILogger logger, string msg);
     }
 }

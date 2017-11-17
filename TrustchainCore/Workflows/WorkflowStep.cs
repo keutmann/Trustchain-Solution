@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using TrustchainCore.Extensions;
 using TrustchainCore.Interfaces;
 
 namespace TrustchainCore.Workflows
@@ -15,5 +17,12 @@ namespace TrustchainCore.Workflows
         public virtual void Dispose()
         {
         }
+
+        public void CombineLog(ILogger logger, string msg)
+        {
+            logger.DateInformation(Context.ID, msg);
+            Context.Log(msg);
+        }
+
     }
 }

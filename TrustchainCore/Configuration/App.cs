@@ -10,7 +10,7 @@ namespace TrustchainCore.Configuration
     {
         public static JObject Config = new JObject();
 
-        public static Network BitcoinNetwork = Network.Main;
+        public static Network BitcoinNetwork = Network.TestNet;
 
         static App()
         {

@@ -54,7 +54,7 @@ namespace TruststampCore.Services
         /// <returns>-1 = no Timestamps, 0 = unconfirmed tx, above 0 is the number of confimations</returns>
         public int AddressTimestamped(byte[] merkleRoot)
         {
-            var key = new Key(merkleRoot);
+            var key = new Key(CryptoStrategy.GetKey(merkleRoot));
             var address = key.PubKey.GetAddress(Network);
 
             var json = _blockchain.GetReceivedAsync(address.ToString()).Result; //.ToWif());
@@ -64,9 +64,16 @@ namespace TruststampCore.Services
             if (txs.Count() == 0)
                 return -1;
 
-            var max = txs.Max(p => p["confirmations"].ToInteger());
+            var confirmations = txs.Max(p => p["confirmations"].ToInteger());
+            //var unconfirmed = txs.Max(p => p["unconfirmed_received_value"].ToInteger());
 
-            return max;
+            if (confirmations > 0)
+                return 1;
+
+            //if (unconfirmed > 0)
+                //return 0; // There are unconfirmed confirmations, return 0
+
+            return 0;
         }
 
         /// <summary>

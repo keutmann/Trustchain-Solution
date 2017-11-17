@@ -37,8 +37,18 @@ namespace TrustchainCore.Strategy
 
         public byte[] GetAddress(byte[] key)
         {
-            return new Key(key).PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes();
+            return new Key(key).PubKey.GetAddress(Network.TestNet).Hash.ToBytes();
         }
+
+        public string StringifyAddress(byte[] address)
+        {
+            var en = new NBitcoin.DataEncoders.Base58Encoder();
+            var tt = en.EncodeData(address);
+            String s = Convert.ToBase64String(address);
+            var addr = new BitcoinPubKeyAddress(tt, Network.TestNet);
+            return addr.ToString();
+        }
+
 
         public byte[] Sign(byte[] key, byte[] data)
         {

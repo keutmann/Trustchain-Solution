@@ -1,12 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TrustchainCore.Enumerations;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Services;
 using TrustchainCore.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace TrustchainCore.Workflows
 {
@@ -27,7 +29,8 @@ namespace TrustchainCore.Workflows
         [JsonProperty(PropertyName = "created")]
         public long Created { get; set; }
 
-        public int CurrentStepIndex { get; set; }
+        //public int CurrentStepIndex { get; set; }
+        public string CurrentStep { get; set; }
 
         [JsonProperty(PropertyName = "steps", NullValueHandling = NullValueHandling.Ignore)]
         public IList<IWorkflowStep> Steps { get; set; }
@@ -69,16 +72,14 @@ namespace TrustchainCore.Workflows
 
                 UpdateState();
 
-                while (TryGetNextStep(out IWorkflowStep step))
+                IWorkflowStep step = null;
+                while(DoExecution())
                 {
                     try
                     {
+                        step = GetCurrentStep();
+
                         ExecutedStep(step);
-
-                        CurrentStepIndex++;
-
-                        if (!DoExecution())
-                            break;
                     }
                     catch (Exception ex)
                     {
@@ -92,12 +93,6 @@ namespace TrustchainCore.Workflows
                     }
                 }
             });
-
-            if (CurrentStepIndex >= Steps.Count)
-            {
-                Success();
-                Save();
-            }
         }
 
         public T GetStep<T>()
@@ -119,8 +114,8 @@ namespace TrustchainCore.Workflows
                 var step = Steps[i];
                 if (typeof(T).IsAssignableFrom(step.GetType()))
                 {
-                    CurrentStepIndex = i - 1;
                     found = true;
+                    CurrentStep = typeof(T).FullName;
                     break;
                 }
             }
@@ -142,6 +137,8 @@ namespace TrustchainCore.Workflows
             var instance = WorkflowService.ServiceProvider.GetRequiredService<T>();
             instance.Context = this;
             Steps.Add(instance);
+            CurrentStep = typeof(T).FullName;
+
             return instance; 
         }
 
@@ -149,6 +146,10 @@ namespace TrustchainCore.Workflows
         {
             if (NextExecution > DateTime.Now.ToUnixTime())
                 return false;
+
+            if (State == WorkflowStatusType.Finished.ToString() || State == WorkflowStatusType.Failed.ToString())
+                return false;
+            
             return true;
         }
 
@@ -163,16 +164,26 @@ namespace TrustchainCore.Workflows
             WorkflowService.Save(this);
         }
 
-        public virtual bool TryGetNextStep(out IWorkflowStep step)
+        public IWorkflowStep GetCurrentStep()
         {
-            step = null;
-            if (Steps.Count == 0 || CurrentStepIndex >= Steps.Count)
-                return false;
+            if (String.IsNullOrEmpty(CurrentStep))
+                return Steps[0];
 
-            step = Steps[CurrentStepIndex];
-
-            return true;
+            var currentType = Type.GetType(CurrentStep);
+            var step = Steps.FirstOrDefault(p => currentType.IsAssignableFrom(p.GetType()));
+            return step;
         }
+
+        //public virtual bool TryGetNextStep(out IWorkflowStep step)
+        //{
+        //    step = null;
+        //    if (Steps.Count == 0 || CurrentStepIndex >= Steps.Count)
+        //        return false;
+
+        //    step = Steps[CurrentStepIndex];
+
+        //    return true;
+        //}
 
         public virtual void Wait(int seconds)
         {
@@ -182,7 +193,7 @@ namespace TrustchainCore.Workflows
         public virtual void RunStepAgain(int seconds)
         {
             Wait(seconds);
-            CurrentStepIndex--;
+            //CurrentStepIndex--;
         }
 
         private void ExecutedStep(IWorkflowStep step)
@@ -191,11 +202,11 @@ namespace TrustchainCore.Workflows
             Log($"{step.GetType().Name} has executed.");
         }
 
-        public virtual void Success()
-        {
-            State = WorkflowStatusType.Finished.ToString();
-            Log("Workflow completed successfully");
-        }
+        //public virtual void Success()
+        //{
+        //    State = WorkflowStatusType.Finished.ToString();
+        //    Log("Workflow completed successfully");
+        //}
 
         public virtual void Failed(IWorkflowStep step, Exception ex)
         {

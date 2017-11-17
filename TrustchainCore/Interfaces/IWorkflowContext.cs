@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,7 +16,8 @@ namespace TrustchainCore.Interfaces
         List<IWorkflowLog> Logs { get; set; }
         string State { get; set; }
         IList<IWorkflowStep> Steps { get; set; }
-        int CurrentStepIndex { get; set; }
+        //int CurrentStepIndex { get; set; }
+        string CurrentStep { get; set; }
         string Tag { get; set; }
         long NextExecution { get; set; }
         long Created { get; set; }
@@ -30,5 +32,6 @@ namespace TrustchainCore.Interfaces
         void RunStep<T>(int seconds = 0) where T : IWorkflowStep;
         void RunStepAgain(int seconds);
         void Log(string message);
+        
     }
 }

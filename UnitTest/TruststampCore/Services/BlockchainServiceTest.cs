@@ -34,7 +34,7 @@ namespace UnitTest.TruststampCore.Services
         }
 
         [TestMethod]
-        public void AddressTimestamped()
+        public void AddressTimestampedConfirmed()
         {
             var blockchainService = ServiceProvider.GetRequiredService<IBlockchainService>();
 
@@ -46,6 +46,25 @@ namespace UnitTest.TruststampCore.Services
 
             var result = blockchainService.AddressTimestamped(fundingKey);
             Assert.IsTrue(result > 0, "No confirmations on: " + address);
+        }
+
+        [TestMethod]
+        public void AddressTimestampedUnknown()
+        {
+            //var blockchainService = ServiceProvider.GetRequiredService<IBlockchainService>();
+            var config = ServiceProvider.GetRequiredService<IConfiguration>();
+            var crypto = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
+            var repo = new SoChainTransactionRepository(config);
+            var blockchainService = new BitcoinService(repo, crypto);
+
+            var key = new Key(blockchainService.CryptoStrategy.HashOf(Guid.NewGuid().ToByteArray())); // A random key
+            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(key.ToString(Network.TestNet));
+
+            var address = key.PubKey.GetAddress(Network.TestNet);
+            Console.WriteLine(address.ToString());
+
+            var result = blockchainService.AddressTimestamped(fundingKey);
+            Assert.IsTrue(result == -1, "Should have been -1 (no unconfired and no confirmations): " + address);
         }
 
 

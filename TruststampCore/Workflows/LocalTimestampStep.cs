@@ -31,10 +31,10 @@ namespace TruststampCore.Workflows
 
         public override void Execute()
         {
-            var timestampProof = ((ITimestampWorkflow)Context).Proof;
-            timestampProof.Confirmations = 0;
+            var proof = ((ITimestampWorkflow)Context).Proof;
+            proof.Confirmations = 0;
 
-            var fundingKeyWIF = _configuration.FundingKey(timestampProof.Blockchain);
+            var fundingKeyWIF = _configuration.FundingKey(proof.Blockchain);
             if (String.IsNullOrWhiteSpace(fundingKeyWIF))
             {
                 _logger.DateInformation(Context.ID, $"No server key provided, using remote timestamping");
@@ -42,25 +42,25 @@ namespace TruststampCore.Workflows
                 return;
             }
 
-            var blockchainService = _blockchainServiceFactory.GetService(timestampProof.Blockchain);
+            var blockchainService = _blockchainServiceFactory.GetService(proof.Blockchain);
             var fundingKey = blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
 
-            timestampProof.Address = blockchainService.CryptoStrategy.GetAddress(fundingKey);
+            var merkleRootKey = blockchainService.CryptoStrategy.GetKey(proof.MerkleRoot);
+            proof.Address = blockchainService.CryptoStrategy.GetAddress(merkleRootKey);
 
-
-            var tempTxKey = timestampProof.Blockchain + "_previousTx";
+            var tempTxKey = proof.Blockchain + "_previousTx";
             var previousTx = _keyValueService.Get(tempTxKey);
             var previousTxList = (previousTx != null) ? new List<Byte[]> { previousTx } : null;
 
-            OutTx = blockchainService.Send(timestampProof.MerkleRoot, fundingKey, previousTxList);
+            OutTx = blockchainService.Send(proof.MerkleRoot, fundingKey, previousTxList);
 
             // OutTX needs to go to a central store for that blockchain
             _keyValueService.Set(tempTxKey, OutTx[0]);
 
-            //timestampProof.Registered = DateTime.Now;
-            //timestampProof.
+            var merkleAddressString = blockchainService.CryptoStrategy.StringifyAddress(proof.Address);
+            CombineLog(_logger, $"Merkle root: {proof.MerkleRoot.ConvertToHex()} has been timestamped with address: {merkleAddressString}");
 
-            Context.RunStep<IAddressVerifyStep>(_configuration.ConfirmationWait(timestampProof.Blockchain));
+            Context.RunStep<IAddressVerifyStep>(_configuration.ConfirmationWait(proof.Blockchain));
         }
     }
 }

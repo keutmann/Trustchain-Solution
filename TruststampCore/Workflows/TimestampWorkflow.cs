@@ -29,8 +29,7 @@ namespace TruststampCore.Workflows
 
         public override void Initialize()
         {
-            AddStep<IMerkleStep>();
-            //AddStep<ILocalTimestampStep>();
+            AddStep<ITimestampStep>();
 
             Proof = new BlockchainProof();
             var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
