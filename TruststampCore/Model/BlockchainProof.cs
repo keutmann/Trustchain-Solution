@@ -25,9 +25,6 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "remote", NullValueHandling = NullValueHandling.Ignore)]
         public BlockchainProof Remote { get; set; }
 
-        [JsonProperty(PropertyName = "registered")]
-        public long Registered { get; set; }
-
         [JsonProperty(PropertyName = "status")]
         public string Status { get; set; }
 
@@ -44,11 +41,5 @@ namespace TrustchainCore.Model
         {
             return Confirmations != -1;
         }
-
-        public bool ShouldSerializeRegistered()
-        {
-            return Registered != 0;
-        }
-
     }
 }

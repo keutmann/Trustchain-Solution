@@ -7,5 +7,6 @@ namespace TrustchainCore.Interfaces
     {
         MerkleNode Add(IProof proof);
         MerkleNode Build();
+        byte[] ComputeRoot(byte[] hash, byte[] path);
     }
 }

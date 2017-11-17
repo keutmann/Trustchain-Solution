@@ -20,7 +20,8 @@ namespace TrustchainCore.Strategy
 
         public MerkleNode Add(IProof proof)
         {
-            var node = new MerkleNode(proof);
+
+            var node = new MerkleNode(proof, CryptoService);
             LeafNodes.Add(node);
             return node;
         }
@@ -52,9 +53,14 @@ namespace TrustchainCore.Strategy
                 while (nodes.Count > 0)
                 {
                     var first = nodes.Dequeue();
-                    var second = (nodes.Count == 0) ? first : nodes.Dequeue();
+                    if(nodes.Count == 0)
+                    {
+                        parents.Enqueue(first); // Move the odd node up to the next level
+                        break;
+                    }
+                    var second = nodes.Dequeue();
 
-                    if (first.Hash.Compare(second.Hash) > 0)
+                    if (first.Hash.Compare(second.Hash) < 0)
                     {
                         var hash = CryptoService.HashOf(first.Hash.Combine(second.Hash));
                         parents.Enqueue(new MerkleNode(hash, first, second));
@@ -108,13 +114,14 @@ namespace TrustchainCore.Strategy
             return;
         }
 
-        public byte[] ComputeRoot(byte[] hash, byte[] path, int hashLength)
+        public byte[] ComputeRoot(byte[] hash, byte[] path)
         {
+            var hashLength = CryptoService.Length;
             for (var i = 0; i < path.Length; i += hashLength)
             {
                 var merkle = new byte[hashLength];
                 Array.Copy(path, i, merkle, 0, hashLength);
-                if (hash.Compare(merkle) > 0)
+                if (hash.Compare(merkle) < 0)
                     hash = CryptoService.HashOf(hash.Combine(merkle));
                 else
                     hash = CryptoService.HashOf(merkle.Combine(hash));

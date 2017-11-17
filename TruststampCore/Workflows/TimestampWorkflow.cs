@@ -33,7 +33,6 @@ namespace TruststampCore.Workflows
             //AddStep<ILocalTimestampStep>();
 
             Proof = new BlockchainProof();
-            Proof.Registered = DateTime.Now.ToUnixTime();
             var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
             Proof.Blockchain = configuration.Blockchain();
             base.Initialize();
