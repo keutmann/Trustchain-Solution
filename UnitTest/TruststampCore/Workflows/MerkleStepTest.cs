@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TrustchainCore.Extensions;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Services;
 using TruststampCore.Interfaces;
@@ -14,11 +15,48 @@ namespace UnitTest.TruststampCore.Workflows
     public class MerkleStepTest : StartupMock
     {
         [TestMethod]
+        public void Empty()
+        {
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = workflowService.Create<TimestampWorkflow>();
+
+            var step = (MerkleStep)workflow.Steps[0];
+            Assert.IsNotNull(step);
+
+            step.Execute();
+
+            Assert.IsNotNull(step);
+            Assert.IsNull(workflow.Proof.MerkleRoot);
+        }
+
+        [TestMethod]
+        public void One()
+        {
+            var cryptoFactory = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
+            var crypto = cryptoFactory.GetService("btcpkh");
+            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+
+            var one = Encoding.UTF8.GetBytes("Hello world\n");
+            var oneHash = crypto.HashOf(one);
+
+            proofService.AddProof(one);
+
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = workflowService.Create<TimestampWorkflow>();
+
+            var step = (MerkleStep)workflow.Steps[0];
+            Assert.IsNotNull(step);
+
+            step.Execute();
+
+            Assert.IsNotNull(step);
+            Assert.IsTrue(oneHash.Compare(workflow.Proof.MerkleRoot) == 0, "One hash and root hash are not the same");
+        }
+
+
+        [TestMethod]
         public void Execute()
         {
-            var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
-            var merkleTree = ServiceProvider.GetRequiredService<IMerkleTree>();
-
             var proofService = ServiceProvider.GetRequiredService<IProofService>();
 
             proofService.AddProof(Guid.NewGuid().ToByteArray());

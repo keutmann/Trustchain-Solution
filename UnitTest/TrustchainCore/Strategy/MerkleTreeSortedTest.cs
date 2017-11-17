@@ -5,6 +5,7 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Extensions;
 using System;
+using System.Collections.Generic;
 
 namespace UnitTest.TrustchainCore.Strategy
 {
@@ -25,11 +26,13 @@ namespace UnitTest.TrustchainCore.Strategy
 
             var root = merkle.Build();
 
-            Assert.AreEqual(oneProof.Hash, root.Hash);
-            Assert.AreEqual(0, oneProof.Proof.Receipt.Length);
-
             Console.WriteLine($"Root - Hash: {root.Hash.ConvertToHex()}");
             Console.WriteLine($"One  - source: {one.ConvertToHex()} - hash: {oneProof.Hash.ConvertToHex()} -oneHash: {oneHash.ConvertToHex()}");
+
+            Assert.AreEqual(crypto.Length, root.Hash.Length, "Root hash has wrong length");
+            Assert.IsTrue(oneProof.Hash.Compare(root.Hash) == 0, "Expected and root hash are not the same");
+            Assert.AreEqual(0, oneProof.Proof.Receipt.Length);
+
         }
 
         [TestMethod]
@@ -102,6 +105,37 @@ namespace UnitTest.TrustchainCore.Strategy
             Assert.IsTrue(root.Hash.Compare(merkle.ComputeRoot(oneProof.Hash, oneProof.Proof.Receipt)) == 0, "root and one with receipt are not the same");
             Assert.IsTrue(root.Hash.Compare(merkle.ComputeRoot(twoProof.Hash, twoProof.Proof.Receipt)) == 0, "root and two with receipt are not the same");
             Assert.IsTrue(root.Hash.Compare(merkle.ComputeRoot(threeProof.Hash, threeProof.Proof.Receipt)) == 0, "root and three with receipt are not the same");
+        }
+
+        [TestMethod]
+        public void Receipt()
+        {
+            var merkle = ServiceProvider.GetRequiredService<IMerkleTree>();
+            var cryptoFactory = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
+            var crypto = cryptoFactory.GetService("btcpkh");
+
+            var length = 101;
+            var nodes = new List<MerkleNode>();
+            for (int i = 0; i < length; i++)
+            {
+                var data = Encoding.UTF8.GetBytes($"{i}\n");
+                nodes.Add(merkle.Add(new ProofEntity { Source = data }));
+            }
+            var root = merkle.Build();
+
+
+            var one = nodes[0];
+            Console.WriteLine($"Root        - Hash: {root.Hash.ConvertToHex()}");
+            Console.WriteLine($"One  - source: {one.Proof.Source.ConvertToHex()} - hash: {one.Hash.ConvertToHex()} -Receipt: {one.Proof.Receipt.ConvertToHex()}");
+
+            var index = 0;
+            foreach (var node in nodes)
+            {
+                var expectedResult = merkle.ComputeRoot(node.Hash, node.Proof.Receipt);
+                Assert.IsTrue(expectedResult.Compare(root.Hash) == 0, $"Expected node number {index} and root hash are not the same");
+                index++;
+            }
+
         }
 
         private byte[] CombineHash(ICryptoStrategy crypto, byte[] first, byte[] second)
