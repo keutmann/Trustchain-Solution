@@ -115,7 +115,7 @@ namespace TrustchainCore.Workflows
                 if (typeof(T).IsAssignableFrom(step.GetType()))
                 {
                     found = true;
-                    CurrentStep = typeof(T).FullName;
+                    CurrentStep = typeof(T).AssemblyQualifiedName;
                     break;
                 }
             }
@@ -137,7 +137,7 @@ namespace TrustchainCore.Workflows
             var instance = WorkflowService.ServiceProvider.GetRequiredService<T>();
             instance.Context = this;
             Steps.Add(instance);
-            CurrentStep = typeof(T).FullName;
+            CurrentStep = typeof(T).AssemblyQualifiedName;
 
             return instance; 
         }

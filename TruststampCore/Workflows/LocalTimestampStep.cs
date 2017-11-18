@@ -32,7 +32,7 @@ namespace TruststampCore.Workflows
         public override void Execute()
         {
             var proof = ((ITimestampWorkflow)Context).Proof;
-            proof.Confirmations = 0;
+            //proof.Confirmations = 0;
 
             var fundingKeyWIF = _configuration.FundingKey(proof.Blockchain);
             if (String.IsNullOrWhiteSpace(fundingKeyWIF))
@@ -43,10 +43,15 @@ namespace TruststampCore.Workflows
             }
 
             var blockchainService = _blockchainServiceFactory.GetService(proof.Blockchain);
+            proof.Confirmations = blockchainService.AddressTimestamped(proof.MerkleRoot);
+            if (proof.Confirmations > -1) // Already timestamp on merkleRoot
+            {
+                Context.RunStep<IAddressVerifyStep>(); // Now run verify step
+                return;
+            }
+
             var fundingKey = blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
 
-            var merkleRootKey = blockchainService.CryptoStrategy.GetKey(proof.MerkleRoot);
-            proof.Address = blockchainService.CryptoStrategy.GetAddress(merkleRootKey);
 
             var tempTxKey = proof.Blockchain + "_previousTx";
             var previousTx = _keyValueService.Get(tempTxKey);
@@ -56,6 +61,9 @@ namespace TruststampCore.Workflows
 
             // OutTX needs to go to a central store for that blockchain
             _keyValueService.Set(tempTxKey, OutTx[0]);
+
+            var merkleRootKey = blockchainService.CryptoStrategy.GetKey(proof.MerkleRoot);
+            proof.Address = blockchainService.CryptoStrategy.GetAddress(merkleRootKey);
 
             var merkleAddressString = blockchainService.CryptoStrategy.StringifyAddress(proof.Address);
             CombineLog(_logger, $"Merkle root: {proof.MerkleRoot.ConvertToHex()} has been timestamped with address: {merkleAddressString}");

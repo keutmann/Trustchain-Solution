@@ -29,7 +29,7 @@ namespace TruststampCore.Workflows
 
         public override void Initialize()
         {
-            AddStep<ITimestampStep>();
+            AddStep<IMerkleStep>(); // Start with the MerkleStep
 
             Proof = new BlockchainProof();
             var configuration = _serviceProvider.GetRequiredService<IConfiguration>();

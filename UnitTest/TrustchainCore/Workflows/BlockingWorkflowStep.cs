@@ -12,7 +12,7 @@ namespace UnitTest.TrustchainCore.Workflows
         //public TaskCompletionSource<int> taskCompletionSource = new TaskCompletionSource<int>();
 
         //public Task<int> MachineTask { get => taskCompletionSource.Task; }
-        private ILogger<BlockingWorkflowStep> _logger;
+        //private ILogger<BlockingWorkflowStep> _logger;
         public int Seconds = 3;
 
         public BlockingWorkflowStep()

@@ -27,12 +27,21 @@ namespace TruststampCore.Workflows
 
         public override void Execute()
         {
+            var timestampProof = ((ITimestampWorkflow)Context).Proof;
+            if (timestampProof.MerkleRoot != null && timestampProof.MerkleRoot.Length > 0)
+            {
+                Context.RunStep<ILocalTimestampStep>();
+                return;
+            }
+
             var proofs = (from p in _trustDBService.Proofs
                           where p.WorkflowID == Context.ID
                           select p).ToList();
 
             if(proofs.Count == 0)
             {
+                CombineLog(_logger, $"No proofs found");
+                Context.RunStep<ISuccessStep>();
                 return; // Exit workflow succesfully
             }
 
@@ -41,14 +50,11 @@ namespace TruststampCore.Workflows
                 _merkleTree.Add(proof);
             }
 
-            var timestampProof = ((ITimestampWorkflow)Context).Proof;
             timestampProof.MerkleRoot = _merkleTree.Build().Hash;
             timestampProof.Status = TimestampProofStatusType.Waiting.ToString();
 
             CombineLog(_logger, $"Proof found {proofs.Count} - Merkleroot: {timestampProof.MerkleRoot.ConvertToHex()}");
-
-            Context.RunStep<IAddressVerifyStep>(_configuration.ConfirmationWait(timestampProof.Blockchain));
-
+            Context.RunStep<ILocalTimestampStep>();
         }
     }
 }
