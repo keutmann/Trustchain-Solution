@@ -162,7 +162,7 @@ namespace TruststampCore.Workflows
             // OutTX needs to go to a central store for that blockchain
             _keyValueService.Set(tempTxKey, OutTx[0]);
 
-            var merkleAddressString = blockchainService.CryptoStrategy.StringifyAddress(TimestampProof.Address);
+            var merkleAddressString = blockchainService.CryptoStrategy.StringifyAddress(merkleRootKey);
             CombineLog(_logger, $"Merkle root: {TimestampProof.MerkleRoot.ConvertToHex()} has been timestamped with address: {merkleAddressString}");
 
             Context.Wait(_configuration.ConfirmationWait(TimestampProof.Blockchain)); // Run again, but wait

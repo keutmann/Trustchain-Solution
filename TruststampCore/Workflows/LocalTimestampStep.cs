@@ -65,7 +65,7 @@ namespace TruststampCore.Workflows
             var merkleRootKey = blockchainService.CryptoStrategy.GetKey(proof.MerkleRoot);
             proof.Address = blockchainService.CryptoStrategy.GetAddress(merkleRootKey);
 
-            var merkleAddressString = blockchainService.CryptoStrategy.StringifyAddress(proof.Address);
+            var merkleAddressString = blockchainService.CryptoStrategy.StringifyAddress(merkleRootKey);
             CombineLog(_logger, $"Merkle root: {proof.MerkleRoot.ConvertToHex()} has been timestamped with address: {merkleAddressString}");
 
             Context.RunStep<IAddressVerifyStep>(_configuration.ConfirmationWait(proof.Blockchain));

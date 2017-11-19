@@ -13,10 +13,13 @@ namespace TrustchainCore.Strategy
         public int Length { get; }
         public string ScriptName { get; }
 
+        private Network network;
+
         public CryptoBTCPKH()
         {
             Length = 32; // SHA 256 = 32 bytes
             ScriptName = "btc-pkh";
+            network = Network.TestNet;
         }
 
         public byte[] HashOf(byte[] data)
@@ -37,16 +40,12 @@ namespace TrustchainCore.Strategy
 
         public byte[] GetAddress(byte[] key)
         {
-            return new Key(key).PubKey.GetAddress(Network.TestNet).Hash.ToBytes();
+            return new Key(key).PubKey.GetAddress(network).Hash.ToBytes();
         }
 
-        public string StringifyAddress(byte[] address)
+        public string StringifyAddress(byte[] key)
         {
-            var en = new NBitcoin.DataEncoders.Base58Encoder();
-            var tt = en.EncodeData(address);
-            String s = Convert.ToBase64String(address);
-            var addr = new BitcoinPubKeyAddress(tt, Network.TestNet);
-            return addr.ToString();
+            return new Key(key).PubKey.GetAddress(network).ToString();
         }
 
 
