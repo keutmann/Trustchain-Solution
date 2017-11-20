@@ -1,20 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TrustchainCore.Attributes;
 using TrustchainCore.Builders;
-using TrustchainCore.Model;
 
 namespace TrustchainCore.Controllers
 {
     [ApiExceptionFilter()]
     public class ApiController : Controller
     {
+        /// <summary>
+        /// Returns a standard api return object as a wrapper around the data object
+        /// </summary>
+        /// <param name="data">if null then no render</param>
+        /// <param name="status">if null then Success</param>
+        /// <param name="message">if null then no render</param>
+        /// <returns>Returns a standard api return object as a wrapper around the data object</returns>
         [NonAction]
-        public OkObjectResult ApiOk(object data)
+        public OkObjectResult ApiOk(object data, string status = null, string message = null)
         {
-            return Ok(HttpResultBuilder.Success(data));
+            return Ok(HttpResultBuilder.Success(data, status, message));
         }
     }
 }

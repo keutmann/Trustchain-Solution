@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using TrustchainCore.Builders;
 using TrustgraphCore.Model;
 using TrustgraphCore.Interfaces;
+using TrustchainCore.Controllers;
 
 namespace TrustgraphCore.Controllers
 {
-    [Route("api/[controller]")]
-    public class QueryController : Controller
+    [Route("api/graph/[controller]")]
+    public class QueryController : ApiController
     {
 
         public IGraphQueryService SearchService { get; set; }
@@ -51,7 +52,7 @@ namespace TrustgraphCore.Controllers
 
             var result = SearchService.Execute(query);
 
-            return Ok(result);
+            return ApiOk(result);
             //}
             //catch (Exception ex)
             //{

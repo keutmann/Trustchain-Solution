@@ -1,7 +1,7 @@
 @page
-@model Trustchain.Pages.Proofs.IndexModel
+@model Trustchain.Pages.Timestamps.IndexModel
 @{
-    ViewData["Title"] = "Proofs";
+    ViewData["Title"] = "Timestamps";
 }
 <h2>Proof</h2>
 
@@ -17,7 +17,7 @@
            data-classes="table table-condensed table-hover table-striped"
            data-toggle="table"
            data-side-pagination="server"
-           data-url="/api/Proof"
+           data-url="/api/timestamp/query"
            data-query-params="extraServerParams"
            data-pagination="true"
            data-show-refresh="true"
@@ -27,10 +27,10 @@
            data-page-list="[5,10,20,50,100,All]">
         <thead>
             <tr>
-                <th data-field="id" data-sortable="true">@Html.DisplayNameFor(model => model.Proof.ID)</th>
-                <th data-field="source" data-sortable="true">@Html.DisplayNameFor(model => model.Proof.Source)</th>
-                <th data-field="registered" data-sortable="true">@Html.DisplayNameFor(model => model.Proof.Registered)</th>
-                <th data-field="workflowID" data-sortable="true">@Html.DisplayNameFor(model => model.Proof.WorkflowID)</th>
+                <th data-field="id" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.ID)</th>
+                <th data-field="source" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.Source)</th>
+                <th data-field="registered" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.Registered)</th>
+                <th data-field="workflowID" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.WorkflowID)</th>
             </tr>
         </thead>
     </table>

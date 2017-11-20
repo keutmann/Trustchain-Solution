@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
 
-namespace Trustchain.Pages.Proofs
+namespace Trustchain.Pages.Timestamps
 {
     public class DetailsModel : PageModel
     {
-        private readonly TrustchainCore.Repository.TrustDBContext _context;
+        private readonly TrustDBContext _context;
 
-        public DetailsModel(TrustchainCore.Repository.TrustDBContext context)
+        public DetailsModel(TrustDBContext context)
         {
             _context = context;
         }

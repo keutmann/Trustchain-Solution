@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Trustchain.Pages.Proofs
+namespace Trustchain.Pages.Timestamps
 {
     public class StampModel : PageModel
     {

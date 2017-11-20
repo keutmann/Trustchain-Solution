@@ -11,47 +11,48 @@ using TruststampCore.Interfaces;
 
 namespace TruststampCore.Controllers
 {
-    public class ProofController : Controller
+    public class TimestampController : ApiController
     {
 
         private IProofService _proofService;
 
-        public ProofController(IProofService proofService)
+        public TimestampController(IProofService proofService)
         {
             _proofService = proofService;
         }
         
         [HttpPost] // string blockchain, 
-        [Route("api/{blockchain}/[controller]")]
-        public ActionResult Add(string blockchain, [FromBody]byte[] source)
+        [Route("api/[controller]")]
+        public ActionResult Add([FromBody]byte[] source)
         {
-            return Ok(_proofService.AddProof(source));
+            return ApiOk(_proofService.AddProof(source));
         }
 
         [HttpGet] // string blockchain, 
-        [Route("api/{blockchain}/[controller]/add/{source}")]
+        //[Route("api/{blockchain}/[controller]/add/{source}")]
+        [Route("api/[controller]/add/{source}")]
         public ActionResult AddString(string blockchain, string source)
         {
             if (String.IsNullOrWhiteSpace(source))
                 throw new ApplicationException("Source cannot be empty.");
 
             var data = Encoding.UTF8.GetBytes(source);
-            return Ok(_proofService.AddProof(data));
+            return ApiOk(_proofService.AddProof(data));
         }
 
 
 
         // GET api/
         [HttpGet]
-        [Route("api/{blockchain}/[controller]/{source}")]
+        [Route("api/[controller]/{source}")]
         public ActionResult Get(string blockchain, byte[] source)
         {
-            return Ok(_proofService.GetBlockchainProof(source));
+            return ApiOk(_proofService.GetBlockchainProof(source));
         }
 
 
         [HttpGet]
-        [Route("api/[controller]")]
+        [Route("api/[controller]/query")]
         public ActionResult Load(String sort, String order, String search, Int32 limit, Int32 offset, String ExtraParam)
         {
             // Get entity fieldnames
@@ -69,7 +70,6 @@ namespace TruststampCore.Controllers
             // Sort the filtered items and apply paging
             return Ok(items.Filter(columnNames, sort, order, limit, offset));
         }
-        
     }
 }
 

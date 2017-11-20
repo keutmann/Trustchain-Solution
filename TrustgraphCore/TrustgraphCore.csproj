@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TrustchainCore\TrustchainCore.csproj" />
+    <ProjectReference Include="..\TruststampCore\TruststampCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

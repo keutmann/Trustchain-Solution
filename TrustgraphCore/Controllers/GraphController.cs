@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TrustchainCore.Controllers;
 using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Controllers
 {
     [Route("api/[controller]")]
-    public class GraphController : Controller
+    public class GraphController : ApiController
     {
         public IGraphExportService ExportService { get; set; }
 
@@ -18,7 +19,7 @@ namespace TrustgraphCore.Controllers
         {
             var result = ExportService.GetFullGraph();
 
-            return Ok(result);
+            return ApiOk(result);
         }
     }
 }

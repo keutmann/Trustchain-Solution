@@ -8,22 +8,22 @@ using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
 
-namespace Trustchain.Pages.Proofs
+namespace Trustchain.Pages.Timestamps
 {
     public class IndexModel : PageModel
     {
-        private readonly TrustchainCore.Repository.TrustDBContext _context;
+        private readonly TrustDBContext _context;
 
-        public IndexModel(TrustchainCore.Repository.TrustDBContext context)
+        public IndexModel(TrustDBContext context)
         {
             _context = context;
         }
 
-        public ProofEntity Proof { get;set; }
+        public ProofEntity Timestamp { get;set; }
 
         public void OnGetAsync()
         {
-            Proof = new ProofEntity();
+            Timestamp = new ProofEntity();
         }
     }
 }

@@ -1,50 +1,71 @@
 ﻿using TrustchainCore.Model;
 using Microsoft.AspNetCore.Mvc;
 using TrustgraphCore.Interfaces;
+using TrustchainCore.Controllers;
+using TrustchainCore.Interfaces;
+using TruststampCore.Interfaces;
 
 namespace TrustgraphCore.Controllers
 {
     [Route("api/graph/[controller]")]
-    public class TrustController : Controller
+    public class TrustController : ApiController
     {
         private IGraphTrustService _graphTrustService;
+        private ITrustSchemaService _trustSchemaService;
+        private ITrustDBService _trustDBService;
+        private IProofService _proofService;
 
-        public TrustController(IGraphTrustService trustService)
+
+        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService)
         {
-            _graphTrustService = trustService;
+            _graphTrustService = graphTrustService;
+            _trustSchemaService = trustSchemaService;
+            _trustDBService = trustDBService;
+            _proofService = proofService;
         }
 
         [HttpGet]
         public ActionResult Get()
         {
-            return Ok("OK");
+            return ApiOk("OK");
         }
 
+        [HttpGet]
+        [Route("api/graph/[controller]/{issuerId}/{subjectId}/{scope}")]
+        public ActionResult Get(byte[] issuerId, byte[] subjectId, string scope)
+        {
+            if (!_graphTrustService.ModelService.Graph.IssuersIndex.ContainsKey(issuerId))
+                return NotFound();
+
+            var index = _graphTrustService.ModelService.Graph.IssuersIndex[issuerId];
+            var issuer = _graphTrustService.ModelService.Graph.Issuers[index];
+
+            for (int i = 0; i < issuer.Subjects.Length; i++)
+            {
+
+            }
+
+            return ApiOk("OK");
+        }
+
+
+        [Produces("application/json")]
         [HttpPost]
         public ActionResult Add([FromBody]PackageModel package)
         {
-            _graphTrustService.Add(package);
-            // Add to DB
-            // Add to Timestamp
+            var validaionResult = _trustSchemaService.Validate(package);
+            if (validaionResult.ErrorsFound > 0)
+                return BadRequest(validaionResult);
 
-//#if RELEASE
-//                var buildserverUrl = App.Config["buildserver"].ToStringValue("http://127.0.01:12601");
-//                if (!string.IsNullOrEmpty(buildserverUrl))
-//                {
-//                    var fullUrl = new UriBuilder(buildserverUrl);
-//                    fullUrl.Path = Path;
-//                    using (var client = new HttpClient())
-//                    {
-//                        var response = client.PostAsJsonAsync(fullUrl.ToString(), package);
-//                        Task.WaitAll(response);
-//                        var result = response.Result;
-//                        if (result.StatusCode != System.Net.HttpStatusCode.OK)
-//                            return InternalServerError();
-//                    }
-//                }
-//#endif
+            if (!_trustDBService.Add(package))   // Add to database
+                return ApiOk(null, null, "Package already exist");
 
-            return Ok(new { status = "succes" });
+            _graphTrustService.Add(package);    // Add to Graph
+            _proofService.AddProof(package.PackageId); // Add to timestamp service
+
+
+
+            return ApiOk(null, null, "Package added");
         }
     }
 }
