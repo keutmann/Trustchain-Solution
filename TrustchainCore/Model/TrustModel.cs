@@ -38,10 +38,11 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "subject", NullValueHandling = NullValueHandling.Ignore)]
         public IList<SubjectModel> Subjects { get; set; }
 
-        /// <summary>
-        /// Time when the trust was made by the client, included into the hash of the trust and signature.
-        /// </summary>
-        [JsonProperty(PropertyName = "timestamp", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        ///// <summary>
+        ///// Time when the trust was made by the client, included into the hash of the trust and signature.
+        ///// </summary>
+        //[JsonProperty(PropertyName = "created", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonIgnore]
         public long Timestamp2 { get; set; }
 
         public bool ShouldSerializeTrustId()
