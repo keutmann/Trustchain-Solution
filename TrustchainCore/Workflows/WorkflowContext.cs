@@ -190,12 +190,6 @@ namespace TrustchainCore.Workflows
             NextExecution = DateTime.Now.AddSeconds(seconds).ToUnixTime();
         }
 
-        public virtual void RunStepAgain(int seconds)
-        {
-            Wait(seconds);
-            //CurrentStepIndex--;
-        }
-
         private void ExecutedStep(IWorkflowStep step)
         {
             step.Execute();

@@ -52,7 +52,6 @@ namespace TruststampCore.Workflows
 
             var fundingKey = blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
 
-
             var tempTxKey = proof.Blockchain + "_previousTx";
             var previousTx = _keyValueService.Get(tempTxKey);
             var previousTxList = (previousTx != null) ? new List<Byte[]> { previousTx } : null;

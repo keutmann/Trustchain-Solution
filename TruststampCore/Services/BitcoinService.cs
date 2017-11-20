@@ -60,18 +60,16 @@ namespace TruststampCore.Services
             var json = _blockchain.GetReceivedAsync(address.ToString()).Result; //.ToWif());
 
             var txs = json["data"]["txs"];
+            if (txs == null)
+                return -1;
 
             if (txs.Count() == 0)
                 return -1;
 
             var confirmations = txs.Max(p => p["confirmations"].ToInteger());
-            //var unconfirmed = txs.Max(p => p["unconfirmed_received_value"].ToInteger());
 
             if (confirmations > 0)
-                return 1;
-
-            //if (unconfirmed > 0)
-                //return 0; // There are unconfirmed confirmations, return 0
+                return confirmations;
 
             return 0;
         }

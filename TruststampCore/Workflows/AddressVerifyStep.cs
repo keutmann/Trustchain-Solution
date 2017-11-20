@@ -38,12 +38,11 @@ namespace TruststampCore.Workflows
                 var blockchainService = _blockchainServiceFactory.GetService(proof.Blockchain);
                 proof.Confirmations = blockchainService.AddressTimestamped(proof.MerkleRoot);
 
-                if (proof.Confirmations == -1) // No timestamp on merkleRoot
-                {
-                    Context.RunStep<ILocalTimestampStep>();
-                    return;
-                }
-
+                //if (proof.Confirmations == -1) // No timestamp on merkleRoot
+                //{
+                //    Context.RunStep<ILocalTimestampStep>();
+                //    return;
+                //}
 
                 if (proof.Confirmations >= 0)
                 {
@@ -51,21 +50,20 @@ namespace TruststampCore.Workflows
                     if (proof.Confirmations < confirmationThreshold)
                     {
                         CombineLog(_logger, $"Current confirmations {proof.Confirmations} of {confirmationThreshold}");
-                        Context.RunStepAgain(_configuration.ConfirmationWait(proof.Blockchain));
                     }
                     else
                     {
-                        //proof.Status = TimestampProofStatusType.Done.ToString();
                         Context.RunStep<ISuccessStep>(); // Workflow done!
+                        return;
                     }
-
-                    return;
                 }
 
                 if(RetryAttempts > 60 * 24 * 7) // a week.
                 {
                     throw new ApplicationException($"To many RetryAttempts: {RetryAttempts}, cancelling workflow.");
                 }
+
+                Context.Wait(_configuration.ConfirmationWait(proof.Blockchain));
             }
             catch (Exception ex)
             {
@@ -74,7 +72,7 @@ namespace TruststampCore.Workflows
                 
                 _logger.LogError(Context.ID, ex, "Execute failed");
                 Context.Log($"Step: {this.GetType().Name} has failed with an error: {ex.Message}");
-                Context.RunStepAgain(_configuration.StepRetryAttemptWait());
+                Context.Wait(_configuration.StepRetryAttemptWait());
             }
         }
 

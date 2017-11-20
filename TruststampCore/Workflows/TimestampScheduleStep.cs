@@ -24,7 +24,7 @@ namespace TruststampCore.Workflows
             }
 
             // Rerun this step after x time, never to exit
-            Context.RunStepAgain(_configuration.TimestampInterval()); // Default 10 min
+            Context.Wait(_configuration.TimestampInterval()); // Default 10 min
         }
     }
 }

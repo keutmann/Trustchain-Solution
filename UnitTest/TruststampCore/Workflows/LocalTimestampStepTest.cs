@@ -7,6 +7,7 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Services;
 using TruststampCore.Interfaces;
 using TruststampCore.Workflows;
+using UnitTest.TruststampCore.Mocks;
 
 namespace UnitTest.TruststampCore.Workflows
 {
@@ -14,7 +15,7 @@ namespace UnitTest.TruststampCore.Workflows
     public class LocalTimestampStepTest : StartupMock
     {
         [TestMethod]
-        public void Execute()
+        public void ManyProofs()
         {
             // Setup
             var proofService = ServiceProvider.GetRequiredService<IProofService>();
@@ -26,21 +27,73 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
 
+            var merkleStep = workflow.GetStep<IMerkleStep>();
+            merkleStep.Execute();
 
-            //await workflow.Execute();
 
-            var step = (IMerkleStep)workflow.Steps[0];
-            step.Execute();
+            // No received
+            BlockchainRepositoryMock.ReceivedData = @"{
+                ""data"" : {
+                    }
+                }";
 
             // Test
-
-            var localTimestampStep = (LocalTimestampStep)workflow.Steps[1];
+            var localTimestampStep = workflow.GetStep<ILocalTimestampStep>();
             localTimestampStep.Execute();
 
-            // Verify
-            Assert.AreNotEqual(localTimestampStep.OutTx.Count, 0);
-            Assert.IsNotNull(workflow.Steps[2]);
-            Assert.IsTrue(typeof(IAddressVerifyStep).IsAssignableFrom(workflow.Steps[2].GetType()));
+            var btcTimestampStep = localTimestampStep as LocalTimestampStep;
+            if (btcTimestampStep != null)
+            {
+                // Verify
+                Assert.AreNotEqual(btcTimestampStep.OutTx.Count, 0);
+            }
+
+            var addressVerifyStep = workflow.GetStep<IAddressVerifyStep>();
+            Assert.IsNotNull(addressVerifyStep);
+        }
+
+        [TestMethod]
+        public void AlreadyTimestamp()
+        {
+            // Setup
+            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+
+            proofService.AddProof(Guid.NewGuid().ToByteArray());
+            proofService.AddProof(Guid.NewGuid().ToByteArray());
+            proofService.AddProof(Guid.NewGuid().ToByteArray());
+
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var workflow = workflowService.Create<TimestampWorkflow>();
+
+            var merkleStep = workflow.GetStep<IMerkleStep>();
+            merkleStep.Execute();
+
+
+            // No received
+            BlockchainRepositoryMock.ReceivedData = @"{
+                ""data"" : {
+                    ""txs"" : [
+                            {
+                                ""confirmations"" : 10
+                            }
+                        ]
+                    }
+                }";
+            
+
+            // Test
+            var localTimestampStep = workflow.GetStep<ILocalTimestampStep>();
+            localTimestampStep.Execute();
+
+            var btcTimestampStep = localTimestampStep as LocalTimestampStep;
+            if (btcTimestampStep != null)
+            {
+                // Verify
+                Assert.IsNull(btcTimestampStep.OutTx);
+            }
+
+            var addressVerifyStep = workflow.GetStep<IAddressVerifyStep>();
+            Assert.IsNotNull(addressVerifyStep);
         }
 
     }
