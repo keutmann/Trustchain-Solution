@@ -144,6 +144,9 @@ namespace TrustchainCore.Workflows
 
         public virtual bool DoExecution()
         {
+            if (Steps.Count == 0)
+                return false;
+
             if (NextExecution > DateTime.Now.ToUnixTime())
                 return false;
 

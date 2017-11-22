@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Linq;
-using System.IO;
+﻿using System.IO;
 using TrustchainCore.Extensions;
 using TrustchainCore.Model;
 using TrustchainCore.Interfaces;

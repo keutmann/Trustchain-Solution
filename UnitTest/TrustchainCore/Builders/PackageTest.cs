@@ -19,7 +19,7 @@ namespace UnitTest.TrustchainCore.Builders
             var serverKey = cryptoService.GetKey(Encoding.UTF8.GetBytes("testserver"));
 
             //var key = new Key()
-            var builder = new TrustBuilder(cryptoService, new TrustBinary());
+            var builder = new TrustBuilder(cryptoService, new TrustBinary(), new MerkleTreeSorted(cryptoService));
             builder.SetServerKey(serverKey);
             builder.AddTrust("testissuer1")
                 .AddSubject("testsubject1", TrustBuilder.CreateTrustTrue("The subject trusted person"))

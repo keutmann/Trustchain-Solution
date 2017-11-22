@@ -18,9 +18,13 @@ namespace TrustchainCore.Strategy
             LeafNodes = new List<MerkleNode>();
         }
 
+        public MerkleNode Add(byte[] data)
+        {
+            return Add(new ProofEntity() { Source = data });
+        }
+
         public MerkleNode Add(IProof proof)
         {
-
             var node = new MerkleNode(proof, CryptoService);
             LeafNodes.Add(node);
             return node;

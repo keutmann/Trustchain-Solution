@@ -30,7 +30,7 @@ namespace UnitTest.TrustgraphCore
             _trustCryptoService = new TrustCryptoService(_cryptoService);
             _graphModelService = new GraphModelService(new GraphModel());
             _graphTrustService = new GraphTrustService(_graphModelService);
-            _trustBuilder = new TrustBuilder(_cryptoService, new TrustBinary());
+            _trustBuilder = new TrustBuilder(_cryptoService, new TrustBinary(), new MerkleTreeSorted(_cryptoService));
         }
 
 

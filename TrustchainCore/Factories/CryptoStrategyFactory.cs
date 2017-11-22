@@ -19,7 +19,8 @@ namespace TrustchainCore.Factories
             Type type = null;
             switch(name.ToLower())
             {
-                case "btcpkh": type = typeof(CryptoBTCPKH); break; 
+                case "btcpkh": type = typeof(CryptoBTCPKH); break;
+                case "btc-pkh": type = typeof(CryptoBTCPKH); break;
             }
 
             return (ICryptoStrategy)_serviceProvider.GetRequiredService(type);

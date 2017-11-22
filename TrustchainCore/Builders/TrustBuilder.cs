@@ -17,15 +17,16 @@ namespace TrustchainCore.Builders
         private byte[] _serverKey;
 
         private TrustModel _currentTrust;
+        private IMerkleTree _merkleTree;
 
-        public TrustBuilder(ICryptoStrategy cryptoService, ITrustBinary trustBinary)
+        public TrustBuilder(ICryptoStrategy cryptoService, ITrustBinary trustBinary, IMerkleTree merkleTree)
         {
             Package = new PackageModel();
             Package.Trust = new List<TrustModel>();
             EnsureHead(Package);
             _cryptoService = cryptoService;
             _trustBinary = trustBinary;
-
+            _merkleTree = merkleTree;
         }
 
         public TrustBuilder Load(string content)
@@ -111,6 +112,13 @@ namespace TrustchainCore.Builders
             return this;
         }
 
+        public TrustBuilder AddTrust(TrustModel trust)
+        {
+            _currentTrust = trust;
+            Package.Trust.Add(_currentTrust);
+            return this;
+        }
+
         public PackageModel Sign()
         {
             foreach (var trust in Package.Trust)
@@ -123,12 +131,24 @@ namespace TrustchainCore.Builders
             return Package;
         }
 
-        public TrustBuilder SignTrust(TrustModel trust = null)
+
+        public TrustBuilder BuildTrustID(TrustModel trust = null)
         {
             if (trust == null)
                 trust = _currentTrust;
 
             trust.TrustId = _cryptoService.HashOf(_trustBinary.GetIssuerBinary(trust));
+
+            return this;
+        }
+
+        public TrustBuilder SignTrust(TrustModel trust = null)
+        {
+            if (trust == null)
+                trust = _currentTrust;
+
+            BuildTrustID(trust);
+            //trust.TrustId = _cryptoService.HashOf(_trustBinary.GetIssuerBinary(trust));
             trust.Signature = _cryptoService.SignMessage(trust.IssuerKey, trust.TrustId);
 
             return this;
@@ -171,13 +191,15 @@ namespace TrustchainCore.Builders
 
         public TrustBuilder BuildPackageID()
         {
+            
             var hash = new byte[0];
             foreach (var trust in Package.Trust)
             {
-                hash = _cryptoService.HashOf(hash.Combine(trust.TrustId));
+                if(trust.TrustId == null)
+                    BuildTrustID(trust);
+                _merkleTree.Add(new ProofEntity() { Source = trust.TrustId });
             }
-
-            Package.PackageId = hash;
+            Package.PackageId = _merkleTree.Build().Hash;
                  
             return this;
         }
