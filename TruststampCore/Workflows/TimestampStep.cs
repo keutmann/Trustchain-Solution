@@ -67,7 +67,9 @@ namespace TruststampCore.Workflows
             }
 
             // Check if the address already has been activated
-            TimestampProof.Confirmations = blockchainService.AddressTimestamped(TimestampProof.MerkleRoot);
+            var blockchainTimestamp = blockchainService.GetTimestamp(TimestampProof.MerkleRoot);
+
+            TimestampProof.Confirmations = blockchainTimestamp.Confirmations;
             if (TimestampProof.Confirmations >= 0)
             {
                 ProcessConfirmation();

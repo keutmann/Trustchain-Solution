@@ -1,4 +1,5 @@
-﻿using TrustchainCore.Model;
+﻿using System.Linq;
+using TrustchainCore.Model;
 using Microsoft.AspNetCore.Mvc;
 using TrustgraphCore.Interfaces;
 using TrustchainCore.Controllers;
@@ -14,14 +15,16 @@ namespace TrustgraphCore.Controllers
         private ITrustSchemaService _trustSchemaService;
         private ITrustDBService _trustDBService;
         private IProofService _proofService;
+        private IBlockchainServiceFactory _blockchainServiceFactory;
 
 
-        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService)
+        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService, IBlockchainServiceFactory blockchainServiceFactory)
         {
             _graphTrustService = graphTrustService;
             _trustSchemaService = trustSchemaService;
             _trustDBService = trustDBService;
             _proofService = proofService;
+            _blockchainServiceFactory = blockchainServiceFactory;
         }
 
         [HttpGet]
@@ -53,9 +56,26 @@ namespace TrustgraphCore.Controllers
         [HttpPost]
         public ActionResult Add([FromBody]PackageModel package)
         {
-            var validaionResult = _trustSchemaService.Validate(package);
-            if (validaionResult.ErrorsFound > 0)
-                return BadRequest(validaionResult);
+            var validationResult = _trustSchemaService.Validate(package);
+            if (validationResult.ErrorsFound > 0)
+                return BadRequest(validationResult);
+
+            if (_trustDBService.DBContext.Packages.Any(f => f.PackageId == package.PackageId))
+                return ApiOk(null, null, "Package already exist");
+
+            // Check timestamp
+            if(package.Timestamp != null && package.Timestamp.Count > 0)
+            {
+                var timestamp = package.Timestamp[0]; // Only support one timestamp for now
+                var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
+                if(blockchainService == null)
+                    return BadRequest("Invalid Blockchain definition in package timestamp");
+
+                //var 
+                //var addressTimestamp = blockchainService.GetTimestamp()
+            }
+            
+
 
             if (!_trustDBService.Add(package))   // Add to database
                 return ApiOk(null, null, "Package already exist");

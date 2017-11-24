@@ -7,6 +7,7 @@ using TruststampCore.Extensions;
 using Newtonsoft.Json.Linq;
 using TrustchainCore.Extensions;
 using TrustchainCore.Interfaces;
+using TruststampCore.Model;
 
 namespace TruststampCore.Services
 {
@@ -52,26 +53,26 @@ namespace TruststampCore.Services
         /// </summary>
         /// <param name="merkleRoot">The private key of the source hash</param>
         /// <returns>-1 = no Timestamps, 0 = unconfirmed tx, above 0 is the number of confimations</returns>
-        public int AddressTimestamped(byte[] merkleRoot)
+        public AddressTimestamp GetTimestamp(byte[] merkleRoot)
         {
+            var result = new AddressTimestamp();
             var key = new Key(CryptoStrategy.GetKey(merkleRoot));
             var address = key.PubKey.GetAddress(Network);
+            result.Address = address.Hash.ToBytes(); // Address without Network format
 
             var json = _blockchain.GetReceivedAsync(address.ToString()).Result; //.ToWif());
 
             var txs = json["data"]["txs"];
             if (txs == null)
-                return -1;
+                return result; // -1
 
             if (txs.Count() == 0)
-                return -1;
+                return result; // -1
 
-            var confirmations = txs.Max(p => p["confirmations"].ToInteger());
+            result.Time = txs.Min(p => p["time"].ToInteger());
+            result.Confirmations = txs.Max(p => p["confirmations"].ToInteger());
 
-            if (confirmations > 0)
-                return confirmations;
-
-            return 0;
+            return result;
         }
 
         /// <summary>

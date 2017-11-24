@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using TrustchainCore.Interfaces;
+using TruststampCore.Model;
 
 namespace TruststampCore.Interfaces
 {
@@ -7,7 +8,7 @@ namespace TruststampCore.Interfaces
     {
         ICryptoStrategy CryptoStrategy { get; set; }
         int VerifyFunds(byte[] key, IList<byte[]> previousTx = null);
-        int AddressTimestamped(byte[] merkleRoot);
+        AddressTimestamp GetTimestamp(byte[] merkleRoot);
         IList<byte[]> Send(byte[] hash, byte[] key, IList<byte[]> previousTx = null);
     }
 }

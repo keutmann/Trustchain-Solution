@@ -43,7 +43,9 @@ namespace TruststampCore.Workflows
             }
 
             var blockchainService = _blockchainServiceFactory.GetService(proof.Blockchain);
-            proof.Confirmations = blockchainService.AddressTimestamped(proof.MerkleRoot);
+            var blockchainTimestamp = blockchainService.GetTimestamp(proof.MerkleRoot);
+            proof.Confirmations = blockchainTimestamp.Confirmations;
+
             if (proof.Confirmations > -1) // Already timestamp on merkleRoot
             {
                 Context.RunStep<IAddressVerifyStep>(); // Now run verify step

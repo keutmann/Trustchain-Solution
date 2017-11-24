@@ -44,8 +44,8 @@ namespace UnitTest.TruststampCore.Services
             var address = key.PubKey.GetAddress(Network.TestNet);
             Console.WriteLine(address.ToString());
 
-            var result = blockchainService.AddressTimestamped(fundingKey);
-            Assert.IsTrue(result > 0, "No confirmations on: " + address);
+            var result = blockchainService.GetTimestamp(fundingKey);
+            Assert.IsTrue(result.Confirmations > 0, "No confirmations on: " + address);
         }
 
         [TestMethod]
@@ -63,8 +63,8 @@ namespace UnitTest.TruststampCore.Services
             var address = key.PubKey.GetAddress(Network.TestNet);
             Console.WriteLine(address.ToString());
 
-            var result = blockchainService.AddressTimestamped(fundingKey);
-            Assert.IsTrue(result == -1, "Should have been -1 (no unconfired and no confirmations): " + address);
+            var result = blockchainService.GetTimestamp(fundingKey);
+            Assert.IsTrue(result.Confirmations == -1, "Should have been -1 (no unconfired and no confirmations): " + address);
         }
 
 

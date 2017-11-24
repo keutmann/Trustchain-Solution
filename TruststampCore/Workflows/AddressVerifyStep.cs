@@ -36,14 +36,9 @@ namespace TruststampCore.Workflows
 
 
                 var blockchainService = _blockchainServiceFactory.GetService(proof.Blockchain);
-                proof.Confirmations = blockchainService.AddressTimestamped(proof.MerkleRoot);
-
-                //if (proof.Confirmations == -1) // No timestamp on merkleRoot
-                //{
-                //    Context.RunStep<ILocalTimestampStep>();
-                //    return;
-                //}
-
+                var blockchainTimestamp = blockchainService.GetTimestamp(proof.MerkleRoot);
+                proof.Confirmations = blockchainTimestamp.Confirmations;
+                
                 if (proof.Confirmations >= 0)
                 {
                     var confirmationThreshold = _configuration.ConfirmationThreshold(proof.Blockchain);
