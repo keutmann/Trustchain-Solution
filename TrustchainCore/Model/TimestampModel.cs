@@ -25,8 +25,8 @@ namespace TrustchainCore.Model
         /// <summary>
         /// Default is sha256
         /// </summary>
-        [JsonProperty(PropertyName = "algo")]
-        public string Algorithm { get; set; }
+        [JsonProperty(PropertyName = "hash")]
+        public string Hash { get; set; }
 
         /// <summary>
         /// The merkle tree path used for calculating the merkle root.
@@ -43,8 +43,8 @@ namespace TrustchainCore.Model
         public TimestampModel()
         {
             Blockchain = "btc-pkh";
-            Algorithm = "sha256";
-            MerkleTree = "tc1-sorted"; // Trustchain v1 sorted
+            Hash = "sha256";
+            MerkleTree = "tc1"; // Trustchain v1 sorted
         }
     }
 }

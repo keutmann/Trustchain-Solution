@@ -6,11 +6,8 @@ using TrustchainCore.Interfaces;
 namespace TrustchainCore.Model
 {
     [Table("Workflow")]
-    public class WorkflowContainer
+    public class WorkflowContainer : DatabaseEntity
     {
-        [JsonIgnore]
-        public int ID { get; set; } // Database row key
-
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
         public string Type { get; set; }
 

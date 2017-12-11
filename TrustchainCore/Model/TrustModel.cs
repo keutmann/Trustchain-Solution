@@ -12,12 +12,18 @@ namespace TrustchainCore.Model
         [JsonIgnore]
         public int PackageModelID { get; set; }
 
+        /// <summary>
+        /// The ID is composed by the content of the trust and hashed 
+        /// </summary>
         [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
         public byte[] TrustId { get; set; }
 
         //[JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]
         //public IssuerModel Issuer { get; set; }
 
+        /// <summary>
+        /// The ID (address) if the Issuer.
+        /// </summary>
         [JsonProperty(PropertyName = "issuerid")]
         public byte[] IssuerId { get; set; }
 
@@ -30,6 +36,8 @@ namespace TrustchainCore.Model
         public string Name { get; set; }
 
         /// <summary>
+        /// A signature that proofs the creator of the trust.
+        /// IssuerId signing the TrustId
         /// Not included in the Binary payload for signature verification!
         /// </summary>
         [JsonProperty(PropertyName = "signature", NullValueHandling = NullValueHandling.Ignore)]

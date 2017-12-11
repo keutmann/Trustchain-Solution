@@ -79,7 +79,7 @@ namespace UnitTest.TruststampCore.Workflows
             //((IMerkleStep)workflow.Steps[0]).RootHash = new byte[] { 1 };
             var id = workflowService.Save(workflow);
 
-            var container = trustDBService.Workflows.FirstOrDefault(p => p.ID == id);
+            var container = trustDBService.Workflows.FirstOrDefault(p => p.DatabaseID == id);
             Assert.IsNotNull(container);
             Console.WriteLine(container.Data);
 

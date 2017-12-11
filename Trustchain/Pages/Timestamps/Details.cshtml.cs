@@ -28,7 +28,7 @@ namespace Trustchain.Pages.Timestamps
                 return NotFound();
             }
 
-            ProofEntity = await _context.Proofs.SingleOrDefaultAsync(m => m.ID == id);
+            ProofEntity = await _context.Proofs.SingleOrDefaultAsync(m => m.DatabaseID == id);
 
             if (ProofEntity == null)
             {

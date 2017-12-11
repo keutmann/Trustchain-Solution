@@ -6,11 +6,8 @@ using TrustchainCore.Interfaces;
 namespace TrustchainCore.Model
 {
     [Table("Proof")]
-    public class ProofEntity : IProof
+    public class ProofEntity : DatabaseEntity,IProof
     {
-        [JsonIgnore]
-        public int ID { get; set; } // Database row key
-
         [JsonProperty(PropertyName = "source", NullValueHandling = NullValueHandling.Ignore)]
         public byte[] Source { get; set; }
 

@@ -60,7 +60,7 @@ namespace TrustchainCore.Services
                 step.Context = instance;
             }
 
-            instance.ID = container.ID;
+            instance.ID = container.DatabaseID;
             instance.State = container.State;
             instance.Tag = container.Tag;
 
@@ -92,7 +92,7 @@ namespace TrustchainCore.Services
         {
             if(workflow.ID != 0)
             {
-                var entity = _trustDBService.Workflows.FirstOrDefault(w => w.ID == workflow.ID);
+                var entity = _trustDBService.Workflows.FirstOrDefault(w => w.DatabaseID == workflow.ID);
                 if (entity != null)
                 {
                     entity.Type = workflow.GetType().FullName;
@@ -114,8 +114,8 @@ namespace TrustchainCore.Services
             var container = CreateWorkflowContainer(workflow);
             _trustDBService.DBContext.Workflows.Add(container);
             _trustDBService.DBContext.SaveChanges();
-            workflow.ID = container.ID;
-            return container.ID;
+            workflow.ID = container.DatabaseID;
+            return container.DatabaseID;
         }
 
         public WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow)

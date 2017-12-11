@@ -19,7 +19,7 @@ namespace TruststampCore.Factories
 
         public BlockchainProof Create(ProofEntity proofEntity)
         {
-            var workflowContainer = _workflowService.Workflows.FirstOrDefault(p => p.ID == proofEntity.WorkflowID);
+            var workflowContainer = _workflowService.Workflows.FirstOrDefault(p => p.DatabaseID == proofEntity.WorkflowID);
             if (workflowContainer == null)
                 return null;
 

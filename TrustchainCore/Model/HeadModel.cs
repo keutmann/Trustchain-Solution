@@ -36,7 +36,7 @@ namespace TrustchainCore.Model
         {
             Script = "btc-pkh";
             Hash = "sha256";
-            MerkleTree = "tc1-sorted"; // Trustchain v1 sorted
+            MerkleTree = "tc1"; // Trustchain v1 sorted
         }
 
     }
