@@ -4,6 +4,6 @@ namespace TrustchainCore.Interfaces
 {
     public interface ITrustBinary
     {
-        byte[] GetIssuerBinary(TrustModel trust);
+        byte[] GetIssuerBinary(Trust trust);
     }
 }

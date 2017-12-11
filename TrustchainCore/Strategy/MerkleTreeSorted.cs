@@ -10,11 +10,11 @@ namespace TrustchainCore.Strategy
     public class MerkleTreeSorted : IMerkleTree
     {
         private IList<MerkleNode> LeafNodes { get; }
-        private ICryptoStrategy CryptoService { get; }
+        private IHashAlgorithm HashAlgorithm { get; }
 
-        public MerkleTreeSorted(ICryptoStrategy cryptoService)
+        public MerkleTreeSorted(IHashAlgorithm hashAlgorithm)
         {
-            CryptoService = cryptoService;
+            HashAlgorithm = hashAlgorithm;
             LeafNodes = new List<MerkleNode>();
         }
 
@@ -25,7 +25,7 @@ namespace TrustchainCore.Strategy
 
         public MerkleNode Add(IProof proof)
         {
-            var node = new MerkleNode(proof, CryptoService);
+            var node = new MerkleNode(proof, HashAlgorithm);
             LeafNodes.Add(node);
             return node;
         }
@@ -66,12 +66,12 @@ namespace TrustchainCore.Strategy
 
                     if (first.Hash.Compare(second.Hash) < 0)
                     {
-                        var hash = CryptoService.HashOf(first.Hash.Combine(second.Hash));
+                        var hash = HashAlgorithm.HashOf(first.Hash.Combine(second.Hash));
                         parents.Enqueue(new MerkleNode(hash, first, second));
                     }
                     else
                     {
-                        var hash = CryptoService.HashOf(second.Hash.Combine(first.Hash));
+                        var hash = HashAlgorithm.HashOf(second.Hash.Combine(first.Hash));
                         parents.Enqueue(new MerkleNode(hash, second, first));
                     }
                 }
@@ -120,15 +120,15 @@ namespace TrustchainCore.Strategy
 
         public byte[] ComputeRoot(byte[] hash, byte[] path)
         {
-            var hashLength = CryptoService.Length;
+            var hashLength = HashAlgorithm.Length;
             for (var i = 0; i < path.Length; i += hashLength)
             {
                 var merkle = new byte[hashLength];
                 Array.Copy(path, i, merkle, 0, hashLength);
                 if (hash.Compare(merkle) < 0)
-                    hash = CryptoService.HashOf(hash.Combine(merkle));
+                    hash = HashAlgorithm.HashOf(hash.Combine(merkle));
                 else
-                    hash = CryptoService.HashOf(merkle.Combine(hash));
+                    hash = HashAlgorithm.HashOf(merkle.Combine(hash));
             }
             return hash;
         }

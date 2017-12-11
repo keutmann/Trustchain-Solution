@@ -3,6 +3,7 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TrustchainCore.Extensions;
 using TrustchainCore.Strategy;
+using System;
 
 namespace TrustchainCore.Services
 {
@@ -10,10 +11,14 @@ namespace TrustchainCore.Services
     public class TrustSchemaService : ITrustSchemaService
     {
         private ICryptoStrategyFactory _cryptoServiceFactory;
+        private IMerkleStrategyFactory _merkleStrategyFactory;
+        private IHashAlgorithmFactory _hashAlgorithmFactory;
 
-        public TrustSchemaService(ICryptoStrategyFactory cryptoServiceFactory)
+        public TrustSchemaService(ICryptoStrategyFactory cryptoServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory)
         {
             _cryptoServiceFactory = cryptoServiceFactory;
+            _merkleStrategyFactory = merkleStrategyFactory;
+            _hashAlgorithmFactory = hashAlgorithmFactory;
         }
 
 
@@ -22,9 +27,8 @@ namespace TrustchainCore.Services
         {
             package = TrustBuilder.EnsureHead(package);
             var cryptoService = _cryptoServiceFactory.GetService(package.Head.Script);
-            var merkleTreeSorted = new MerkleTreeSorted(cryptoService);
-            var trustBinary = new TrustBinary();
-            var engine = new ValidationEngine(cryptoService, merkleTreeSorted, trustBinary);
+            //var merkleTreeSorted = new MerkleTreeSorted(cryptoService);
+            var engine = new ValidationEngine(_cryptoServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, new TrustBinary());
             return engine.Validate(package);
         }
 
@@ -32,40 +36,61 @@ namespace TrustchainCore.Services
         private class ValidationEngine
         {
             private SchemaValidationResult result = new SchemaValidationResult();
-            private ICryptoStrategy _cryptoService;
-            private IMerkleTree _merkleTree;
+            //private ICryptoStrategy _cryptoService;
+            //private IMerkleTree _merkleTree;
             private ITrustBinary _trustBinary;
 
+            private ICryptoStrategyFactory _cryptoServiceFactory;
+            private IMerkleStrategyFactory _merkleStrategyFactory;
+            private IHashAlgorithmFactory _hashAlgorithmFactory;
 
-            public ValidationEngine(ICryptoStrategy cryptoService, IMerkleTree merkleTree, ITrustBinary trustBinary)
+
+
+            //public ValidationEngine(ICryptoStrategy cryptoService, IMerkleTree merkleTree, ITrustBinary trustBinary)
+            //{
+            //    _cryptoService = cryptoService;
+            //    _merkleTree = merkleTree;
+            //}
+            public ValidationEngine(ICryptoStrategyFactory cryptoServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
             {
-                _cryptoService = cryptoService;
-                _merkleTree = merkleTree;
+                _cryptoServiceFactory = cryptoServiceFactory;
+                _merkleStrategyFactory = merkleStrategyFactory;
+                _hashAlgorithmFactory = hashAlgorithmFactory;
                 _trustBinary = trustBinary;
             }
 
-            public SchemaValidationResult Validate(PackageModel package)
+            public SchemaValidationResult Validate(Package package)
             {
-                if (package.PackageId == null)
+                if (package.Id == null)
                     result.Errors.Add("Package.PackageID is missing");
 
-                ValidateHead(package.Head, result);
-                var testBuilder = new TrustBuilder(_cryptoService, _trustBinary, _merkleTree);
-                var trustIndex = 0;
-                foreach (var trust in package.Trust)
+                try
                 {
-                    testBuilder.AddTrust(trust);
-                    ValidateTrust(trustIndex++, trust, result);
-                }
+                    var script = _merkleStrategyFactory.GetStrategy(package.Algorithm);
+                
 
-                var testPackageID = testBuilder.BuildPackageID().Package.PackageId;
-                if (testPackageID.Compare(package.PackageId) != 0)
-                    result.Errors.Add("Package.PackageID is not same as merkle tree root of all trust ID");
+                    var testBuilder = new TrustBuilder(_cryptoService, _trustBinary, _merkleTree);
+                    //var trustIndex = 0;
+                    foreach (var trust in package.Trusts)
+                    {
+                        //testBuilder.AddTrust(trust);
+                        //ValidateTrust(trustIndex++, trust, result);
+                    }
+
+                    //var testPackageID = testBuilder.BuildPackageID().Package.PackageId;
+                    //if (testPackageID.Compare(package.PackageId) != 0)
+                       // result.Errors.Add("Package.PackageID is not same as merkle tree root of all trust ID");
+
+                }
+                catch (Exception ex)
+                {
+                    result.Errors.Add(ex.Message);
+                }
 
                 return result;
             }
 
-            private void ValidateHead(HeadModel head, SchemaValidationResult result)
+            private void ValidateServer(HeadModel head, SchemaValidationResult result)
             {
 
                 if (head == null)

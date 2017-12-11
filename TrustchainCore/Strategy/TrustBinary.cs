@@ -11,7 +11,7 @@ namespace TrustchainCore.Strategy
         {
         }
 
-        public byte[] GetIssuerBinary(TrustModel trust)
+        public byte[] GetIssuerBinary(Trust trust)
         {
             using (MemoryStream ms = new MemoryStream())
             {

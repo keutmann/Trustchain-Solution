@@ -14,10 +14,10 @@ namespace TrustchainCore.Model
 
         public IProof Proof { get; set; }
 
-        public MerkleNode(IProof proof, ICryptoStrategy cryptoService)
+        public MerkleNode(IProof proof, IHashAlgorithm hashAlgorithm)
         {
             Proof = proof;
-            Hash = cryptoService.HashOf(proof.Source);
+            Hash = hashAlgorithm.HashOf(proof.Source);
         }
 
         public MerkleNode(byte[] hash, MerkleNode left, MerkleNode right)

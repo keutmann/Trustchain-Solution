@@ -20,11 +20,14 @@ namespace TrustchainCore.Extensions
             services.AddScoped<IWorkflowService, WorkflowService>();
             services.AddScoped<IKeyValueService, KeyValueService>();
             
-            services.AddTransient<ICryptoStrategyFactory, CryptoStrategyFactory>();
-            services.AddTransient<CryptoBTCPKH>();
             
             services.AddTransient<ITrustSchemaService, TrustSchemaService>();
-            services.AddTransient<IMerkleTree, MerkleTreeSorted>();
+
+            services.AddTransient<IHashAlgorithmFactory, HashAlgorithmFactory>();
+            services.AddTransient<IMerkleStrategyFactory, MerkleStrategyFactory>();
+            services.AddTransient<ICryptoStrategyFactory, CryptoStrategyFactory>();
+            services.AddTransient<CryptoBTCPKH>();
+
             // ---------------------------------------------------------------------------------------------------------------
             // http://www.dotnet-programming.com/post/2017/05/08/Aspnet-core-Deserializing-Json-with-Dependency-Injection.aspx
             services.AddSingleton<IDIMeta>(s => { return new DIMetaDefault(services); });

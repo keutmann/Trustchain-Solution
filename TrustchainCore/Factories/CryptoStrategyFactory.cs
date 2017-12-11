@@ -7,6 +7,8 @@ namespace TrustchainCore.Factories
 {
     public class CryptoStrategyFactory : ICryptoStrategyFactory
     {
+        public const string BTC_PKH = "btc-pkh";
+
         private IServiceProvider _serviceProvider;
 
         public CryptoStrategyFactory(IServiceProvider serviceProvider)

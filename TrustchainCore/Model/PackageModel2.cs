@@ -13,13 +13,13 @@ namespace TrustchainCore.Model
         public string Algorithm { get; set; }
 
         [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        public byte[] Id { get; set; }
 
         [JsonProperty(PropertyName = "trusts", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Trust> Trusts { get; set; }
 
         [JsonProperty(PropertyName = "server", NullValueHandling = NullValueHandling.Ignore)]
-        public ServerIdentity Server { get; set; }
+        public Identity Server { get; set; }
 
         [JsonProperty(PropertyName = "timestamps", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Timestamp> Timestamps { get; set; }
@@ -41,23 +41,23 @@ namespace TrustchainCore.Model
 
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
-    public class ServerIdentity
-    {
-        [JsonProperty(PropertyName = "script")]
-        public string Script { get; set; }
+    //[JsonObject(MemberSerialization.OptIn)]
+    //public class ServerIdentity
+    //{
+    //    [JsonProperty(PropertyName = "script")]
+    //    public string Script { get; set; }
 
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+    //    [JsonProperty(PropertyName = "id")]
+    //    public byte[] Id { get; set; }
 
-        [JsonProperty(PropertyName = "signature")]
-        public string Signature { get; set; }
+    //    [JsonProperty(PropertyName = "signature")]
+    //    public string Signature { get; set; }
 
-        public ServerIdentity()
-        {
-            Script = "btc-pkh";
-        }
-    }
+    //    public ServerIdentity()
+    //    {
+    //        Script = "btc-pkh";
+    //    }
+    //}
 
     [Table("Trust")]
     [JsonObject(MemberSerialization.OptIn)]
@@ -67,10 +67,10 @@ namespace TrustchainCore.Model
         public string Algorithm { get; set; }
 
         [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        public byte[] Id { get; set; }
 
         [JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]
-        public IssuerIdentity Issuer { get; set; }
+        public Identity Issuer { get; set; }
 
         [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Subject> Subjects { get; set; }
@@ -97,19 +97,28 @@ namespace TrustchainCore.Model
         }
     }
 
+    public delegate byte[] SignDelegate(Identity identity, byte[] data);
+
     [JsonObject(MemberSerialization.OptIn)]
-    public class IssuerIdentity
+    public class Identity
     {
         [JsonProperty(PropertyName = "script")]
         public string Script { get; set; }
 
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        [JsonProperty(PropertyName = "address")]
+        public byte[] Address { get; set; }
+
+        /// <summary>
+        /// Internal property for holding the private key to sign with
+        /// </summary>
+        [JsonIgnore]
+        [NotMapped]
+        public SignDelegate Sign { get; set; }
 
         [JsonProperty(PropertyName = "signature")]
-        public string Signature { get; set; }
+        public byte[] Signature { get; set; }
 
-        public IssuerIdentity()
+        public Identity()
         {
             Script = "btc-pkh";
         }
@@ -123,7 +132,7 @@ namespace TrustchainCore.Model
         public string Algorithm { get; set; }
 
         [JsonProperty(PropertyName = "recipt")]
-        public string Recipt { get; set; }
+        public byte[] Recipt { get; set; }
 
         [UIHint("JSON")]
         [JsonProperty(PropertyName = "timestamps")]
@@ -152,7 +161,7 @@ namespace TrustchainCore.Model
         public int[] ClaimIndexs { get; set; }
 
         [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
+        public byte[] Id { get; set; }
 
         [JsonProperty(PropertyName = "kind")]
         public string Kind { get; set; }
