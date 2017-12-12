@@ -55,6 +55,7 @@ namespace Trustchain
             services.AddDbContext<TrustDBContext>(options =>
                 //options.UseSqlite(Configuration.GetConnectionString("TrustDB"), b => b.MigrationsAssembly("TrustchainCore"))); 
                 options.UseSqlite("Filename=./trust.db", b => b.MigrationsAssembly("TrustchainCore")));
+                //options.UseSqlite("Filename=./trust.db"));
 
         }
 

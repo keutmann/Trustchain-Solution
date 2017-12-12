@@ -45,6 +45,7 @@ namespace Trustchain.Pages.Workflows
                 return NotFound();
             }
 
+
             WorkflowContainer = await _context.Workflows.FindAsync(id);
 
             if (WorkflowContainer != null)

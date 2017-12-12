@@ -28,6 +28,7 @@ namespace Trustchain.Pages.Workflows
                 return NotFound();
             }
 
+            
             WorkflowContainer = await _context.Workflows.SingleOrDefaultAsync(m => m.DatabaseID == id);
 
             if (WorkflowContainer == null)

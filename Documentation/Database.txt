@@ -27,6 +27,8 @@ Add-Migration [Name]
 Update-Database
 
 
+Add-Migration -Name MyMigration -OutputDir MyMigrationDir -Context MyContext -Project MyProject -StartupProject MyStartupProject
+
 
 Scaffold model
 https://docs.microsoft.com/en-us/aspnet/core/tutorials/razor-pages/model
@@ -37,6 +39,11 @@ dotnet aspnet-codegenerator razorpage -m Workflows -dc TrustDBContext -udl -outD
 
 dotnet aspnet-codegenerator razorpage -m ProofEntity -dc TrustDBContext -udl -outDir Pages\Proofs --referenceScriptLibraries
 
+
+
+  <ItemGroup>
+    <!--<DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.1" />-->
+  </ItemGroup>
 
 Configuration settings
 
