@@ -4,7 +4,7 @@ using TrustchainCore.Model;
 
 namespace TrustgraphCore.Model
 {
-    public class SubjectResult : SubjectModel
+    public class SubjectResult : Subject
     {
         [JsonIgnore]
         public int NametIndex { get; set; }

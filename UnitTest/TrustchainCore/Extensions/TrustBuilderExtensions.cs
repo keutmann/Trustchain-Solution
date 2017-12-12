@@ -43,7 +43,7 @@ namespace UnitTest.TrustchainCore.Extensions
 
             builder.AddClaim(data, out Claim claim);
 
-            builder.AddSubject(address, subjectName, "person", new int[] { claim.Index });
+            builder.AddSubject(address, subjectName, "person", new byte[] { (byte)claim.Index });
             return builder;
         }
 

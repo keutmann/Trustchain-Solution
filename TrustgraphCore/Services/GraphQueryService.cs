@@ -6,6 +6,7 @@ using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
 using TrustchainCore.Interfaces;
 using TrustgraphCore.Enumerations;
+using TrustchainCore.Model;
 
 namespace TrustgraphCore.Services
 {
@@ -50,9 +51,9 @@ namespace TrustgraphCore.Services
 
                     if ((item.ClaimModel.Metadata & ClaimMetadata.Reason) > 0) // A reason property exist on this subject
                     {
-                        var dbItem = _trustDBService.Subjects.FirstOrDefault(w => w.SubjectId == item.SubjectId);
+                        var dbItem = _trustDBService.Subjects.FirstOrDefault(w => w.Address == item.Address);
                         if (dbItem != null)
-                            item.Claim = dbItem.Claim;
+                            item.ClaimIndexs = dbItem.ClaimIndexs;
                     }
                 }
             });
@@ -82,8 +83,10 @@ namespace TrustgraphCore.Services
                 subject.ParentIndex = result.IssuerIndex;
                 var visited = context.Visited[result.IssuerIndex];
 
+                var claim = new Claim();
+
                 subject.GraphSubjectIndex = new Int64Container(result.IssuerIndex, visited.SubjectIndex);
-                ModelService.InitSubjectModel(subject, result.Subject);
+                ModelService.InitSubjectModel(subject, claim, result.Subject);
                 subject.NametIndex = result.Subject.NameIndex;
                 subject.ClaimModel = result.Subject.Claim;
 
@@ -111,12 +114,13 @@ namespace TrustgraphCore.Services
                     }
 
                     var issuer = ModelService.Graph.Issuers[parentNode.SubjectIndex];
-                    parentNode.SubjectId = issuer.Id;
+                    parentNode.Address = issuer.Id;
 
                     if (visited.SubjectIndex >= 0)
                     {
+                        var claim = new Claim();
                         var edge = issuer.Subjects[visited.SubjectIndex];
-                        ModelService.InitSubjectModel(parentNode, edge);
+                        ModelService.InitSubjectModel(parentNode, claim, edge);
                     }
 
                     parentNode.Subjects = new List<SubjectResult> { subject };

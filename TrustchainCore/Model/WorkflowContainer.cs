@@ -1,13 +1,15 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TrustchainCore.Interfaces;
 
 namespace TrustchainCore.Model
 {
     [Table("Workflow")]
-    public class WorkflowContainer : DatabaseEntity
+    public class WorkflowContainer //: DatabaseEntity
     {
+        [Key]
+        public int DatabaseID { get; set; }
+
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
         public string Type { get; set; }
 

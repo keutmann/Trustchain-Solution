@@ -13,30 +13,35 @@ namespace TrustgraphCore.Services
             ModelService = modelService;
         }
 
-        public PackageModel GetFullGraph()
+        public Package GetFullGraph()
         {
-            var package = new PackageModel();
-            package.Trust = new List<TrustModel>();
+            var package = new Package();
+            package.Trusts = new List<Trust>();
 
             foreach (var address in ModelService.Graph.Issuers)
             {
-                var trust = new TrustModel();
-                trust.IssuerId = address.Id;
-                
-                var subjects = new List<SubjectModel>();
+                var trust = new Trust();
+                trust.Issuer = new Identity();
+                trust.Issuer.Address = address.Id;
+                trust.Claims = new List<Claim>();
+                var subjects = new List<Subject>();
+
                 if (address.Subjects != null)
                 {
                     foreach (var edge in address.Subjects)
                     {
-                        var child = new SubjectModel();
-                        ModelService.InitSubjectModel(child, edge);
+                        var child = new Subject();
+                        var claim = new Claim();
+                        ModelService.InitSubjectModel(child, claim, edge);
+
                         subjects.Add(child);
+                        trust.Claims.Add(claim);
                     }
                 }
                 if(subjects.Count > 0)
                     trust.Subjects = subjects;
 
-                package.Trust.Add(trust);
+                package.Trusts.Add(trust);
             }
             return package;
         }

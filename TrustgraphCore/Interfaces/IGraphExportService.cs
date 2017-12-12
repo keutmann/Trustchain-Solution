@@ -4,6 +4,6 @@ namespace TrustgraphCore.Interfaces
 {
     public interface IGraphExportService
     {
-        PackageModel GetFullGraph();
+        Package GetFullGraph();
     }
 }

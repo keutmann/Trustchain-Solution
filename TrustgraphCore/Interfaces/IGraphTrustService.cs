@@ -8,8 +8,8 @@ namespace TrustgraphCore.Interfaces
     {
         IGraphModelService ModelService { get; }
 
-        void Add(PackageModel package);
-        void Add(IEnumerable<TrustModel> trusts);
-        void Add(TrustModel trust, long unixTime);
+        void Add(Package package);
+        void Add(IEnumerable<Trust> trusts);
+        void Add(Trust trust, long unixTime);
     }
 }

@@ -230,7 +230,7 @@ namespace TrustchainCore.Builders
         }
 
 
-        public TrustBuilder AddSubject(byte[] address, string alias, string kind, int[] claimIndex)
+        public TrustBuilder AddSubject(byte[] address, string alias, string kind, byte[] claimIndex)
         {
             if(_currentTrust.Subjects == null)
                 _currentTrust.Subjects = new List<Subject>();

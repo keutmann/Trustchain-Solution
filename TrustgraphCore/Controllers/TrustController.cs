@@ -60,7 +60,7 @@ namespace TrustgraphCore.Controllers
             if (validationResult.ErrorsFound > 0)
                 return BadRequest(validationResult);
 
-            if (_trustDBService.DBContext.Packages.Any(f => f.PackageId == package.Id))
+            if (_trustDBService.DBContext.Packages.Any(f => f.Id == package.Id))
                 return ApiOk(null, null, "Package already exist");
 
             // Check timestamp
@@ -81,7 +81,7 @@ namespace TrustgraphCore.Controllers
                 return ApiOk(null, null, "Package already exist");
 
             _graphTrustService.Add(package);    // Add to Graph
-            _proofService.AddProof(package.PackageId); // Add to timestamp service
+            _proofService.AddProof(package.Id); // Add to timestamp service
 
 
 

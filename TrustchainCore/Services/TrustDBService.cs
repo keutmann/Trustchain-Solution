@@ -10,31 +10,34 @@ namespace TrustchainCore.Services
     {
         public TrustDBContext DBContext { get; }
 
-        public IQueryable<PackageModel> Packages
+        public IQueryable<Package> Packages
         {
             get
             {
                 return DBContext.Packages
-                .Include(c => c.Timestamp)
-                .Include(c => c.Trust)
+                .Include(c => c.Timestamps)
+                .Include(c => c.Trusts)
                     .ThenInclude(c => c.Subjects)
-                .Include(c => c.Trust)
+                .Include(c => c.Trusts)
+                    .ThenInclude(c => c.Claims)
+                .Include(c => c.Trusts)
                     .ThenInclude(c => c.Timestamp);
                 
             }
         }
 
-        public IQueryable<TrustModel> Trusts
+        public IQueryable<Trust> Trusts
         {
             get
             {
                 return DBContext.Trusts
                     .Include(c => c.Timestamp)
-                    .Include(c => c.Subjects);
+                    .Include(c => c.Subjects)
+                    .Include(c => c.Claims);
             }
         }
 
-        public IQueryable<SubjectModel> Subjects
+        public IQueryable<Subject> Subjects
         {
             get
             {
@@ -63,9 +66,9 @@ namespace TrustchainCore.Services
             DBContext = trustDBContext;
         }
 
-        public bool Add(PackageModel package)
+        public bool Add(Package package)
         {
-            if (DBContext.Packages.Any(f => f.PackageId == package.PackageId))
+            if (DBContext.Packages.Any(f => f.Id == package.Id))
                 return false;
 
             DBContext.Packages.Add(package);
@@ -73,9 +76,9 @@ namespace TrustchainCore.Services
             return true;
         }
 
-        public PackageModel GetPackage(byte[] packageId)
+        public Package GetPackage(byte[] packageId)
         {
-            var task = Packages.SingleOrDefaultAsync(f => f.PackageId == packageId); 
+            var task = Packages.SingleOrDefaultAsync(f => f.Id == packageId); 
 
             task.Wait();
 

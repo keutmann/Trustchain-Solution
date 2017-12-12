@@ -9,6 +9,7 @@ using TrustchainCore.Services;
 using TrustchainCore.Strategy;
 using TrustchainCore.Extensions;
 using TrustchainCore.Factories;
+using UnitTest.TrustchainCore.Extensions;
 
 namespace UnitTest.TrustchainCore.Builders
 {
@@ -22,20 +23,20 @@ namespace UnitTest.TrustchainCore.Builders
             var serverKey = cryptoService.GetKey(Encoding.UTF8.GetBytes("testserver"));
 
             //var key = new Key()
-            var builder = new TrustBuilder(cryptoService, new TrustBinary(), new MerkleTreeSorted(cryptoService));
-            builder.SetServerKey(serverKey);
+            var builder = new TrustBuilder(ServiceProvider);
+            builder.SetServer(serverKey);
             builder.AddTrust("testissuer1")
                 .AddSubject("testsubject1", TrustBuilder.CreateTrustTrue("The subject trusted person"))
                 .AddSubject("testsubject2", TrustBuilder.CreateTrustTrue("The subject trusted person"));
             builder.AddTrust("testissuer2", "testsubject1", TrustBuilder.CreateTrustTrue("The subject trusted person"));
             builder.Sign();
 
-            var schemaService = new TrustSchemaService(new CryptoStrategyFactory(ServiceProvider));
+            var schemaService = new TrustSchemaService(ServiceProvider);
             var result = schemaService.Validate(builder.Package);
 
             Console.WriteLine(result.ToString());
 
-            Assert.IsTrue(builder.Package.Trust.Count > 0);
+            Assert.IsTrue(builder.Package.Trusts.Count > 0);
             Assert.AreEqual(0, result.Errors.Count);
             Assert.AreEqual(0, result.Warnings.Count);
 
@@ -55,10 +56,11 @@ namespace UnitTest.TrustchainCore.Builders
             using (var context = new TrustDBContext(options))
             {
                 var task = context.Packages
-                        .Include(c => c.Timestamp)
-                        .Include(c => c.Trust)
+                        .Include(c => c.Timestamps)
+                        .Include(c => c.Trusts)
                             .ThenInclude(c => c.Subjects)
-                        .Include(c => c.Trust)
+                            //.ThenInclude(c => c.Claims)
+                        .Include(c => c.Trusts)
                             .ThenInclude(c => c.Timestamp)
 
                         .AsNoTracking().ToListAsync();

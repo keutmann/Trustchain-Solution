@@ -164,7 +164,7 @@ namespace TrustchainCore.Model
         public string Alias { get; set; }
 
         [JsonProperty(PropertyName = "claimIndexs", NullValueHandling = NullValueHandling.Ignore)]
-        public int[] ClaimIndexs { get; set; }
+        public byte[] ClaimIndexs { get; set; }
 
         [JsonProperty(PropertyName = "address")]
         public byte[] Address { get; set; }
@@ -191,13 +191,13 @@ namespace TrustchainCore.Model
         public string Data { get; set; }
 
         [JsonProperty(PropertyName = "cost")]
-        public int Cost { get; set; }
+        public short Cost { get; set; }
 
         [JsonProperty(PropertyName = "activate")]
-        public int Activate { get; set; }
+        public uint Activate { get; set; }
 
         [JsonProperty(PropertyName = "expire")]
-        public int Expire { get; set; }
+        public uint Expire { get; set; }
 
         [JsonProperty(PropertyName = "scope")]
         public string Scope { get; set; }

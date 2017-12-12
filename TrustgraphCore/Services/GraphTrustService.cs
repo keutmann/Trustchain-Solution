@@ -18,12 +18,12 @@ namespace TrustgraphCore.Services
             ModelService = modelService;
         }
 
-        public void Add(PackageModel package)
+        public void Add(Package package)
         {
-            Add(package.Trust);
+            Add(package.Trusts);
         }
 
-        public void Add(IEnumerable<TrustModel> trusts)
+        public void Add(IEnumerable<Trust> trusts)
         {
             long unixTime = DateTime.Now.ToUnixTime();
             foreach (var trust in trusts)
@@ -32,19 +32,19 @@ namespace TrustgraphCore.Services
             }
         }
 
-        public void Add(TrustModel trust, long unixTime = 0)
+        public void Add(Trust trust, long unixTime = 0)
         {
             if (unixTime == 0)
                 unixTime = DateTime.Now.ToUnixTime();
 
-            var index = ModelService.EnsureId(trust.IssuerId);
+            var index = ModelService.EnsureId(trust.Issuer.Address);
             var issuer = ModelService.Graph.Issuers[index]; // Remember its a copy of Issuer!
-            var nameIndex = ModelService.EnsureName(trust.Name);
+            //var nameIndex = ModelService.EnsureName(trust.Name);
             var subjects = new List<GraphSubject>(issuer.Subjects ?? (new GraphSubject[0]));
 
             foreach (var subject in trust.Subjects)
             {
-                BuildSubject(trust, subjects, subject, nameIndex);
+                BuildSubject(trust, subjects, subject, 0);
             }
 
             // Remove old subjects thats expired!
@@ -55,9 +55,10 @@ namespace TrustgraphCore.Services
 
         }
 
-        private void BuildSubject(TrustModel trust, List<GraphSubject> existingItems, SubjectModel subjectModel, int nameIndex = 0)
+        private void BuildSubject(Trust trust, List<GraphSubject> existingItems, Subject subject, int nameIndex = 0)
         {
-            var graphSubject = ModelService.CreateGraphSubject(subjectModel, nameIndex, (int)trust.Timestamp2);
+            var claim = trust.Claims[subject.ClaimIndexs[0]];
+            var graphSubject = ModelService.CreateGraphSubject(subject, claim, nameIndex, 0); //(int)trust.Timestamp2
             var ids = new List<int>();
             // Find all edges that matchs
             for (var i = 0 ; i < existingItems.Count; i++)

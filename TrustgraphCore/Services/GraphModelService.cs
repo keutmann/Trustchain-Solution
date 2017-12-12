@@ -20,34 +20,34 @@ namespace TrustgraphCore.Services
             Graph = model;
         }
 
-        public GraphSubject CreateGraphSubject(SubjectModel subject, int nameIndex, int timestamp)
+        public GraphSubject CreateGraphSubject(Subject subject, Claim claim, int nameIndex, int timestamp)
         {
             var edge = new GraphSubject
             {
-                SubjectId = EnsureId(subject.SubjectId),
-                SubjectType = EnsureSubjectType(subject.SubjectType),
+                SubjectId = EnsureId(subject.Address),
+                SubjectType = EnsureSubjectType(subject.Kind),
                 NameIndex = nameIndex,
-                Scope = EnsureScopeIndex(subject.Scope),
-                Activate = subject.Activate,
-                Expire = subject.Expire,
-                Cost = (short)subject.Cost,
+                Scope = EnsureScopeIndex(claim.Scope),
+                Activate = claim.Activate,
+                Expire = claim.Expire,
+                Cost = (short)claim.Cost,
                 Timestamp = timestamp,
-                Claim = ClaimStandardModel.Parse((JObject)JsonConvert.DeserializeObject(subject.Claim))
+                Claim = ClaimStandardModel.Parse((JObject)JsonConvert.DeserializeObject(claim.Data))
             };
 
             return edge;
         }
 
-        public void InitSubjectModel(SubjectModel node, GraphSubject edge)
+        public void InitSubjectModel(Subject node, Claim claim, GraphSubject edge)
         {
-            node.SubjectId = Graph.Issuers[edge.SubjectId].Id;
-            node.SubjectType = Graph.SubjectTypesIndexReverse[edge.SubjectType];
-            node.Scope = Graph.ScopeIndexReverse[edge.Scope];
-            node.Activate = edge.Activate;
-            node.Expire = edge.Expire;
-            node.Cost = edge.Cost;
-            node.Timestamp = edge.Timestamp;
-            node.Claim = edge.Claim.ConvertToJObject().ToString(Formatting.None);
+            node.Address = Graph.Issuers[edge.SubjectId].Id;
+            node.Kind = Graph.SubjectTypesIndexReverse[edge.SubjectType];
+            claim.Scope = Graph.ScopeIndexReverse[edge.Scope];
+            claim.Activate = edge.Activate;
+            claim.Expire = edge.Expire;
+            claim.Cost = edge.Cost;
+            //claim.Timestamp = edge.Timestamp;
+            claim.Data = edge.Claim.ConvertToJObject().ToString(Formatting.None);
         }
 
         public int EnsureId(byte[] id)

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using TrustchainCore.Model;
 using TrustgraphCore.Model;
 
@@ -19,12 +17,13 @@ namespace TrustgraphCore.Builders
             };
         }
 
-        public QueryRequestBuilder Add(byte[] issuerId, SubjectModel subject)
+        public QueryRequestBuilder Add(byte[] issuerId, Subject subject)
         {
             Query.Issuers.Add(issuerId);
-            Query.Subjects.Add(new SubjectQuery { Id = subject.SubjectId, Type = subject.SubjectType });
-            Query.Scope = subject.Scope;
-            Query.Claim = subject.Claim;
+            Query.Subjects.Add(new SubjectQuery { Id = subject.Address, Type = subject.Kind});
+
+            //Query.Scope = subject.Scope;
+            //Query.Claim = subject.Claim;
 
             return this;
         }

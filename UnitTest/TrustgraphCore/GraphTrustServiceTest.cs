@@ -10,11 +10,12 @@ using TrustgraphCore.Interfaces;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
 using TrustgraphCore.Enumerations;
+using UnitTest.TrustchainCore.Extensions;
 
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
-    public class GraphTrustServiceTest
+    public class GraphTrustServiceTest : StartupMock
     {
 
         private TrustCryptoService _trustCryptoService;
@@ -30,7 +31,7 @@ namespace UnitTest.TrustgraphCore
             _trustCryptoService = new TrustCryptoService(_cryptoService);
             _graphModelService = new GraphModelService(new GraphModel());
             _graphTrustService = new GraphTrustService(_graphModelService);
-            _trustBuilder = new TrustBuilder(_cryptoService, new TrustBinary(), new MerkleTreeSorted(_cryptoService));
+            _trustBuilder = new TrustBuilder(ServiceProvider);
         }
 
 
@@ -52,10 +53,11 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void BuildEdge1()
         {
-            var trust = _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue()).Package.Trust[0];
-            trust.Subjects[0].Activate = (uint)DateTime.Now.UnixTimestamp() - 1000;
-            trust.Subjects[0].Expire = (uint)DateTime.Now.UnixTimestamp() + 1000;
-            trust.Subjects[0].Cost = 112;
+            var trust = _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue()).Package.Trusts[0];
+
+            trust.Claims[0].Activate = (uint)DateTime.Now.UnixTimestamp() - 1000;
+            trust.Claims[0].Expire = (uint)DateTime.Now.UnixTimestamp() + 1000;
+            trust.Claims[0].Cost = 112;
 
             _graphTrustService.Add(_trustBuilder.Package);
 
@@ -65,9 +67,9 @@ namespace UnitTest.TrustgraphCore
             Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].Claim.Flags == ClaimType.Trust);
             Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].Claim.Types == ClaimType.Trust);
             Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].SubjectId == 1);
-            Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].Cost == trust.Subjects[0].Cost);
-            Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].Activate == trust.Subjects[0].Activate);
-            Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].Expire == trust.Subjects[0].Expire);
+            Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].Cost == trust.Claims[0].Cost);
+            Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].Activate == trust.Claims[0].Activate);
+            Assert.IsTrue(_graphModelService.Graph.Issuers[0].Subjects[0].Expire == trust.Claims[0].Expire);
 
             Assert.IsTrue(_graphModelService.Graph.IssuersIndex.Count == 2);
             Assert.IsTrue(_graphModelService.Graph.SubjectTypesIndex.Count == 2);
@@ -81,9 +83,9 @@ namespace UnitTest.TrustgraphCore
         {
             _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue());
             _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrue());
-            var trusts = _trustBuilder.Package.Trust;
+            var trusts = _trustBuilder.Package.Trusts;
 
-            Assert.IsTrue(trusts[0].Subjects[0].SubjectId.Compare(trusts[1].IssuerId) == 0);
+            Assert.IsTrue(trusts[0].Subjects[0].Address.Compare(trusts[1].Issuer.Address) == 0);
 
             _graphTrustService.Add(_trustBuilder.Package);
 
@@ -112,9 +114,9 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue());
             _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrue());
             _trustBuilder.AddTrust("C", "A", TrustBuilder.CreateTrustTrue());
-            var trusts = _trustBuilder.Package.Trust;
+            var trusts = _trustBuilder.Package.Trusts;
 
-            Assert.IsTrue(trusts[0].Subjects[0].SubjectId.Compare(trusts[1].IssuerId) == 0);
+            Assert.IsTrue(trusts[0].Subjects[0].Address.Compare(trusts[1].Issuer.Address) == 0);
 
             _graphTrustService.Add(_trustBuilder.Package);
 
@@ -147,7 +149,7 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrue());
             _trustBuilder.AddTrust("C", "A", TrustBuilder.CreateTrustTrue());
 
-            var trusts = _trustBuilder.Package.Trust;
+            var trusts = _trustBuilder.Package.Trusts;
 
             _graphTrustService.Add(_trustBuilder.Package);
 
@@ -186,7 +188,7 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("C", "A", TrustBuilder.CreateTrustTrue());
             _trustBuilder.AddTrust("D", "E", TrustBuilder.CreateTrustTrue());
 
-            var trusts = _trustBuilder.Package.Trust;
+            var trusts = _trustBuilder.Package.Trusts;
 
             _graphTrustService.Add(_trustBuilder.Package);
 

@@ -5,9 +5,12 @@ namespace TrustchainCore.Repository
 {
     public class TrustDBContext : DbContext
     {
-        public DbSet<PackageModel> Packages { get; set; }
-        public DbSet<TrustModel> Trusts { get; set; }
-        public DbSet<SubjectModel> Subjects { get; set; }
+        public DbSet<Package> Packages { get; set; }
+        public DbSet<Trust> Trusts { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
+        public DbSet<Claim> Claims { get; set; }
+        public DbSet<Timestamp> Timestamps { get; set; }
+
         public DbSet<ProofEntity> Proofs { get; set; }
         public DbSet<WorkflowContainer> Workflows { get; set; }
         public DbSet<KeyValue> KeyValues { get; set; }
@@ -18,32 +21,42 @@ namespace TrustchainCore.Repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+
         }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<PackageModel>().HasIndex("PackageId");
-            builder.Entity<PackageModel>()
-                .OwnsOne(c => c.Head);
-            builder.Entity<PackageModel>()
+            builder.Entity<Package>().HasKey("DatabaseID");
+            builder.Entity<Package>().HasIndex("Id");
+            builder.Entity<Package>()
                 .OwnsOne(c => c.Server);
 
-            builder.Entity<TrustModel>().HasIndex("TrustId");
-            builder.Entity<TrustModel>()
-                .OwnsOne(c => c.Head);
-            builder.Entity<TrustModel>()
-                .OwnsOne(c => c.Server);
+            builder.Entity<Trust>().HasKey("DatabaseID");
+            builder.Entity<Trust>().HasIndex("Id");
+            builder.Entity<Trust>()
+                .OwnsOne(c => c.Issuer);
+            builder.Entity<Trust>()
+                .OwnsOne(c => c.Timestamp);
 
-            builder.Entity<SubjectModel>().HasIndex("SubjectId");
+            builder.Entity<Subject>().HasKey("DatabaseID");
+            builder.Entity<Subject>().HasIndex("Address");
+
+            builder.Entity<Claim>().HasKey("DatabaseID");
+            builder.Entity<Claim>().HasIndex("Index");
+
+            builder.Entity<Timestamp>().HasKey("DatabaseID");
+            //builder.Entity<Timestamp>().HasIndex("");
 
             // Proof
+            builder.Entity<ProofEntity>().HasKey("DatabaseID");
             builder.Entity<ProofEntity>().HasIndex("Source");
             builder.Entity<ProofEntity>().HasIndex("WorkflowID");
 
             // Workflow
-            builder.Entity<WorkflowContainer>().HasIndex("Type");
-            builder.Entity<WorkflowContainer>().HasIndex("State");
+            builder.Entity<WorkflowContainer>().HasKey(p => p.DatabaseID);
+            builder.Entity<WorkflowContainer>().HasIndex(p => p.Type);
+            builder.Entity<WorkflowContainer>().HasIndex(p => p.State);
 
             builder.Entity<KeyValue>().HasIndex(p => p.Key);
 

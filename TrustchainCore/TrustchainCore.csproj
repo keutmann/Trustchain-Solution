@@ -10,6 +10,7 @@
     <Compile Remove="Extensions\SQLiteDataReaderExtensions.cs" />
     <Compile Remove="Model\ClaimModel.cs" />
     <Compile Remove="Model\IssuerModel.cs" />
+    <Compile Remove="Repository\TrustDBContextOld.cs" />
     <Compile Remove="Trust\TrustECDSASignature.cs" />
     <Compile Remove="Trust\TrustManager.cs" />
     <Compile Remove="Workflows\FailueWorkflow.cs" />
@@ -35,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\" />
     <Folder Include="Trust\" />
   </ItemGroup>
 
