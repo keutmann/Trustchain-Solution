@@ -7,6 +7,7 @@ using TrustchainCore.Model;
 using TrustchainCore.Extensions;
 using TrustchainCore.Factories;
 using System;
+using TrustchainCore.Strategy;
 
 namespace TrustchainCore.Builders
 {
@@ -15,8 +16,8 @@ namespace TrustchainCore.Builders
         public Package Package { get; set; }
         //private ICryptoStrategy _cryptoService;
         private ITrustBinary _trustBinary;
-        private byte[] _issuerKey;
-        private byte[] _serverKey;
+        //private byte[] _issuerKey;
+        //private byte[] _serverKey;
 
         private Trust _currentTrust;
         public Trust CurrentTrust
@@ -34,6 +35,11 @@ namespace TrustchainCore.Builders
         private IMerkleStrategyFactory _merkleStrategyFactory;
         private IHashAlgorithmFactory _hashAlgorithmFactory;
 
+
+        public TrustBuilder(IServiceProvider serviceProvider) : this(new CryptoStrategyFactory(serviceProvider), new MerkleStrategyFactory(new HashAlgorithmFactory()), new HashAlgorithmFactory(), new TrustBinary())
+        {
+            
+        }
 
         public TrustBuilder(ICryptoStrategyFactory cryptoServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
         {
@@ -76,17 +82,17 @@ namespace TrustchainCore.Builders
             return JsonConvert.SerializeObject(Package, format);
         }
 
-        public TrustBuilder SetIssuerKey(byte[] key)
-        {
-            _issuerKey = key;
-            return this;
-        }
+        //public TrustBuilder SetIssuerKey(byte[] key)
+        //{
+        //    _issuerKey = key;
+        //    return this;
+        //}
 
-        public TrustBuilder SetServerKey(byte[] key)
-        {
-            _serverKey = key;
-            return this;
-        }
+        //public TrustBuilder SetServerKey(byte[] key)
+        //{
+        //    _serverKey = key;
+        //    return this;
+        //}
 
         public override string ToString()
         {
@@ -167,45 +173,17 @@ namespace TrustchainCore.Builders
             identity.Sign = sign;
         }
 
-        //public TrustBuilder SignIssuer(ICryptoStrategy cryptoStrategy, byte[] key)
-        //{
-        //    return Sign(CurrentTrust.Issuer, CurrentTrust.Id, (Identity identity, byte[] data) =>
-        //    {
-        //        return cryptoStrategy.Sign(key, data);
-        //    });
-        //}
-
         public TrustBuilder SignIssuer(Trust trust = null, SignDelegate sign = null)
         {
             if (trust == null)
                 trust = CurrentTrust;
-            //sign = (sign != null) ? sign :
-            //    (trust.Issuer.Sign != null) ? trust.Issuer.Sign :
-            //    (_cryptoServiceFactory != null) ? (Identity identity, byte[] data) =>
-            //        {
 
-            //            return cryptoStrategy.Sign(key, data);
-            //        }
-            //: null;
             if (sign != null)
                 return Sign(trust.Issuer, trust.Id, sign);
             else
             {
                 if(trust.Issuer.Sign != null)
                     return Sign(trust.Issuer, trust.Id, trust.Issuer.Sign);
-
-                //if(_cryptoServiceFactory != null)
-                //{
-                //    var service = _cryptoServiceFactory.GetService(trust.Issuer.Script);
-                //    if(service != null)
-                //    {
-                //        Sign(trust.Issuer, trust.Id, (Identity identity, byte[] data) =>
-                //        {
-                //            return service.Sign(key, data);
-                //        });
-                //    }
-                //}
-
             }
             return this;
         }
@@ -227,19 +205,6 @@ namespace TrustchainCore.Builders
                 identity.Signature = sign(identity, data);
             return this;
         }
-
-        public Package Sign()
-        {
-            foreach (var trust in Package.Trusts)
-            {
-                SignTrust(trust);
-            }
-
-            SignPackageServerID();
-
-            return Package;
-        }
-
 
         public TrustBuilder BuildTrustID(Trust trust = null)
         {
@@ -265,79 +230,105 @@ namespace TrustchainCore.Builders
         }
 
 
-        public TrustBuilder AddTrust(string issuerName, string subjectName, JObject claim)
-        {
-            AddTrust(issuerName);
-            AddSubject(subjectName, claim);
-            return this;
-        }
-
-        public TrustBuilder AddSubject(string subjectName, JObject claim)
-        {
-            var subjectKey = _cryptoService.GetKey(Encoding.UTF8.GetBytes(subjectName));
-            AddSubject(subjectKey, claim);
-            return this;
-        }
-        public TrustBuilder AddSubject(byte[] subjectKey, JObject claim)
+        public TrustBuilder AddSubject(byte[] address, string alias, string kind, int[] claimIndex)
         {
             if(_currentTrust.Subjects == null)
-                _currentTrust.Subjects = new List<SubjectModel>();
+                _currentTrust.Subjects = new List<Subject>();
 
-            _currentTrust.Subjects.Add(new SubjectModel
+            _currentTrust.Subjects.Add(new Subject
             {
-                SubjectId = _cryptoService.GetAddress(subjectKey),
-                SubjectType = "person",
-                Claim = JsonConvert.SerializeObject((claim != null) ? claim : new JObject(
-                    new JProperty("trust", "true")
-                    ), Formatting.None),
-                Scope = "global"
+                Alias = alias,
+                Address = address,
+                Kind = kind,
+                ClaimIndexs = claimIndex
             });
 
+    //        Claim = JsonConvert.SerializeObject((claim != null) ? claim : new JObject(
+    //new JProperty("trust", "true")
+    //), Formatting.None),
+
             return this;
         }
 
 
-
-
-        public TrustBuilder BuildPackageID()
+        public TrustBuilder Build()
         {
-            
+            var merkleTree = _merkleStrategyFactory.GetStrategy(Package.Algorithm);
+
             var hash = new byte[0];
-            foreach (var trust in Package.Trust)
+            foreach (var trust in Package.Trusts)
             {
-                if(trust.TrustId == null)
+                if(trust.Id == null)
                     BuildTrustID(trust);
-                _merkleTree.Add(new ProofEntity() { Source = trust.TrustId });
+
+                merkleTree.Add(new ProofEntity() { Source = trust.Id });
             }
-            Package.PackageId = _merkleTree.Build().Hash;
-                 
+            Package.Id = merkleTree.Build().Hash;
+                
             return this;
         }
 
-        public TrustBuilder SignPackageServerID(byte[] serverKey = null)
+        public Package Sign()
         {
-            if (serverKey == null)
-                serverKey = _serverKey;
-
-            BuildPackageID();
-
-            Package.Server = new ServerModel
+            foreach (var trust in Package.Trusts)
             {
-                Id = _cryptoService.GetAddress(serverKey),
-                Signature = _cryptoService.Sign(serverKey, Package.PackageId)
-            };
+                SignTrust(trust);
+            }
 
-            return this;
+            SignServer(Package);
+
+            return Package;
         }
 
 
+        //public TrustBuilder SignPackageServerID(byte[] serverKey = null)
+        //{
+        //    if (serverKey == null)
+        //        serverKey = _serverKey;
+
+        //    BuildPackageID();
+
+        //    Package.Server = new ServerModel
+        //    {
+        //        Id = _cryptoService.GetAddress(serverKey),
+        //        Signature = _cryptoService.Sign(serverKey, Package.PackageId)
+        //    };
+
+        //    return this;
+        //}
 
 
-        public TrustBuilder ServerID(byte[] serverKey)
+
+
+        //public TrustBuilder ServerID(byte[] serverKey)
+        //{
+        //    Package.Server.Id = _cryptoService.GetAddress(serverKey);
+        //    //var serverKey = new Key(Hashes.SHA256(Encoding.UTF8.GetBytes("server")));
+        //    //return serverKey.PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes();
+        //    return this;
+        //}
+
+        public TrustBuilder AddClaim(Claim claim, Trust trust = null)
         {
-            Package.Server.Id = _cryptoService.GetAddress(serverKey);
-            //var serverKey = new Key(Hashes.SHA256(Encoding.UTF8.GetBytes("server")));
-            //return serverKey.PubKey.GetAddress(App.BitcoinNetwork).Hash.ToBytes();
+            if (trust == null)
+                trust = CurrentTrust;
+
+            var claimID = claim.GetHashCode();
+
+            for(int i = 0; i < CurrentTrust.Claims.Count; i++)
+            {
+                var item = CurrentTrust.Claims[i];
+                var currentId = item.Data.GetHashCode();
+                if (currentId == claimID)
+                {
+                    claim.Index = i;
+                    return this;
+                }
+            }
+
+            claim.Index = CurrentTrust.Claims.Count;
+            CurrentTrust.Claims.Add(claim);
+
             return this;
         }
 
@@ -357,6 +348,8 @@ namespace TrustchainCore.Builders
                     new JProperty("rating", value)
                     );
         }
+
+
 
     }
 }

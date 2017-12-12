@@ -54,19 +54,19 @@ namespace TrustgraphCore.Controllers
 
         [Produces("application/json")]
         [HttpPost]
-        public ActionResult Add([FromBody]PackageModel package)
+        public ActionResult Add([FromBody]Package package)
         {
             var validationResult = _trustSchemaService.Validate(package);
             if (validationResult.ErrorsFound > 0)
                 return BadRequest(validationResult);
 
-            if (_trustDBService.DBContext.Packages.Any(f => f.PackageId == package.PackageId))
+            if (_trustDBService.DBContext.Packages.Any(f => f.PackageId == package.Id))
                 return ApiOk(null, null, "Package already exist");
 
             // Check timestamp
-            if(package.Timestamp != null && package.Timestamp.Count > 0)
+            if(package.Timestamps != null && package.Timestamps.Count > 0)
             {
-                var timestamp = package.Timestamp[0]; // Only support one timestamp for now
+                var timestamp = package.Timestamps[0]; // Only support one timestamp for now
                 var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
                 if(blockchainService == null)
                     return BadRequest("Invalid Blockchain definition in package timestamp");

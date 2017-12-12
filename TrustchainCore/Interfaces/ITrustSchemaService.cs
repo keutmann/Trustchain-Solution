@@ -4,6 +4,6 @@ namespace TrustchainCore.Interfaces
 {
     public interface ITrustSchemaService
     {
-        SchemaValidationResult Validate(PackageModel package);
+        SchemaValidationResult Validate(Package package);
     }
 }

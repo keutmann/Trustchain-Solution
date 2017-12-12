@@ -4,6 +4,7 @@ using TrustchainCore.Model;
 using TrustchainCore.Extensions;
 using TrustchainCore.Strategy;
 using System;
+using TrustchainCore.Factories;
 
 namespace TrustchainCore.Services
 {
@@ -14,21 +15,26 @@ namespace TrustchainCore.Services
         private IMerkleStrategyFactory _merkleStrategyFactory;
         private IHashAlgorithmFactory _hashAlgorithmFactory;
 
-        public TrustSchemaService(ICryptoStrategyFactory cryptoServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory)
+        private ITrustBinary _trustBinary;
+
+        public TrustSchemaService(IServiceProvider serviceProvider) : this(new CryptoStrategyFactory(serviceProvider), new MerkleStrategyFactory(new HashAlgorithmFactory()), new HashAlgorithmFactory(), new TrustBinary())
+        {
+
+        }
+
+        public TrustSchemaService(ICryptoStrategyFactory cryptoServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
         {
             _cryptoServiceFactory = cryptoServiceFactory;
             _merkleStrategyFactory = merkleStrategyFactory;
             _hashAlgorithmFactory = hashAlgorithmFactory;
+            _trustBinary = trustBinary;
         }
 
 
 
-        public SchemaValidationResult Validate(PackageModel package)
+        public SchemaValidationResult Validate(Package package)
         {
-            package = TrustBuilder.EnsureHead(package);
-            var cryptoService = _cryptoServiceFactory.GetService(package.Head.Script);
-            //var merkleTreeSorted = new MerkleTreeSorted(cryptoService);
-            var engine = new ValidationEngine(_cryptoServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, new TrustBinary());
+            var engine = new ValidationEngine(_cryptoServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
             return engine.Validate(package);
         }
 
@@ -36,8 +42,6 @@ namespace TrustchainCore.Services
         private class ValidationEngine
         {
             private SchemaValidationResult result = new SchemaValidationResult();
-            //private ICryptoStrategy _cryptoService;
-            //private IMerkleTree _merkleTree;
             private ITrustBinary _trustBinary;
 
             private ICryptoStrategyFactory _cryptoServiceFactory;
@@ -69,12 +73,12 @@ namespace TrustchainCore.Services
                     var script = _merkleStrategyFactory.GetStrategy(package.Algorithm);
                 
 
-                    var testBuilder = new TrustBuilder(_cryptoService, _trustBinary, _merkleTree);
-                    //var trustIndex = 0;
+                    var testBuilder = new TrustBuilder(_cryptoServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
+                    var trustIndex = 0;
                     foreach (var trust in package.Trusts)
                     {
-                        //testBuilder.AddTrust(trust);
-                        //ValidateTrust(trustIndex++, trust, result);
+                        testBuilder.AddTrust(trust);
+                        ValidateTrust(trustIndex++, trust, result);
                     }
 
                     //var testPackageID = testBuilder.BuildPackageID().Package.PackageId;
@@ -104,25 +108,17 @@ namespace TrustchainCore.Services
 
             }
 
-            private void ValidateTrust(int trustIndex, TrustModel trust, SchemaValidationResult result)
+            private void ValidateTrust(int trustIndex, Trust trust, SchemaValidationResult result)
             {
                 var location = $"Trust Index: {trustIndex} - ";
 
-                if (trust.TrustId == null)
+                if (trust.Id == null)
                     result.Errors.Add(location+"Missing trust id");
 
-                if (trust.IssuerId == null || trust.IssuerId.Length == 0)
-                    result.Errors.Add(location+"Missing issuer id");
+                if(trust.Issuer == null)
+                    result.Errors.Add(location + "Missing issuer");
 
-                if (trust.Signature == null || trust.Signature.Length == 0)
-                    result.Errors.Add(location+"Missing issuer signature");
-                else
-                {
-                    if (!_cryptoService.VerifySignatureMessage(trust.TrustId, trust.Signature, trust.IssuerId))
-                    {
-                        result.Errors.Add(location + "Invalid issuer signature");
-                    }
-                }
+                ValidateIdentity(trust.Id, trust.Issuer, location, result);
 
                 if (trust.Subjects == null || trust.Subjects.Count == 0)
                     result.Errors.Add(location+"Missing subject");
@@ -133,27 +129,48 @@ namespace TrustchainCore.Services
                     ValidateSubject(trustIndex, subjectIndex++, trust, subject, result);
                 }
 
-                var trustID = _cryptoService.HashOf(_trustBinary.GetIssuerBinary(trust));
-                if(trustID.Compare(trust.TrustId) != 0)
-                    result.Errors.Add(location + "Invalid trust id, do not match subjects");
+                var hashService = _hashAlgorithmFactory.GetAlgorithm(trust.Algorithm);
+
+                var trustID = hashService.HashOf(_trustBinary.GetIssuerBinary(trust));
+                if(trustID.Compare(trust.Id) != 0)
+                    result.Errors.Add(location + "Invalid trust id");
             }
 
-            private void ValidateSubject(int trustIndex, int subjectIndex, TrustModel trust, SubjectModel subject, SchemaValidationResult result)
+            private void ValidateIdentity(byte[] data, Identity identity, string location, SchemaValidationResult result)
             {
-                var location = $"Trust Index: {trustIndex} -> Subject Index: {subjectIndex} - ";
-                if (subject.SubjectId == null || subject.SubjectId.Length == 0)
-                    result.Errors.Add(location+"Missing subject id");
+                if (identity.Address == null || identity.Address.Length == 0)
+                    result.Errors.Add(location + "Missing identity address");
 
-                if (subject.Signature != null && subject.Signature.Length > 0)
+                if (identity.Signature == null || identity.Signature.Length == 0)
+                    result.Errors.Add(location + "Missing identity signature");
+                else
                 {
-                    if (!_cryptoService.VerifySignatureMessage(trust.TrustId, subject.Signature, subject.SubjectId))
+                    var scriptService = _cryptoServiceFactory.GetService(identity.Script);
+
+                    if (!scriptService.VerifySignature(data, identity.Signature, identity.Address))
                     {
-                        result.Errors.Add(location+"Invalid subject signature");
+                        result.Errors.Add(location + "Invalid identity signature");
                     }
                 }
 
-                if (string.IsNullOrWhiteSpace(subject.Claim))
-                    result.Errors.Add(location + "Missing Claim");
+            }
+
+            private void ValidateSubject(int trustIndex, int subjectIndex, Trust trust, Subject subject, SchemaValidationResult result)
+            {
+                var location = $"Trust Index: {trustIndex} -> Subject Index: {subjectIndex} - ";
+                if (subject.Address == null || subject.Address.Length == 0)
+                    result.Errors.Add(location+"Missing subject address");
+
+                //if (subject.Signature != null && subject.Signature.Length > 0)
+                //{
+                //    if (!_cryptoService.VerifySignatureMessage(trust.TrustId, subject.Signature, subject.SubjectId))
+                //    {
+                //        result.Errors.Add(location+"Invalid subject signature");
+                //    }
+                //}
+
+                //if (string.IsNullOrWhiteSpace(subject.ClaimIndexs))
+                //    result.Errors.Add(location + "Missing Claim");
             }
         }
     }

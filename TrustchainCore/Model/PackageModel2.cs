@@ -97,6 +97,12 @@ namespace TrustchainCore.Model
         }
     }
 
+    /// <summary>
+    /// Signing of an address with data
+    /// </summary>
+    /// <param name="identity"></param>
+    /// <param name="data">The data that is signed</param>
+    /// <returns>Signature</returns>
     public delegate byte[] SignDelegate(Identity identity, byte[] data);
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -160,8 +166,8 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "claimIndexs", NullValueHandling = NullValueHandling.Ignore)]
         public int[] ClaimIndexs { get; set; }
 
-        [JsonProperty(PropertyName = "id")]
-        public byte[] Id { get; set; }
+        [JsonProperty(PropertyName = "address")]
+        public byte[] Address { get; set; }
 
         [JsonProperty(PropertyName = "kind")]
         public string Kind { get; set; }
@@ -191,10 +197,31 @@ namespace TrustchainCore.Model
         public int Activate { get; set; }
 
         [JsonProperty(PropertyName = "expire")]
-        public long Expire { get; set; }
+        public int Expire { get; set; }
 
         [JsonProperty(PropertyName = "scope")]
         public string Scope { get; set; }
+
+        public bool ShouldSerializeIndex()
+        {
+            return Index >= 0;
+        }
+
+        public bool ShouldSerializeCost()
+        {
+            return Cost > 0;
+        }
+
+        public bool ShouldSerializeActivate()
+        {
+            return Activate > 0;
+        }
+
+        public bool ShouldSerializeExpire()
+        {
+            return Expire > 0;
+        }
+
     }
 
     //[JsonObject(MemberSerialization.OptIn)]
