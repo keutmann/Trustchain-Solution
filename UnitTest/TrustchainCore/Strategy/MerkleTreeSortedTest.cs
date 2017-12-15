@@ -6,6 +6,7 @@ using TrustchainCore.Model;
 using TrustchainCore.Extensions;
 using System;
 using System.Collections.Generic;
+using TrustchainCore.Factories;
 
 namespace UnitTest.TrustchainCore.Strategy
 {
@@ -16,12 +17,13 @@ namespace UnitTest.TrustchainCore.Strategy
         [TestMethod]
         public void One()
         {
-            var merkle = ServiceProvider.GetRequiredService<IMerkleTree>();
-            var cryptoFactory = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
-            var crypto = cryptoFactory.GetService("btcpkh");
+            var merkleFactory = ServiceProvider.GetRequiredService<IMerkleStrategyFactory>();
+            var merkle = merkleFactory.GetStrategy(MerkleStrategyFactory.MERKLE_TC1_DOUBLE256);
+            var hashAlgorithmFactory = ServiceProvider.GetRequiredService<IHashAlgorithmFactory>();
+            var hashAlgorithm = hashAlgorithmFactory.GetAlgorithm(HashAlgorithmFactory.DOUBLE256);
 
             var one = Encoding.UTF8.GetBytes("Hello world\n");
-            var oneHash = crypto.HashOf(one);
+            var oneHash = hashAlgorithm.HashOf(one);
             var oneProof = merkle.Add(new ProofEntity { Source = one });
 
             var root = merkle.Build();
@@ -29,7 +31,7 @@ namespace UnitTest.TrustchainCore.Strategy
             Console.WriteLine($"Root - Hash: {root.Hash.ConvertToHex()}");
             Console.WriteLine($"One  - source: {one.ConvertToHex()} - hash: {oneProof.Hash.ConvertToHex()} -oneHash: {oneHash.ConvertToHex()}");
 
-            Assert.AreEqual(crypto.Length, root.Hash.Length, "Root hash has wrong length");
+            Assert.AreEqual(hashAlgorithm.Length, root.Hash.Length, "Root hash has wrong length");
             Assert.IsTrue(oneProof.Hash.Compare(root.Hash) == 0, "Expected and root hash are not the same");
             Assert.AreEqual(0, oneProof.Proof.Receipt.Length);
 
@@ -38,21 +40,22 @@ namespace UnitTest.TrustchainCore.Strategy
         [TestMethod]
         public void Two()
         {
-            var merkle = ServiceProvider.GetRequiredService<IMerkleTree>();
-            var cryptoFactory = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
-            var crypto = cryptoFactory.GetService("btcpkh");
+            var merkleFactory = ServiceProvider.GetRequiredService<IMerkleStrategyFactory>();
+            var merkle = merkleFactory.GetStrategy(MerkleStrategyFactory.MERKLE_TC1_DOUBLE256);
+            var hashAlgorithmFactory = ServiceProvider.GetRequiredService<IHashAlgorithmFactory>();
+            var hashAlgorithm = hashAlgorithmFactory.GetAlgorithm(HashAlgorithmFactory.DOUBLE256);
 
             var one = Encoding.UTF8.GetBytes("Hello world\n");
             var two = Encoding.UTF8.GetBytes("Test\n");
             var oneProof = merkle.Add(new ProofEntity { Source = one });
             var twoProof = merkle.Add(new ProofEntity { Source = two });
 
-            var oneHash = crypto.HashOf(one);
-            var twoHash = crypto.HashOf(two);
+            var oneHash = hashAlgorithm.HashOf(one);
+            var twoHash = hashAlgorithm.HashOf(two);
 
             var root = merkle.Build();
 
-            var expectedResult = CombineHash(crypto, oneHash, twoHash);
+            var expectedResult = CombineHash(hashAlgorithm, oneHash, twoHash);
 
             Console.WriteLine($"Root        - Hash: {root.Hash.ConvertToHex()}");
             Console.WriteLine($"Expected    - Hash: {expectedResult.ConvertToHex()}");
@@ -62,8 +65,8 @@ namespace UnitTest.TrustchainCore.Strategy
 
             Assert.IsTrue(expectedResult.Compare(root.Hash) == 0, "Expected and root hash are not the same");
 
-            Assert.IsTrue(root.Hash.Compare(CombineHash(crypto, oneProof.Hash, oneProof.Proof.Receipt)) == 0, "root and one with receipt are not the same");
-            Assert.IsTrue(root.Hash.Compare(CombineHash(crypto, twoProof.Hash, twoProof.Proof.Receipt)) == 0, "root and two with receipt are not the same");
+            Assert.IsTrue(root.Hash.Compare(CombineHash(hashAlgorithm, oneProof.Hash, oneProof.Proof.Receipt)) == 0, "root and one with receipt are not the same");
+            Assert.IsTrue(root.Hash.Compare(CombineHash(hashAlgorithm, twoProof.Hash, twoProof.Proof.Receipt)) == 0, "root and two with receipt are not the same");
 
 
         }
@@ -71,9 +74,10 @@ namespace UnitTest.TrustchainCore.Strategy
         [TestMethod]
         public void Three()
         {
-            var merkle = ServiceProvider.GetRequiredService<IMerkleTree>();
-            var cryptoFactory = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
-            var crypto = cryptoFactory.GetService("btcpkh");
+            var merkleFactory = ServiceProvider.GetRequiredService<IMerkleStrategyFactory>();
+            var merkle = merkleFactory.GetStrategy(MerkleStrategyFactory.MERKLE_TC1_DOUBLE256);
+            var hashAlgorithmFactory = ServiceProvider.GetRequiredService<IHashAlgorithmFactory>();
+            var hashAlgorithm = hashAlgorithmFactory.GetAlgorithm(HashAlgorithmFactory.DOUBLE256);
 
             var one = Encoding.UTF8.GetBytes("Hello world\n");
             var two = Encoding.UTF8.GetBytes("Test\n");
@@ -82,14 +86,14 @@ namespace UnitTest.TrustchainCore.Strategy
             var twoProof = merkle.Add(new ProofEntity { Source = two });
             var threeProof = merkle.Add(new ProofEntity { Source = three });
 
-            var oneHash = crypto.HashOf(one);
-            var twoHash = crypto.HashOf(two);
-            var threeHash = crypto.HashOf(three);
+            var oneHash = hashAlgorithm.HashOf(one);
+            var twoHash = hashAlgorithm.HashOf(two);
+            var threeHash = hashAlgorithm.HashOf(three);
 
             var root = merkle.Build();
 
-            var firstHash = CombineHash(crypto, oneHash, twoHash);
-            var expectedResult =CombineHash(crypto, firstHash, threeHash);
+            var firstHash = CombineHash(hashAlgorithm, oneHash, twoHash);
+            var expectedResult =CombineHash(hashAlgorithm, firstHash, threeHash);
             
 
             Console.WriteLine($"Root        - Hash: {root.Hash.ConvertToHex()}");
@@ -110,9 +114,10 @@ namespace UnitTest.TrustchainCore.Strategy
         [TestMethod]
         public void Receipt()
         {
-            var merkle = ServiceProvider.GetRequiredService<IMerkleTree>();
-            var cryptoFactory = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
-            var crypto = cryptoFactory.GetService("btcpkh");
+            var merkleFactory = ServiceProvider.GetRequiredService<IMerkleStrategyFactory>();
+            var merkle = merkleFactory.GetStrategy(MerkleStrategyFactory.MERKLE_TC1_DOUBLE256);
+            var hashAlgorithmFactory = ServiceProvider.GetRequiredService<IHashAlgorithmFactory>();
+            var hashAlgorithm = hashAlgorithmFactory.GetAlgorithm(HashAlgorithmFactory.DOUBLE256);
 
             var length = 101;
             var nodes = new List<MerkleNode>();
@@ -138,9 +143,9 @@ namespace UnitTest.TrustchainCore.Strategy
 
         }
 
-        private byte[] CombineHash(ICryptoStrategy crypto, byte[] first, byte[] second)
+        private byte[] CombineHash(IHashAlgorithm hashAlgorithm, byte[] first, byte[] second)
         {
-            return crypto.HashOf((first.Compare(second) < 0) ? first.Combine(second) : second.Combine(first));
+            return hashAlgorithm.HashOf((first.Compare(second) < 0) ? first.Combine(second) : second.Combine(first));
 
         }
     }

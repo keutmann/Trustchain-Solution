@@ -94,6 +94,9 @@ namespace TrustgraphCore.Services
 
         public int EnsureScopeIndex(string scope)
         {
+            if (scope == null)
+                scope = string.Empty;
+
             if (!Graph.ScopeIndex.ContainsKey(scope))
             {
                 var index = Graph.ScopeIndex.Count;

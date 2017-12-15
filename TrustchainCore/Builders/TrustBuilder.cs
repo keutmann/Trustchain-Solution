@@ -314,6 +314,8 @@ namespace TrustchainCore.Builders
                 trust = CurrentTrust;
 
             var claimID = claim.GetHashCode();
+            if (trust.Claims == null)
+                trust.Claims = new List<Claim>();
 
             for(int i = 0; i < CurrentTrust.Claims.Count; i++)
             {

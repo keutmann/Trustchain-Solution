@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TrustchainCore.Interfaces;
+using TrustchainCore.Strategy;
 using TruststampCore.Factories;
 using TruststampCore.Interfaces;
 using TruststampCore.Repository;
@@ -15,6 +17,9 @@ namespace TruststampCore.Extensions
 
             services.AddTransient<ITimestampWorkflowService, TimestampWorkflowService>();
             services.AddTransient<IProofService, ProofService>();
+
+            services.AddTransient<IHashAlgorithm, Double256>();
+            services.AddTransient<IMerkleTree, MerkleTreeSorted>();
 
             services.AddTransient<IMerkleStep, MerkleStep>();
             services.AddTransient<ITimestampScheduleStep, TimestampScheduleStep>();

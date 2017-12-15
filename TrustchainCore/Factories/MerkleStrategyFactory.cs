@@ -8,6 +8,8 @@ namespace TrustchainCore.Factories
     {
         private IHashAlgorithmFactory _hashAlgorithmFactory;
 
+        public const string MERKLE_TC1_DOUBLE256 = "merkle.tc1-double256";
+
         public MerkleStrategyFactory(IHashAlgorithmFactory hashAlgorithmFactory)
         {
             _hashAlgorithmFactory = hashAlgorithmFactory;

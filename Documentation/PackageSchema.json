@@ -7,14 +7,14 @@
       "id": "i/Pd9j9fDh0GGt5pPhAQfq2RsI8mcYmM/vfNhm1Qql0=", // A hash of the binary combined value of the trust
       "issuer": {
         "script": "btc-pkh",
-        "id": "F2u5DwkfJUjVDy7gCDp68hbQUDM=", // Base64 encoding of a 20 byte address
+        "address": "F2u5DwkfJUjVDy7gCDp68hbQUDM=", // Base64 encoding of a 20 byte address
         "signature": "H/hqGOZwZNz2/rz0udzyx4eHLzTMvx67ASmp0whBbjq0JAoJokrRnDAWsHNgBQtlYifoH3SG5pjbgS/9+H4Ukuc="
       },
       "subjects": [
         {
           "alias": "MyAlias", // It's related to the scope of the claim
           "claimIndexs": [ 0 ], // One or more claims can be attached to the subject
-          "id": "1ERgQJdwncLvXv16mQaKu...", // id of the subject, format specified in script.
+          "address": "1ERgQJdwncLvXv16mQaKu...", // id of the subject, format specified in script.
           "kind": "person" // Specifies the type of the id. Helps on filtering on Trust resolvement.
         }
       ],
@@ -60,7 +60,7 @@
   // The server that creates the package
   "server": {
     "script": "btc-pkh",
-    "id": "",
+    "address": "",
     "signature": ""
   },
   // Timestamps of the package

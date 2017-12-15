@@ -8,12 +8,15 @@ namespace TrustgraphCore.Builders
     {
         public QueryRequest Query { get; }
 
-        public QueryRequestBuilder()
+        public QueryRequestBuilder(string scope, string claim)
         {
             Query = new QueryRequest
             {
                 Issuers = new List<byte[]>(),
-                Subjects = new List<SubjectQuery>()
+                Subjects = new List<SubjectQuery>(),
+
+                Scope = scope,
+                Claim = claim
             };
         }
 
@@ -21,9 +24,6 @@ namespace TrustgraphCore.Builders
         {
             Query.Issuers.Add(issuerId);
             Query.Subjects.Add(new SubjectQuery { Id = subject.Address, Type = subject.Kind});
-
-            //Query.Scope = subject.Scope;
-            //Query.Claim = subject.Claim;
 
             return this;
         }

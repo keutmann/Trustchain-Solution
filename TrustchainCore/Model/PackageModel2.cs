@@ -75,7 +75,7 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Subject> Subjects { get; set; }
 
-        [JsonProperty(PropertyName = "claim", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "claims", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Claim> Claims { get; set; }
 
         [JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]

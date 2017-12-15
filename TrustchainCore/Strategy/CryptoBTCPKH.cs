@@ -52,7 +52,7 @@ namespace TrustchainCore.Strategy
         public byte[] Sign(byte[] key, byte[] data)
         {
             var ecdsaKey = new Key(key);
-            return ecdsaKey.SignCompact(new uint256(HashOf(data)));
+            return ecdsaKey.SignCompact(new uint256(data));
         }
 
         public byte[] SignMessage(byte[] key, byte[] data)

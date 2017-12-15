@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TrustchainCore.Extensions
 {
@@ -11,6 +8,9 @@ namespace TrustchainCore.Extensions
     {
         public static void WriteBytes(this MemoryStream ms, byte[] data)
         {
+            if (data == null)
+                return;
+
             ms.Write(data, 0, data.Length);
         }
         /// <summary>
@@ -20,6 +20,9 @@ namespace TrustchainCore.Extensions
         /// <param name="text"></param>
         public static void WriteString(this MemoryStream ms, string text)
         {
+            if (String.IsNullOrEmpty(text))
+                return;
+
             ms.WriteBytes(Encoding.UTF8.GetBytes(text));
         }
 

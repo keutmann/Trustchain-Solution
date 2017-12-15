@@ -27,11 +27,6 @@ namespace TrustchainCore.Repository
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            // Workflow
-            builder.Entity<WorkflowContainer>().HasKey(p => p.DatabaseID);
-            builder.Entity<WorkflowContainer>().HasIndex(p => p.Type);
-            builder.Entity<WorkflowContainer>().HasIndex(p => p.State);
-
             builder.Entity<Package>().HasKey("DatabaseID");
             builder.Entity<Package>().HasIndex("Id");
             builder.Entity<Package>()
@@ -41,6 +36,7 @@ namespace TrustchainCore.Repository
             builder.Entity<Trust>().HasIndex("Id");
             builder.Entity<Trust>()
                 .OwnsOne(c => c.Issuer);
+
             builder.Entity<Trust>()
                 .OwnsOne(c => c.Timestamp);
 
@@ -57,6 +53,11 @@ namespace TrustchainCore.Repository
             builder.Entity<ProofEntity>().HasKey("DatabaseID");
             builder.Entity<ProofEntity>().HasIndex("Source");
             builder.Entity<ProofEntity>().HasIndex("WorkflowID");
+
+            // Workflow
+            builder.Entity<WorkflowContainer>().HasKey(p => p.DatabaseID);
+            builder.Entity<WorkflowContainer>().HasIndex(p => p.Type);
+            builder.Entity<WorkflowContainer>().HasIndex(p => p.State);
 
 
             builder.Entity<KeyValue>().HasIndex(p => p.Key);

@@ -6,6 +6,8 @@ namespace TrustchainCore.Factories
 {
     public class HashAlgorithmFactory : IHashAlgorithmFactory
     {
+        public const string DOUBLE256 = "double256";
+
         public IHashAlgorithm GetAlgorithm(string name)
         {
             if (String.IsNullOrWhiteSpace(name))
