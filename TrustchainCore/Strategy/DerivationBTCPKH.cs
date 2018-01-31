@@ -8,14 +8,14 @@ using TrustchainCore.Configuration;
 
 namespace TrustchainCore.Strategy
 {
-    public class CryptoBTCPKH : ICryptoStrategy
+    public class DerivationBTCPKH : IDerivationStrategy
     {
         public int Length { get; }
         public string ScriptName { get; }
 
         private Network network;
 
-        public CryptoBTCPKH()
+        public DerivationBTCPKH()
         {
             Length = 32; // SHA 256 = 32 bytes
             ScriptName = "btc-pkh";

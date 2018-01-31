@@ -21,12 +21,12 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void NodeIndex()
         {
-            var cryptoService = new CryptoBTCPKH();
-            var trustCryptoService = new TrustCryptoService(cryptoService);
+            var derivationStrategy = new DerivationBTCPKH();
+            var trustDerivationService = new TrustDerivationService(derivationStrategy);
             var graphModelService = new GraphModelService(new GraphModel());
 
-            var keyA = trustCryptoService.GetAddress("A");
-            var keyB = trustCryptoService.GetAddress("B");
+            var keyA = trustDerivationService.GetAddress("A");
+            var keyB = trustDerivationService.GetAddress("B");
 
             graphModelService.Graph.IssuersIndex.Add(keyA, 0);
             graphModelService.Graph.IssuersIndex.Add(keyB, 1);

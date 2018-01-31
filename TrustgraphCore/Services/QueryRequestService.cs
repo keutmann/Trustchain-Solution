@@ -8,11 +8,11 @@ namespace TrustgraphCore.Services
 {
     public class QueryRequestService : IQueryRequestService
     {
-        private ICryptoStrategy _cryptoService;
+        private IDerivationStrategy _derivationStrategy;
 
-        public QueryRequestService(ICryptoStrategy cryptoService)
+        public QueryRequestService(IDerivationStrategy derivationStrategy)
         {
-            _cryptoService = cryptoService;
+            _derivationStrategy = derivationStrategy;
         }
 
         public void Verify(QueryRequest query)
@@ -22,14 +22,14 @@ namespace TrustgraphCore.Services
 
             foreach (var issuer in query.Issuers)
             {
-                if (issuer.Length != _cryptoService.Length)
+                if (issuer.Length != _derivationStrategy.Length)
                     throw new ApplicationException("Invalid byte length on Issuer : " +issuer.ConvertToHex());
 
             }
 
             foreach (var subject in query.Subjects)
             {
-                if (subject.Id.Length != _cryptoService.Length)
+                if (subject.Id.Length != _derivationStrategy.Length)
                     throw new ApplicationException("Invalid byte length on subject id: " +subject.Id.ConvertToHex());
             }
         }

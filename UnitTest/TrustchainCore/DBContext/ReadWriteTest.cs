@@ -22,8 +22,8 @@ namespace UnitTest.TrustchainCore.Builders
         public void ReadWritePackageIssuer()
         {
             var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
-            var cryptoService = new CryptoBTCPKH();
-            var serverKey = cryptoService.GetKey(Encoding.UTF8.GetBytes("testserver"));
+            var derivationStrategy = new DerivationBTCPKH();
+            var serverKey = derivationStrategy.GetKey(Encoding.UTF8.GetBytes("testserver"));
 
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer(serverKey);
@@ -45,8 +45,8 @@ namespace UnitTest.TrustchainCore.Builders
         [TestMethod]
         public void ReadWritePackage()
         {
-            var cryptoService = new CryptoBTCPKH();
-            var serverKey = cryptoService.GetKey(Encoding.UTF8.GetBytes("testserver"));
+            var derivationStrategy = new DerivationBTCPKH();
+            var serverKey = derivationStrategy.GetKey(Encoding.UTF8.GetBytes("testserver"));
 
             //var key = new Key()
             var builder = new TrustBuilder(ServiceProvider);

@@ -52,7 +52,7 @@ namespace TruststampCore.Workflows
                 return;
             }
 
-            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(fundingKeyWIF);
+            var fundingKey = blockchainService.DerivationStrategy.KeyFromString(fundingKeyWIF);
 
             var tempTxKey = proof.Blockchain + "_previousTx";
             var previousTx = _keyValueService.Get(tempTxKey);
@@ -63,10 +63,10 @@ namespace TruststampCore.Workflows
             // OutTX needs to go to a central store for that blockchain
             _keyValueService.Set(tempTxKey, OutTx[0]);
 
-            var merkleRootKey = blockchainService.CryptoStrategy.GetKey(proof.MerkleRoot);
-            proof.Address = blockchainService.CryptoStrategy.GetAddress(merkleRootKey);
+            var merkleRootKey = blockchainService.DerivationStrategy.GetKey(proof.MerkleRoot);
+            proof.Address = blockchainService.DerivationStrategy.GetAddress(merkleRootKey);
 
-            var merkleAddressString = blockchainService.CryptoStrategy.StringifyAddress(merkleRootKey);
+            var merkleAddressString = blockchainService.DerivationStrategy.StringifyAddress(merkleRootKey);
             CombineLog(_logger, $"Merkle root: {proof.MerkleRoot.ConvertToHex()} has been timestamped with address: {merkleAddressString}");
 
             Context.RunStep<IAddressVerifyStep>(_configuration.ConfirmationWait(proof.Blockchain));

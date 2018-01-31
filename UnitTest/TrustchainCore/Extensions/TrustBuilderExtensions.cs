@@ -11,7 +11,7 @@ namespace UnitTest.TrustchainCore.Extensions
 {
     public static class TrustBuilderExtensions
     {
-        public static ICryptoStrategy ScriptService = new CryptoBTCPKH();
+        public static IDerivationStrategy ScriptService = new DerivationBTCPKH();
 
 
         public static TrustBuilder AddTrust(this TrustBuilder builder, string name)

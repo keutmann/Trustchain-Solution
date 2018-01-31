@@ -38,12 +38,12 @@ namespace UnitTest.TruststampCore.Workflows
         [TestMethod]
         public void One()
         {
-            var cryptoFactory = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
-            var crypto = cryptoFactory.GetService("btcpkh");
+            var derivationStrategyFactory = ServiceProvider.GetRequiredService<IDerivationStrategyFactory>();
+            var derivationStrategy = derivationStrategyFactory.GetService("btcpkh");
             var proofService = ServiceProvider.GetRequiredService<IProofService>();
 
             var one = Encoding.UTF8.GetBytes("Hello world\n");
-            var oneHash = crypto.HashOf(one);
+            var oneHash = derivationStrategy.HashOf(one);
 
             proofService.AddProof(one);
 

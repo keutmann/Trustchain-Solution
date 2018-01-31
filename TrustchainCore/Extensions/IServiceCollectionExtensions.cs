@@ -25,8 +25,8 @@ namespace TrustchainCore.Extensions
 
             services.AddTransient<IHashAlgorithmFactory, HashAlgorithmFactory>();
             services.AddTransient<IMerkleStrategyFactory, MerkleStrategyFactory>();
-            services.AddTransient<ICryptoStrategyFactory, CryptoStrategyFactory>();
-            services.AddTransient<CryptoBTCPKH>();
+            services.AddTransient<IDerivationStrategyFactory, DerivationStrategyFactory>();
+            services.AddTransient<DerivationBTCPKH>();
 
             // ---------------------------------------------------------------------------------------------------------------
             // http://www.dotnet-programming.com/post/2017/05/08/Aspnet-core-Deserializing-Json-with-Dependency-Injection.aspx

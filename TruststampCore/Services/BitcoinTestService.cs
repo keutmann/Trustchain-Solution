@@ -8,7 +8,7 @@ namespace TruststampCore.Services
     public class BitcoinTestService : BitcoinService
     {
 
-        public BitcoinTestService(IBlockchainRepository blockchain, ICryptoStrategyFactory cryptoStrategyFactory) : base(blockchain, cryptoStrategyFactory)
+        public BitcoinTestService(IBlockchainRepository blockchain, IDerivationStrategyFactory derivationStrategyFactory) : base(blockchain, derivationStrategyFactory)
         {
             Network = Network.TestNet;
         }

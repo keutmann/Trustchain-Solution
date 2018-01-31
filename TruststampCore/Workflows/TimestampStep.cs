@@ -131,7 +131,7 @@ namespace TruststampCore.Workflows
                 return;
             }
 
-            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(FundingKeyWIF);
+            var fundingKey = blockchainService.DerivationStrategy.KeyFromString(FundingKeyWIF);
             if (blockchainService.VerifyFunds(fundingKey, null) == 0)
             {
                 CombineLog(_logger, $"Available funds detected on funding key, using local timestamping");
@@ -150,10 +150,10 @@ namespace TruststampCore.Workflows
 
         public void LocalTimestamp()
         {
-            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(FundingKeyWIF);
+            var fundingKey = blockchainService.DerivationStrategy.KeyFromString(FundingKeyWIF);
 
-            var merkleRootKey = blockchainService.CryptoStrategy.GetKey(TimestampProof.MerkleRoot);
-            TimestampProof.Address = blockchainService.CryptoStrategy.GetAddress(merkleRootKey);
+            var merkleRootKey = blockchainService.DerivationStrategy.GetKey(TimestampProof.MerkleRoot);
+            TimestampProof.Address = blockchainService.DerivationStrategy.GetAddress(merkleRootKey);
 
             var tempTxKey = TimestampProof.Blockchain + "_previousTx";
             var previousTx = _keyValueService.Get(tempTxKey);
@@ -164,7 +164,7 @@ namespace TruststampCore.Workflows
             // OutTX needs to go to a central store for that blockchain
             _keyValueService.Set(tempTxKey, OutTx[0]);
 
-            var merkleAddressString = blockchainService.CryptoStrategy.StringifyAddress(merkleRootKey);
+            var merkleAddressString = blockchainService.DerivationStrategy.StringifyAddress(merkleRootKey);
             CombineLog(_logger, $"Merkle root: {TimestampProof.MerkleRoot.ConvertToHex()} has been timestamped with address: {merkleAddressString}");
 
             Context.Wait(_configuration.ConfirmationWait(TimestampProof.Blockchain)); // Run again, but wait

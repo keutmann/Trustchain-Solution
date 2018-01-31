@@ -11,20 +11,20 @@ namespace TrustchainCore.Services
 
     public class TrustSchemaService : ITrustSchemaService
     {
-        private ICryptoStrategyFactory _cryptoServiceFactory;
+        private IDerivationStrategyFactory _derivationServiceFactory;
         private IMerkleStrategyFactory _merkleStrategyFactory;
         private IHashAlgorithmFactory _hashAlgorithmFactory;
 
         private ITrustBinary _trustBinary;
 
-        public TrustSchemaService(IServiceProvider serviceProvider) : this(new CryptoStrategyFactory(serviceProvider), new MerkleStrategyFactory(new HashAlgorithmFactory()), new HashAlgorithmFactory(), new TrustBinary())
+        public TrustSchemaService(IServiceProvider serviceProvider) : this(new DerivationStrategyFactory(serviceProvider), new MerkleStrategyFactory(new HashAlgorithmFactory()), new HashAlgorithmFactory(), new TrustBinary())
         {
 
         }
 
-        public TrustSchemaService(ICryptoStrategyFactory cryptoServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
+        public TrustSchemaService(IDerivationStrategyFactory derivationServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
         {
-            _cryptoServiceFactory = cryptoServiceFactory;
+            _derivationServiceFactory = derivationServiceFactory;
             _merkleStrategyFactory = merkleStrategyFactory;
             _hashAlgorithmFactory = hashAlgorithmFactory;
             _trustBinary = trustBinary;
@@ -34,7 +34,7 @@ namespace TrustchainCore.Services
 
         public SchemaValidationResult Validate(Package package)
         {
-            var engine = new ValidationEngine(_cryptoServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
+            var engine = new ValidationEngine(_derivationServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
             return engine.Validate(package);
         }
 
@@ -44,20 +44,15 @@ namespace TrustchainCore.Services
             private SchemaValidationResult result = new SchemaValidationResult();
             private ITrustBinary _trustBinary;
 
-            private ICryptoStrategyFactory _cryptoServiceFactory;
+            private IDerivationStrategyFactory _derivationStrategyFactory;
             private IMerkleStrategyFactory _merkleStrategyFactory;
             private IHashAlgorithmFactory _hashAlgorithmFactory;
 
 
 
-            //public ValidationEngine(ICryptoStrategy cryptoService, IMerkleTree merkleTree, ITrustBinary trustBinary)
-            //{
-            //    _cryptoService = cryptoService;
-            //    _merkleTree = merkleTree;
-            //}
-            public ValidationEngine(ICryptoStrategyFactory cryptoServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
+            public ValidationEngine(IDerivationStrategyFactory derivationStrategyFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
             {
-                _cryptoServiceFactory = cryptoServiceFactory;
+                _derivationStrategyFactory = derivationStrategyFactory;
                 _merkleStrategyFactory = merkleStrategyFactory;
                 _hashAlgorithmFactory = hashAlgorithmFactory;
                 _trustBinary = trustBinary;
@@ -73,7 +68,7 @@ namespace TrustchainCore.Services
                     var script = _merkleStrategyFactory.GetStrategy(package.Algorithm);
                 
 
-                    var testBuilder = new TrustBuilder(_cryptoServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
+                    var testBuilder = new TrustBuilder(_derivationStrategyFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
                     var trustIndex = 0;
                     foreach (var trust in package.Trusts)
                     {
@@ -145,7 +140,7 @@ namespace TrustchainCore.Services
                     result.Errors.Add(location + "Missing identity signature");
                 else
                 {
-                    var scriptService = _cryptoServiceFactory.GetService(identity.Script);
+                    var scriptService = _derivationStrategyFactory.GetService(identity.Script);
 
                     if (!scriptService.VerifySignature(data, identity.Signature, identity.Address))
                     {

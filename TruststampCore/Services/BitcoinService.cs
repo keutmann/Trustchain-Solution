@@ -14,17 +14,17 @@ namespace TruststampCore.Services
     public class BitcoinService : IBlockchainService
     {
         public Network Network { get; set; }
-        public ICryptoStrategy CryptoStrategy { get; set; }
+        public IDerivationStrategy DerivationStrategy { get; set; }
 
         private IBlockchainRepository _blockchain;
-        private ICryptoStrategyFactory _cryptoStrategyFactory;
+        private IDerivationStrategyFactory _derivationStrategyFactory;
 
-        public BitcoinService(IBlockchainRepository blockchain, ICryptoStrategyFactory cryptoStrategyFactory)
+        public BitcoinService(IBlockchainRepository blockchain, IDerivationStrategyFactory derivationStrategyFactory)
         {
             _blockchain = blockchain;
-            _cryptoStrategyFactory = cryptoStrategyFactory;
+            _derivationStrategyFactory = derivationStrategyFactory;
 
-            CryptoStrategy = _cryptoStrategyFactory.GetService("btcpkh");
+            DerivationStrategy = _derivationStrategyFactory.GetService("btcpkh");
             Network =  Network.TestNet;
         }
 
@@ -56,7 +56,7 @@ namespace TruststampCore.Services
         public AddressTimestamp GetTimestamp(byte[] merkleRoot)
         {
             var result = new AddressTimestamp();
-            var key = new Key(CryptoStrategy.GetKey(merkleRoot));
+            var key = new Key(DerivationStrategy.GetKey(merkleRoot));
             var address = key.PubKey.GetAddress(Network);
             result.Address = address.Hash.ToBytes(); // Address without Network format
 
@@ -88,7 +88,7 @@ namespace TruststampCore.Services
             var serverAddress = serverKey.PubKey.GetAddress(Network);
             var txs = new List<byte[]>();
 
-            Key merkleRootKey = new Key(CryptoStrategy.GetKey(merkleRoot));
+            Key merkleRootKey = new Key(DerivationStrategy.GetKey(merkleRoot));
             
             var fee = _blockchain.GetEstimatedFee().FeePerK;
 

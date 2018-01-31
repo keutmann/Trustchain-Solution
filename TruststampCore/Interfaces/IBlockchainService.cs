@@ -6,7 +6,7 @@ namespace TruststampCore.Interfaces
 {
     public interface IBlockchainService
     {
-        ICryptoStrategy CryptoStrategy { get; set; }
+        IDerivationStrategy DerivationStrategy { get; set; }
         int VerifyFunds(byte[] key, IList<byte[]> previousTx = null);
         AddressTimestamp GetTimestamp(byte[] merkleRoot);
         IList<byte[]> Send(byte[] hash, byte[] key, IList<byte[]> previousTx = null);

@@ -23,7 +23,7 @@ namespace UnitTest.TruststampCore.Services
         {
             var blockchainService = ServiceProvider.GetRequiredService<IBlockchainService>();
 
-            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(FundingKeyWIF);
+            var fundingKey = blockchainService.DerivationStrategy.KeyFromString(FundingKeyWIF);
 
             var key = new Key(fundingKey);
             var address = key.PubKey.GetAddress(Network.TestNet);
@@ -38,7 +38,7 @@ namespace UnitTest.TruststampCore.Services
         {
             var blockchainService = ServiceProvider.GetRequiredService<IBlockchainService>();
 
-            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(FundingKeyWIF);
+            var fundingKey = blockchainService.DerivationStrategy.KeyFromString(FundingKeyWIF);
 
             var key = new Key(fundingKey);
             var address = key.PubKey.GetAddress(Network.TestNet);
@@ -53,12 +53,12 @@ namespace UnitTest.TruststampCore.Services
         {
             //var blockchainService = ServiceProvider.GetRequiredService<IBlockchainService>();
             var config = ServiceProvider.GetRequiredService<IConfiguration>();
-            var crypto = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
+            var derivationStrategyFactory = ServiceProvider.GetRequiredService<IDerivationStrategyFactory>();
             var repo = new SoChainTransactionRepository(config);
-            var blockchainService = new BitcoinService(repo, crypto);
+            var blockchainService = new BitcoinService(repo, derivationStrategyFactory);
 
-            var key = new Key(blockchainService.CryptoStrategy.HashOf(Guid.NewGuid().ToByteArray())); // A random key
-            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(key.ToString(Network.TestNet));
+            var key = new Key(blockchainService.DerivationStrategy.HashOf(Guid.NewGuid().ToByteArray())); // A random key
+            var fundingKey = blockchainService.DerivationStrategy.KeyFromString(key.ToString(Network.TestNet));
 
             var address = key.PubKey.GetAddress(Network.TestNet);
             Console.WriteLine(address.ToString());
@@ -74,18 +74,18 @@ namespace UnitTest.TruststampCore.Services
             //var BitcoinService
             //var blockchainService = ServiceProvider.GetRequiredService<IBlockchainService>();
             var config = ServiceProvider.GetRequiredService<IConfiguration>();
-            var crypto = ServiceProvider.GetRequiredService<ICryptoStrategyFactory>();
+            var derivationStrategyFactory = ServiceProvider.GetRequiredService<IDerivationStrategyFactory>();
             var repo = new SoChainTransactionRepository(config);
-            var blockchainService = new BitcoinService(repo, crypto); 
+            var blockchainService = new BitcoinService(repo, derivationStrategyFactory); 
             
-            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(FundingKeyWIF);
+            var fundingKey = blockchainService.DerivationStrategy.KeyFromString(FundingKeyWIF);
 
             var key = new Key(fundingKey);
             var address = key.PubKey.GetAddress(Network.TestNet);
             Console.WriteLine(address.ToString());
 
             var merkleRoot = Encoding.UTF8.GetBytes("Hello world!"); // address: mgXcnc8q2PBQFt9r1KyZgdGcP8F4pjcjRd
-            var merkleRootKey = new Key(blockchainService.CryptoStrategy.GetKey(merkleRoot));
+            var merkleRootKey = new Key(blockchainService.DerivationStrategy.GetKey(merkleRoot));
             var merkleRootAddress = merkleRootKey.PubKey.GetAddress(Network.TestNet);
             Console.WriteLine($"Merkle Root Address: {merkleRootAddress}");
             
@@ -105,7 +105,7 @@ namespace UnitTest.TruststampCore.Services
         {
             var blockchainService = ServiceProvider.GetRequiredService<IBlockchainService>();
 
-            var fundingKey = blockchainService.CryptoStrategy.KeyFromString(FundingKeyWIF);
+            var fundingKey = blockchainService.DerivationStrategy.KeyFromString(FundingKeyWIF);
             var key = new Key(fundingKey);
             var address = key.PubKey.GetAddress(Network.Main);
             Console.WriteLine(address.ToString());

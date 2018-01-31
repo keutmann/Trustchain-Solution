@@ -14,10 +14,7 @@ namespace TrustchainCore.Builders
     public class TrustBuilder
     {
         public Package Package { get; set; }
-        //private ICryptoStrategy _cryptoService;
         private ITrustBinary _trustBinary;
-        //private byte[] _issuerKey;
-        //private byte[] _serverKey;
 
         private Trust _currentTrust;
         public Trust CurrentTrust
@@ -28,24 +25,22 @@ namespace TrustchainCore.Builders
             }
         }
 
-//        private IMerkleTree _merkleTree;
 
-
-        private ICryptoStrategyFactory _cryptoServiceFactory;
+        private IDerivationStrategyFactory _derivationServiceFactory;
         private IMerkleStrategyFactory _merkleStrategyFactory;
         private IHashAlgorithmFactory _hashAlgorithmFactory;
 
 
-        public TrustBuilder(IServiceProvider serviceProvider) : this(new CryptoStrategyFactory(serviceProvider), new MerkleStrategyFactory(new HashAlgorithmFactory()), new HashAlgorithmFactory(), new TrustBinary())
+        public TrustBuilder(IServiceProvider serviceProvider) : this(new DerivationStrategyFactory(serviceProvider), new MerkleStrategyFactory(new HashAlgorithmFactory()), new HashAlgorithmFactory(), new TrustBinary())
         {
             
         }
 
-        public TrustBuilder(ICryptoStrategyFactory cryptoServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
+        public TrustBuilder(IDerivationStrategyFactory derivationServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
         {
             Package = new Package();
             Package.Trusts = new List<Trust>();
-            _cryptoServiceFactory = cryptoServiceFactory;
+            _derivationServiceFactory = derivationServiceFactory;
             _merkleStrategyFactory = merkleStrategyFactory;
             _hashAlgorithmFactory = hashAlgorithmFactory;
             _trustBinary = trustBinary;
@@ -150,7 +145,7 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public TrustBuilder SetIssuer(byte[] address, string script = CryptoStrategyFactory.BTC_PKH, SignDelegate sign = null)
+        public TrustBuilder SetIssuer(byte[] address, string script = DerivationStrategyFactory.BTC_PKH, SignDelegate sign = null)
         {
             var identity = CurrentTrust.Issuer = new Identity();
             SetIdentity(identity, address, script, sign);
@@ -158,7 +153,7 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public TrustBuilder SetServer(byte[] address, string script = CryptoStrategyFactory.BTC_PKH, SignDelegate sign = null)
+        public TrustBuilder SetServer(byte[] address, string script = DerivationStrategyFactory.BTC_PKH, SignDelegate sign = null)
         {
             var identity = Package.Server = new Identity();
             SetIdentity(identity, address, script, sign);
