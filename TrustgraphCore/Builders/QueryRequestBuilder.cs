@@ -8,6 +8,10 @@ namespace TrustgraphCore.Builders
     {
         public QueryRequest Query { get; }
 
+        public QueryRequestBuilder(string claimData) : this("", claimData)
+        {
+        }
+
         public QueryRequestBuilder(string scope, string claim)
         {
             Query = new QueryRequest

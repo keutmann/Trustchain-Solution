@@ -17,72 +17,49 @@ using TrustgraphCore.Builders;
 using TrustgraphCore.Enumerations;
 using UnitTest.TrustchainCore.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
 
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
     public class GraphQueryServiceTest : StartupMock
     {
+        private IGraphTrustService _graphTrustService = null;
+        private TrustBuilder _trustBuilder = null;
+        private ITrustDBService _trustDBService = null;
+        private IGraphQueryService _graphQueryService = null;
+        private JObject ClaimTrustTrueTest = null;
 
-        //private TrustCryptoService _trustCryptoService;
-        //private IGraphModelService _graphModelService;
-        //private IGraphTrustService _graphTrustService;
-        //private TrustBuilder _trustBuilder;
-        //private ICryptoStrategy _cryptoService;
-        //private GraphQueryService _graphQueryService;
-        //private TrustDBContext _dbContext;
-        //private ITrustDBService _trustDBService;
 
-        //[TestInitialize]
-        //public void Init()
-        //{
-        //    var options = new DbContextOptionsBuilder<TrustDBContext>()
-        //            .UseInMemoryDatabase(databaseName: "Add_writes_to_database")
-        //            .Options;
-
-        //    _dbContext = new TrustDBContext(options);
-        //    _trustDBService = new TrustDBService(_dbContext);
-            
-        //    _cryptoService = new CryptoBTCPKH();
-        //    _trustCryptoService = new TrustCryptoService(_cryptoService);
-        //    _graphModelService = new GraphModelService(new GraphModel());
-        //    _graphTrustService = new GraphTrustService(_graphModelService);
-        //    _graphQueryService = new GraphQueryService(_graphModelService, _trustDBService);
-        //    _trustBuilder = new TrustBuilder(ServiceProvider);
-        //}
-
-        //[TestCleanup]
-        //public void Cleanup()
-        //{
-        //    if (_dbContext != null)
-        //        _dbContext.Dispose();
-        //}
-        
+        [TestInitialize]
+        public override void Init()
+        {
+            base.Init();
+            _graphTrustService = new GraphTrustService();
+            _trustBuilder = new TrustBuilder(ServiceProvider);
+            _trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
+            _graphQueryService = new GraphQueryService(_graphTrustService.ModelService, null);
+            ClaimTrustTrueTest = TrustBuilder.CreateTrustTrue("Test");
+        }
 
         [TestMethod]
         public void Search1()
         {
-            var graphModelService = new GraphModelService(new GraphModel());
-            var graphTrustService = new GraphTrustService(graphModelService);
-            var trustBuilder = new TrustBuilder(ServiceProvider);
-            var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
-            var graphQueryService = ServiceProvider.GetRequiredService<IGraphQueryService>(); 
+            _trustBuilder.AddTrust("A", "B", ClaimTrustTrueTest);
 
+            _graphTrustService.Add(_trustBuilder.Package);  // Build graph!
 
-            trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue("Test"));
-            trustDBService.Add(trustBuilder.Package);
-            graphTrustService.Add(trustBuilder.Package);
-            var trusts = trustBuilder.Package.Trusts;
+            var trusts = _trustBuilder.Package.Trusts;
             var trust = trusts[0];
             Console.WriteLine("Trust object");
             Console.WriteLine(JsonConvert.SerializeObject(trusts[0], Formatting.Indented));
 
-            var claimString = JsonConvert.SerializeObject(trusts[0].Claims[0]);
-            var query = new QueryRequestBuilder("", claimString).Add(trusts[0].Issuer.Address, trusts[0].Subjects[0]).Query;
+            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+            queryBuilder.Add(trusts[0].Issuer.Address, trusts[0].Subjects[0]);
 
             Console.WriteLine("Query object");
-            Console.WriteLine(JsonConvert.SerializeObject(query, Formatting.Indented));
-            var result = graphQueryService.Execute(query);
+            Console.WriteLine(JsonConvert.SerializeObject(queryBuilder.Query, Formatting.Indented));
+            var result = _graphQueryService.Execute(queryBuilder.Query);
             var issuer = result.Subjects[0];
             Assert.IsNotNull(result.Subjects);
             Assert.AreEqual(result.Subjects.Count, 1);
@@ -103,10 +80,10 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void Search2()
         {
-            //_trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue());
-            //_trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrue());
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue());
+            _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrue());
 
-            //var trusts = _trustBuilder.Package.Trust;
+            //var trusts = _trustBuilder.Package.Trusts;
             //var trust1 = trusts[0];
             //var trust2 = trusts[1];
             //var query = new QueryRequest();
@@ -124,9 +101,9 @@ namespace UnitTest.TrustgraphCore
             //var result = _graphQueryService.Execute(query);
             //Assert.IsNotNull(result.Subjects);
 
-            ////Console.WriteLine("Start id: "+search.GraphService.Graph.IdIndex[0].ConvertToHex()); // A
-            ////PrintResult(result.Nodes, search.GraphService, 1);
-            ////PrintJson(result.Nodes);
+            //Console.WriteLine("Start id: "+search.GraphService.Graph.IdIndex[0].ConvertToHex()); // A
+            //PrintResult(result.Nodes, search.GraphService, 1);
+            //PrintJson(result.Nodes);
         }
 
 

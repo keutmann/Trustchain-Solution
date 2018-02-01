@@ -7,6 +7,7 @@ using TrustgraphCore.Interfaces;
 using TrustchainCore.Interfaces;
 using TrustgraphCore.Enumerations;
 using TrustchainCore.Model;
+using System.Runtime.CompilerServices;
 
 namespace TrustgraphCore.Services
 {
@@ -172,6 +173,7 @@ namespace TrustgraphCore.Services
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected bool PeekNode(QueueItem item, QueryContext context)
         {
             int found = 0;
@@ -215,6 +217,7 @@ namespace TrustgraphCore.Services
             return found != 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected List<QueueItem> Enqueue(QueueItem item, QueryContext context)
         {
             var list = new List<QueueItem>();

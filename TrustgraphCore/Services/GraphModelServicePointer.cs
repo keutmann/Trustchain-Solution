@@ -6,20 +6,20 @@ using TrustgraphCore.Model;
 
 namespace TrustgraphCore.Services
 {
-    public class GraphModelService : IGraphModelService
+    public class GraphModelServicePointer : IGraphModelServicePointer
     {
-        public GraphModel Graph
+        public GraphModelPointer Graph
         {
             get;
             set;
         }
 
-        public GraphModelService()
+        public GraphModelServicePointer()
         {
-            Graph = new GraphModel();
+            Graph = new GraphModelPointer();
         }
 
-        public GraphModelService(GraphModel model)
+        public GraphModelServicePointer(GraphModelPointer model)
         {
             Graph = model;
         }
@@ -28,7 +28,7 @@ namespace TrustgraphCore.Services
         {
             var edge = new GraphSubject
             {
-                SubjectId = EnsureId(subject.Address),
+                //SubjectId = EnsureIssuer(subject.Address),
                 SubjectType = EnsureSubjectType(subject.Kind),
                 NameIndex = nameIndex,
                 Scope = EnsureScopeIndex(claim.Scope),
@@ -44,26 +44,22 @@ namespace TrustgraphCore.Services
 
         public void InitSubjectModel(Subject node, Claim claim, GraphSubject edge)
         {
-            node.Address = Graph.Issuers[edge.SubjectId].Id;
-            node.Kind = Graph.SubjectTypesIndexReverse[edge.SubjectType];
-            claim.Scope = Graph.ScopeIndexReverse[edge.Scope];
-            claim.Activate = edge.Activate;
-            claim.Expire = edge.Expire;
-            claim.Cost = edge.Cost;
-            //claim.Timestamp = edge.Timestamp;
-            claim.Data = edge.Claim.ConvertToJObject().ToString(Formatting.None);
+            //node.Address = Graph.Issuers[edge.SubjectId].Id;
+            //node.Kind = Graph.SubjectTypesIndexReverse[edge.SubjectType];
+            //claim.Scope = Graph.ScopeIndexReverse[edge.Scope];
+            //claim.Activate = edge.Activate;
+            //claim.Expire = edge.Expire;
+            //claim.Cost = edge.Cost;
+            ////claim.Timestamp = edge.Timestamp;
+            //claim.Data = edge.Claim.ConvertToJObject().ToString(Formatting.None);
         }
 
-        public int EnsureId(byte[] id)
+        public GraphIssuerPointer EnsureIssuer(byte[] id)
         {
-            if (Graph.IssuersIndex.ContainsKey(id))
-                return Graph.IssuersIndex[id];
+            if (!Graph.Issuers.ContainsKey(id))
+                Graph.Issuers.Add(id, new GraphIssuerPointer {  });
 
-            var index = Graph.Issuers.Count;
-            Graph.IssuersIndex.Add(id, index);
-            Graph.Issuers.Add(new GraphIssuer { Id = id });
-
-            return index;
+            return Graph.Issuers[id];
         }
 
         public int EnsureName(string name = "")

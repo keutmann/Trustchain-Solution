@@ -20,7 +20,7 @@ namespace UnitTest
         public IServiceScope ServiceScope { get; set; }
 
         [TestInitialize]
-        public void Init()
+        public virtual void Init()
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
@@ -43,7 +43,7 @@ namespace UnitTest
         }
 
         [TestCleanup]
-        public void Cleanup()
+        public virtual void Cleanup()
         {
             ServiceScope.Dispose();
         }

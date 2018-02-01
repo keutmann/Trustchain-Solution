@@ -21,15 +21,14 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void NodeIndex()
         {
-            var derivationStrategy = new DerivationBTCPKH();
-            var trustDerivationService = new TrustDerivationService(derivationStrategy);
-            var graphModelService = new GraphModelService(new GraphModel());
+            var trustDerivationService = new TrustDerivationService();
+            var graphModelService = new GraphModelService();
 
-            var keyA = trustDerivationService.GetAddress("A");
-            var keyB = trustDerivationService.GetAddress("B");
+            var keyA = trustDerivationService.GetAddressFromPassword("A");
+            var keyB = trustDerivationService.GetAddressFromPassword("B");
 
-            graphModelService.Graph.IssuersIndex.Add(keyA, 0);
-            graphModelService.Graph.IssuersIndex.Add(keyB, 1);
+            graphModelService.EnsureId(keyA);
+            graphModelService.EnsureId(keyB);
 
             Assert.IsTrue(graphModelService.Graph.IssuersIndex.ContainsKey(keyA));
             Assert.IsTrue(graphModelService.Graph.IssuersIndex.ContainsKey(keyB));
@@ -40,7 +39,7 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void BuildEdge1()
         {
-            var graphModelService = new GraphModelService(new GraphModel());
+            var graphModelService = new GraphModelService();
             var graphTrustService = new GraphTrustService(graphModelService);
 
             var trustBuilder = new TrustBuilder(ServiceProvider);
@@ -72,7 +71,7 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void BuildEdge2()
         {
-            var graphModelService = new GraphModelService(new GraphModel());
+            var graphModelService = new GraphModelService();
             var graphTrustService = new GraphTrustService(graphModelService);
             var trustBuilder = new TrustBuilder(ServiceProvider);
 
@@ -106,7 +105,7 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void BuildEdge3()
         {
-            var graphModelService = new GraphModelService(new GraphModel());
+            var graphModelService = new GraphModelService();
             var graphTrustService = new GraphTrustService(graphModelService);
             var trustBuilder = new TrustBuilder(ServiceProvider);
 
@@ -143,7 +142,7 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void BuildEdge4()
         {
-            var graphModelService = new GraphModelService(new GraphModel());
+            var graphModelService = new GraphModelService();
             var graphTrustService = new GraphTrustService(graphModelService);
             var trustBuilder = new TrustBuilder(ServiceProvider);
 
@@ -185,7 +184,7 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void BuildEdge5()
         {
-            var graphModelService = new GraphModelService(new GraphModel());
+            var graphModelService = new GraphModelService();
             var graphTrustService = new GraphTrustService(graphModelService);
             var trustBuilder = new TrustBuilder(ServiceProvider);
 

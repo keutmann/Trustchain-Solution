@@ -13,6 +13,10 @@ namespace TrustgraphCore.Services
     {
         public IGraphModelService ModelService { get; }
 
+        public GraphTrustService() : this(new GraphModelService())
+        {
+        }
+
         public GraphTrustService(IGraphModelService modelService)
         {
             ModelService = modelService;
