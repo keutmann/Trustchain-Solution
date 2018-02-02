@@ -16,13 +16,13 @@ namespace TrustgraphCore.Model
         public Dictionary<string, int> ScopeIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public Dictionary<int, string> ScopeIndexReverse = new Dictionary<int, string>();
 
-        public Dictionary<string, int> NameIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        public Dictionary<int, string> NameIndexReverse = new Dictionary<int, string>();
+        public Dictionary<string, int> AliasIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<int, string> AliasIndexReverse = new Dictionary<int, string>();
 
         public GraphModelPointer()
         {
-            NameIndex.Add("", 0);
-            NameIndexReverse.Add(0, "");
+            AliasIndex.Add("", 0);
+            AliasIndexReverse.Add(0, "");
 
             SubjectTypesIndex.Add("", 0);
             SubjectTypesIndexReverse.Add(0, "");

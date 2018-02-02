@@ -8,10 +8,10 @@ namespace TrustgraphCore.Interfaces
     {
         GraphModelPointer Graph { get; set; }
 
-        GraphSubject CreateGraphSubject(Subject subject, Claim claim, int nameIndex, int timestamp);
-        void InitSubjectModel(Subject node, Claim claim, GraphSubject edge);
+        GraphSubjectPointer CreateGraphSubject(Subject subject, Claim claim, int nameIndex, int timestamp);
+        //void InitSubjectModel(Subject node, Claim claim, GraphSubject edge);
         GraphIssuerPointer EnsureIssuer(byte[] id);
-        int EnsureName(string name);
+        int EnsureAlias(string alias);
         int EnsureScopeIndex(string scope);
         int EnsureSubjectType(string subjectType);
     }

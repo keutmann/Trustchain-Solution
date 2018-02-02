@@ -4,6 +4,7 @@ using TrustchainCore.Extensions;
 using Newtonsoft.Json;
 using TrustgraphCore.Interfaces;
 using System.Runtime.InteropServices;
+using TrustchainCore.Collections.Generic;
 
 namespace TrustgraphCore.Model
 {
@@ -18,6 +19,8 @@ namespace TrustgraphCore.Model
         public int SubjectIndex;
         public GraphIssuerPointer Issuer;
 
+
+        
         //public int SubjectIndex;
         //public int Cost;
 
@@ -37,15 +40,15 @@ namespace TrustgraphCore.Model
 
         public List<GraphIssuerPointer> Issuers { get; set; }
         public List<GraphIssuerPointer> Targets { get; set; }
-        public List<GraphIssuerPointer> Queue { get; set; }
         public int Scope; // scope of the trust
         public ClaimStandardModel Claim; // Claims 
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
-        public List<ResultNode> Results { get; set; }
+        public Dictionary<byte[], IssuerResultPointer> Results { get; set; }
         public int MaxCost { get; set; }
         public int Level { get; set; }
         public int MaxLevel { get; set; }
         public int MatchLevel { get; set; }
+        public ulong Visited = 0;
 
 
 
@@ -68,21 +71,20 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "unknownsubjecttypes", NullValueHandling = NullValueHandling.Ignore, Order = 90)]
         public List<string> UnknownSubjectTypes = new List<string>();
 
-        [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
-        public List<SubjectResult> Subjects { get; set; }
+        //[JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
+        //public List<SubjectResult> Subjects { get; set; }
 
         public QueryContextPointer()
         {
             Issuers = new List<GraphIssuerPointer>();
             Targets = new List<GraphIssuerPointer>();
-
-            //InitializeVisited(addressCount);
+            Results = new Dictionary<byte[], IssuerResultPointer>(ByteComparer.Standard);
 
             MaxCost = 500; 
-            Results = new List<ResultNode>();
             Level = 0;
             MaxLevel = 3; // About 3 levels down max!
             MatchLevel = int.MaxValue; // At watch level do we have the first match
+            Visited = 1; // Use bit 1!
         }
 
         public QueryContextPointer(IGraphModelServicePointer graphService, QueryRequest query) : this()
@@ -115,50 +117,6 @@ namespace TrustgraphCore.Model
             Scope = (GraphService.Graph.ScopeIndex.ContainsKey(query.Scope)) ? GraphService.Graph.ScopeIndex[query.Scope] : -1;
             Claim = ClaimStandardModel.Parse(query.Claim);
 
-            //Queue.AddRange(Issuers); // Make sure to start at the issuers!
         }
-
-
-        ///// <summary>
-        ///// Get a Visit item 
-        ///// If a index is larger than the array then rebuild the array to fit the index size.
-        ///// This may happen during the Query and new Trusts are added.
-        ///// </summary>
-        ///// <param name="index"></param>
-        ///// <returns></returns>
-        //public VisitItem GetVisitItemSafely(int index)
-        //{
-        //    if (index >= Visited.Length)
-        //        InitializeVisited(index + 1);
-
-        //    return Visited[index]; 
-        //}
-
-        //public void SetVisitItemSafely(int index, VisitItem item)
-        //{
-        //    if (index >= Visited.Length)
-        //        InitializeVisited(index + 1);
-
-        //    Visited[index] = item;
-        //}
-
-
-        //private void InitializeVisited(int count)
-        //{
-        //    var template = new VisitItem(-1, -1);
-        //    var index = 0;
-        //    if (Visited != null) // Make sure to copy the old data to the new array
-        //    {
-        //        var tempArray = new VisitItem[count];
-        //        Visited.CopyTo(tempArray, 0);
-        //        index = Visited.Length;
-        //        Visited = tempArray;
-        //    }
-        //    else
-        //        Visited = new VisitItem[count];
-
-        //    for (int i = index; i < count; i++)
-        //        Visited[i] = template;
-        //}
     }
 }
