@@ -7,8 +7,13 @@ namespace TrustgraphCore.Model
 {
     public class GraphModelPointer
     {
+
+        public Dictionary<byte[], int> IssuerIndex = new Dictionary<byte[], int>(ByteComparer.Standard);
+        public List<GraphIssuerPointer> Issuers = new List<GraphIssuerPointer>();
+
+        public Dictionary<byte[], int> ClaimIndex = new Dictionary<byte[], int>(ByteComparer.Standard);
+        public List<GraphClaimPointer> Claims = new List<GraphClaimPointer>();
         
-        public Dictionary<byte[], GraphIssuerPointer> Issuers = new Dictionary<byte[], GraphIssuerPointer>(ByteComparer.Standard);
 
         public Dictionary<string, int> SubjectTypesIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public Dictionary<int, string> SubjectTypesIndexReverse = new Dictionary<int, string>();

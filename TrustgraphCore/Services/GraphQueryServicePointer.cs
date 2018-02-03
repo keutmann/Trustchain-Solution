@@ -61,6 +61,7 @@ namespace TrustgraphCore.Services
             };
             context.Tracker.Push(tracker);
 
+            // Set the Issuer to visited bit, avoiding researching the issuer
             issuer.Visited |= context.Visited;
 
             // Process current level
@@ -73,19 +74,20 @@ namespace TrustgraphCore.Services
             }
             else
             {   // Otherwise continue down!
-                for (var i = 0; i < issuer.Subjects.Count; i++) // Use the index for accessing Stuck's directly
+                var subjects = issuer.Subjects;
+
+                for (var i = 0; i < subjects.Count; i++) // Use the index for accessing struct directly, no memory copy!
                 {
-                    // Check if the current subject is to followed.
-                    if ((issuer.Subjects[i].TargetIssuer.Visited & context.Visited) != 0)
-                        continue; // The targetIssuer has already been visited!
+                    bool follow = false;
+                    if (subjects[i].Claims.ContainsKey(context.Claim.Scope)) // Do a subject contain the specific scope
+                        follow = subjects[i].Claims[context.Claim.Scope].ContainsKey(ModelService.TrustTrueClaim.Index); // Check the Trust true claim in specified scope
 
-                    if (context.Scope != 0 && issuer.Subjects[i].Scope != context.Scope)
-                        continue; // Do not follow when Trust do not match scope or SubjectType
+                    if (!follow && context.SearchGlobalScope)
+                        if (subjects[i].Claims.ContainsKey(ModelService.GlobalScopeIndex)) // Do a subject contain a global scope index
+                            follow = subjects[i].Claims[ModelService.GlobalScopeIndex].ContainsKey(ModelService.TrustTrueClaim.Index); // Do a subject contain a global scope index
 
-                    if ((issuer.Subjects[i].Claim.Flags & ClaimType.Trust) == 0)
-                        continue; // Do not follow when trust is false or do not exist.
-
-                    SearchIssuer(context, issuer.Subjects[i].TargetIssuer);
+                    if(follow)
+                        SearchIssuer(context, subjects[i].TargetIssuer);
                 }
             }
 
@@ -96,19 +98,23 @@ namespace TrustgraphCore.Services
         protected void SearchSubject(QueryContextPointer context, GraphTracker tracker)
         {
             var i = tracker.SubjectIndex;
-            var subjects = tracker.Issuer.Subjects; //[tracker.SubjectIndex];
+            var subjects = tracker.Issuer.Subjects; 
 
             if ((subjects[i].TargetIssuer.Visited & context.Visited) != 0)
                 return; // The targetIssuer has already been visited!
 
-            if ((subjects[i].Claim.Types & context.Claim.Types) == 0)
-                return;
+            // Check local scope for claims
+            if (subjects[i].Claims.ContainsKey(context.Claim.Scope)) // Do a subject contain the specific scope
+                if (!subjects[i].Claims[context.Claim.Scope].ContainsKey(context.Claim.Index)) // Check the Trust true claim in specified scope
+                    return;
 
-            if (context.Scope != 0 && subjects[i].Scope != context.Scope)
-                return; // No claims match query
+            if(context.SearchGlobalScope) // Check global scope for claims
+                if (subjects[i].Claims.ContainsKey(ModelService.GlobalScopeIndex)) // Do a subject contain a global scope index
+                    if (!subjects[i].Claims[ModelService.GlobalScopeIndex].ContainsKey(context.Claim.Index)) // Do a subject contain a global scope index
+                        return;
 
             // Do any of the subjects match the Targets
-            for(var t =0; t < context.Targets.Count; t++)
+            for (var t =0; t < context.Targets.Count; t++)
             {
                 if (!ReferenceEquals(context.Targets[t], subjects[i].TargetIssuer))
                     continue;

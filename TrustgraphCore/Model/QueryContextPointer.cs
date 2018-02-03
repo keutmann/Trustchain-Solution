@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using TrustgraphCore.Interfaces;
 using System.Runtime.InteropServices;
 using TrustchainCore.Collections.Generic;
+using System.Security.Claims;
+using TrustchainCore.Builders;
 
 namespace TrustgraphCore.Model
 {
@@ -40,8 +42,8 @@ namespace TrustgraphCore.Model
 
         public List<GraphIssuerPointer> Issuers { get; set; }
         public List<GraphIssuerPointer> Targets { get; set; }
-        public int Scope; // scope of the trust
-        public ClaimStandardModel Claim; // Claims 
+        public bool SearchGlobalScope; // scope of the trust
+        public GraphClaimPointer Claim; // Claims 
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
         public Dictionary<byte[], IssuerResultPointer> Results { get; set; }
         public int MaxCost { get; set; }
@@ -92,16 +94,23 @@ namespace TrustgraphCore.Model
             GraphService = graphService;
             foreach (var issuerId in query.Issuers)
             {
-                if(GraphService.Graph.Issuers.ContainsKey(issuerId)) 
-                    Issuers.Add(GraphService.Graph.Issuers[issuerId]);
+                if (GraphService.Graph.IssuerIndex.ContainsKey(issuerId))
+                {
+                    var index = GraphService.Graph.IssuerIndex[issuerId];
+                    Issuers.Add(GraphService.Graph.Issuers[index]);
+                }
+                    
                 else
                     UnknownIssuers.Add(issuerId);
             }
 
             foreach (var subject in query.Subjects)
             {
-                if (GraphService.Graph.Issuers.ContainsKey(subject.Id))
-                    Targets.Add(GraphService.Graph.Issuers[subject.Id]);
+                if (GraphService.Graph.IssuerIndex.ContainsKey(subject.Id))
+                {
+                    var index = GraphService.Graph.IssuerIndex[subject.Id];
+                    Targets.Add(GraphService.Graph.Issuers[index]);
+                }
                 else
                     UnknownIssuers.Add(subject.Id);
 
@@ -109,13 +118,19 @@ namespace TrustgraphCore.Model
                 if (type == -1)
                     UnknownSubjectTypes.Add(subject.Type);
                     //throw new ApplicationException("Unknown subject type: " + subject.Type);
-
-                //if(index > -1 && type > -1)
-                //    TargetIndex.Add(new TargetIndex { Id = index, Type = type });
             }
 
-            Scope = (GraphService.Graph.ScopeIndex.ContainsKey(query.Scope)) ? GraphService.Graph.ScopeIndex[query.Scope] : -1;
-            Claim = ClaimStandardModel.Parse(query.Claim);
+            if(!GraphService.Graph.ScopeIndex.ContainsKey(query.Scope))
+                throw new ApplicationException("Unknown scope in query: " + query.Scope);
+
+            //ScopeIndex = GraphService.Graph.ScopeIndex[query.Scope];
+
+            var trustClaim = new TrustchainCore.Model.Claim();
+            trustClaim.Cost = 100;
+            trustClaim.Scope = query.Scope;
+            trustClaim.Data = query.Claim;
+
+            Claim = GraphService.CreateClaim(trustClaim);
 
         }
     }

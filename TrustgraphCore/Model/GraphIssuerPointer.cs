@@ -12,6 +12,8 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "address", Order = 10)]
         public byte[] Address;
 
+        [JsonProperty(PropertyName = "index", Order = 10)]
+        public int Index;
 
         [JsonProperty(PropertyName = "referenceId", Order = 20)]
         public int DataBaseID;
@@ -20,6 +22,6 @@ namespace TrustgraphCore.Model
         public ulong Visited; // Max 64 concurrent threads can search the graph at the same time.
 
         [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
-        public List<GraphSubjectPointer> Subjects = new List<GraphSubjectPointer>();
+        public Dictionary<int, GraphSubjectPointer> Subjects = new Dictionary<int, GraphSubjectPointer>();
     }
 }

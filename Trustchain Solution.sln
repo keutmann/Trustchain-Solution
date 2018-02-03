@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trustchain", "Trustchain\Trustchain.csproj", "{5D1BFE1B-9DBF-46FB-B6E2-D3949F571864}"
 EndProject
@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrustgraphCore", "TrustgraphCore\TrustgraphCore.csproj", "{3676F0C1-4021-4FA7-8720-160631761ED4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruststampCore", "TruststampCore\TruststampCore.csproj", "{3299928D-8EC7-485F-96DB-281A4D83A432}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TruststampCore", "TruststampCore\TruststampCore.csproj", "{3299928D-8EC7-485F-96DB-281A4D83A432}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

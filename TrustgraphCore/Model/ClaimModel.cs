@@ -1,25 +1,44 @@
-﻿using Newtonsoft.Json;
+﻿using NBitcoin.Crypto;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using TrustchainCore.Extensions;
+using TrustchainCore.Interfaces;
 using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Model
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct ClaimStandardModel
+    public struct ClaimStandardModel : ObjectID
     {
         public ClaimType Types; // What claims has been made
         public ClaimType Flags; // Collection of claims that are boolean
         public byte Rating;     // Used for trust that use rating
         public ClaimMetadata Metadata;
 
+        public string StringID()
+        {
+            return $"{Types}:{Flags}:{Rating}:{Metadata}";
+        }
+
+        public byte[] RIPEMD160()
+        {
+            var data = Encoding.UTF8.GetBytes(StringID());
+            return Hashes.RIPEMD160(data, data.Length);
+        }
+
+
+        public static implicit operator ClaimStandardModel(string data)
+        {
+            return Parse(data);
+        }
+
         public static ClaimStandardModel Parse(string claim)
         {
             return Parse((JObject)JsonConvert.DeserializeObject(claim));
         }
-
 
         public static ClaimStandardModel Parse(JObject claim)
         {
@@ -82,5 +101,7 @@ namespace TrustgraphCore.Model
 
             return result;
         }
+
+
     }
 }

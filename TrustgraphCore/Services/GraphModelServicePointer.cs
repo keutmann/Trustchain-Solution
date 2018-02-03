@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using TrustchainCore.Builders;
 using TrustchainCore.Model;
 using TrustgraphCore.Interfaces;
 using TrustgraphCore.Model;
@@ -14,53 +16,108 @@ namespace TrustgraphCore.Services
             set;
         }
 
+        public GraphClaimPointer TrustTrueClaim { get; set; }
+        public int GlobalScopeIndex { get; set; }
+
         public GraphModelServicePointer()
         {
             Graph = new GraphModelPointer();
+            EnsureSetup();
         }
 
         public GraphModelServicePointer(GraphModelPointer model)
         {
             Graph = model;
+            EnsureSetup();
         }
 
-        public GraphSubjectPointer CreateGraphSubject(Subject subject, Claim claim, int nameIndex, int timestamp)
+        public void EnsureSetup()
         {
-            var edge = new GraphSubjectPointer
+            GlobalScopeIndex = EnsureGraphScope(string.Empty); // Setup global scope index
+            TrustTrueClaim = EnsureTrustTrueClaim();
+        }
+
+        public GraphClaimPointer EnsureTrustTrueClaim()
+        {
+            var claim = new Claim();
+            claim.Cost = 100;
+            claim.Data = TrustBuilder.CreateTrustTrue().ToString();
+            claim.Scope = string.Empty; // Global scope
+
+            return EnsureGraphClaim(claim);
+        }
+
+        public GraphIssuerPointer EnsureGraphIssuer(byte[] address)
+        {
+            
+            if (!Graph.IssuerIndex.TryGetValue(address, out int index))
             {
-                TargetIssuer = EnsureIssuer(subject.Address),
-                IssuerType = EnsureSubjectType(subject.Kind),
-                AliasIndex = nameIndex,
-                Scope = EnsureScopeIndex(claim.Scope),
-                //Activate = claim.Activate,
-                //Expire = claim.Expire,
-                Cost = (short)claim.Cost,
-                //Timestamp = timestamp,
-                Claim = ClaimStandardModel.Parse((JObject)JsonConvert.DeserializeObject(claim.Data))
+                index = Graph.Issuers.Count;
+                var issuer = new GraphIssuerPointer { Address = address, Index = index };
+                Graph.Issuers.Add(issuer);
+                Graph.IssuerIndex.Add(address, index);
+                return issuer;
+            }
+
+            return Graph.Issuers[index];
+        }
+
+        public GraphSubjectPointer EnsureGraphSubject(GraphIssuerPointer graphIssuer, Subject trustSubject)
+        {
+            var index = EnsureGraphIssuer(trustSubject.Address).Index;
+            if(!graphIssuer.Subjects.ContainsKey(index))
+            {
+                var graphSubject = CreateGraphSubject(trustSubject);
+                graphIssuer.Subjects.Add(index, graphSubject);
+            }
+            return graphIssuer.Subjects[index];
+
+        }
+
+        public GraphSubjectPointer CreateGraphSubject(Subject trustSubject)
+        {
+            var graphSubject = new GraphSubjectPointer
+            {
+                TargetIssuer = EnsureGraphIssuer(trustSubject.Address),
+                IssuerKind = EnsureSubjectType(trustSubject.Kind),
+                AliasIndex = EnsureAlias(trustSubject.Alias),
+                Claims = new Dictionary<int, Dictionary<int,GraphClaimPointer>>()
             };
 
-            return edge;
+            return graphSubject;
         }
 
-        //public void InitSubjectModel(Subject node, Claim claim, GraphSubject edge)
-        //{
-        //    //node.Address = Graph.Issuers[edge.SubjectId].Id;
-        //    //node.Kind = Graph.SubjectTypesIndexReverse[edge.SubjectType];
-        //    //claim.Scope = Graph.ScopeIndexReverse[edge.Scope];
-        //    //claim.Activate = edge.Activate;
-        //    //claim.Expire = edge.Expire;
-        //    //claim.Cost = edge.Cost;
-        //    ////claim.Timestamp = edge.Timestamp;
-        //    //claim.Data = edge.Claim.ConvertToJObject().ToString(Formatting.None);
-        //}
-
-        public GraphIssuerPointer EnsureIssuer(byte[] address)
+        public GraphClaimPointer EnsureGraphClaim(Claim trustClaim)
         {
-            if (!Graph.Issuers.ContainsKey(address))
-                Graph.Issuers.Add(address, new GraphIssuerPointer {  Address = address });
+            var gc = CreateClaim(trustClaim); // Need to created the GraphClaim before the RIPEMD160 can be calculated
+            var gcID = gc.RIPEMD160();
 
-            return Graph.Issuers[address];
+            if (!Graph.ClaimIndex.TryGetValue(gcID, out int index))
+            {
+                gc.Index = Graph.Claims.Count;
+                Graph.Claims.Add(gc);
+                Graph.ClaimIndex.Add(gcID, gc.Index);
+                
+                return gc;
+            }
+
+            return Graph.Claims[index];
+
         }
+
+        public GraphClaimPointer CreateClaim(Claim trustClaim)
+        {
+            var gclaim = new GraphClaimPointer();
+
+            gclaim.Scope = EnsureGraphScope(trustClaim.Scope);
+            //gclaim.Activate = edge.Activate;
+            //gclaim.Expire = edge.Expire;
+            gclaim.Cost = trustClaim.Cost;
+            //claim.Timestamp = edge.Timestamp;
+            gclaim.Data = trustClaim.Data;
+            return gclaim;
+        }
+
 
         public int EnsureAlias(string alias = null)
         {
@@ -92,7 +149,7 @@ namespace TrustgraphCore.Services
             return (short)Graph.SubjectTypesIndex[subjectType];
         }
 
-        public int EnsureScopeIndex(string scope)
+        public int EnsureGraphScope(string scope)
         {
             if (scope == null)
                 scope = string.Empty;
