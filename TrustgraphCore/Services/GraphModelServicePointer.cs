@@ -81,7 +81,7 @@ namespace TrustgraphCore.Services
                 TargetIssuer = EnsureGraphIssuer(trustSubject.Address),
                 IssuerKind = EnsureSubjectType(trustSubject.Kind),
                 AliasIndex = EnsureAlias(trustSubject.Alias),
-                Claims = new Dictionary<int, Dictionary<int,GraphClaimPointer>>()
+                Claims = new Dictionary<long, GraphClaimPointer>()
             };
 
             return graphSubject;

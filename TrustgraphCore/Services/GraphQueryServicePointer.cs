@@ -8,6 +8,7 @@ using TrustchainCore.Interfaces;
 using TrustgraphCore.Enumerations;
 using TrustchainCore.Model;
 using System.Runtime.CompilerServices;
+using TrustgraphCore.Extensions;
 
 namespace TrustgraphCore.Services
 {
@@ -78,13 +79,12 @@ namespace TrustgraphCore.Services
 
                 for (var i = 0; i < subjects.Count; i++) // Use the index for accessing struct directly, no memory copy!
                 {
-                    bool follow = false;
-                    if (subjects[i].Claims.ContainsKey(context.Claim.Scope)) // Do a subject contain the specific scope
-                        follow = subjects[i].Claims[context.Claim.Scope].ContainsKey(ModelService.TrustTrueClaim.Index); // Check the Trust true claim in specified scope
+                    // Check local index
+                    bool follow = subjects[i].Claims.Exist(context.Claim.Scope, ModelService.TrustTrueClaim.Index);
 
-                    if (!follow && context.SearchGlobalScope)
-                        if (subjects[i].Claims.ContainsKey(ModelService.GlobalScopeIndex)) // Do a subject contain a global scope index
-                            follow = subjects[i].Claims[ModelService.GlobalScopeIndex].ContainsKey(ModelService.TrustTrueClaim.Index); // Do a subject contain a global scope index
+                    // Check global
+                    if (!follow && context.SearchGlobalScope) // Create the Global index
+                        follow = subjects[i].Claims.Exist(ModelService.GlobalScopeIndex, ModelService.TrustTrueClaim.Index);
 
                     if(follow)
                         SearchIssuer(context, subjects[i].TargetIssuer);
@@ -102,26 +102,25 @@ namespace TrustgraphCore.Services
 
             if ((subjects[i].TargetIssuer.Visited & context.Visited) != 0)
                 return; // The targetIssuer has already been visited!
-
+            
             // Check local scope for claims
-            if (subjects[i].Claims.ContainsKey(context.Claim.Scope)) // Do a subject contain the specific scope
-                if (!subjects[i].Claims[context.Claim.Scope].ContainsKey(context.Claim.Index)) // Check the Trust true claim in specified scope
-                    return;
+            var claimExist = subjects[i].Claims.Exist(context.Claim.Scope, context.Claim.Index);
 
-            if(context.SearchGlobalScope) // Check global scope for claims
-                if (subjects[i].Claims.ContainsKey(ModelService.GlobalScopeIndex)) // Do a subject contain a global scope index
-                    if (!subjects[i].Claims[ModelService.GlobalScopeIndex].ContainsKey(context.Claim.Index)) // Do a subject contain a global scope index
-                        return;
+            if(!claimExist && context.SearchGlobalScope) // Check global scope for claims
+                claimExist = subjects[i].Claims.Exist(ModelService.GlobalScopeIndex, context.Claim.Index); // Do a subject contain a global scope index
 
-            // Do any of the subjects match the Targets
-            for (var t =0; t < context.Targets.Count; t++)
+            if (claimExist)
             {
-                if (!ReferenceEquals(context.Targets[t], subjects[i].TargetIssuer))
-                    continue;
+                // Do any of the subjects match the Targets
+                for (var t = 0; t < context.Targets.Count; t++)
+                {
+                    if (!ReferenceEquals(context.Targets[t], subjects[i].TargetIssuer))
+                        continue;
 
-                context.MatchLevel = context.Tracker.Count; // The number of levels before a search hit!                
-                // Add the hit to the context result!
-                BuildResult(context);
+                    context.MatchLevel = context.Tracker.Count; // The number of levels before a search hit!                
+                                                                // Add the hit to the context result!
+                    BuildResult(context);
+                }
             }
         }
 

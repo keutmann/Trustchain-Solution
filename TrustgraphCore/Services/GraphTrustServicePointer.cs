@@ -55,14 +55,8 @@ namespace TrustgraphCore.Services
                     var trustClaim = trust.Claims[index];
                     var graphClaim = ModelService.EnsureGraphClaim(trustClaim);
 
-                    // Ensure scope 
-                    if (!graphSubject.Claims.TryGetValue(graphClaim.Scope, out Dictionary<int, GraphClaimPointer> scopeDict))
-                    {
-                        scopeDict = new Dictionary<int, GraphClaimPointer>();
-                        graphSubject.Claims.Add(graphClaim.Scope, scopeDict);
-                    }
-
-                    scopeDict.Add(graphClaim.Index, graphClaim);
+                    var claimIndex = new SubjectClaimIndex { Scope = graphClaim.Scope, Index = graphClaim.Index };
+                    graphSubject.Claims[claimIndex.Value] = graphClaim;
                 }
 
 
