@@ -15,7 +15,7 @@
           "alias": "MyAlias", // An alias of the subject address.
           "claimIndexs": [ 0 ], // One or more claims can be attached to the subject
           "address": "1ERgQJdwncLvXv16mQaKu...", // id of the subject, data and format of the address can be anything.
-          "kind": "person", // Specifies the type of the id. Helps on filtering on Trust resolvement.
+          "type": "person", // Specifies the type of the id. Helps on filtering on Trust resolvement.
           "claim": {}  // Optional for single claims. (Included for simplicity reasons)
         }
       ],
@@ -23,24 +23,11 @@
         {
           "index": 0, // Optional, specify index, if the possibility of claim object gets reordered.
           // Claim made about the subject. The format is specified by the version property in the header section.
-          "data": [
-            {
-              "index": 0,
-              "type": "tc-binarytrust-1.0", // tc=Trustchain, binarytrust=graph, 1.0=version
-              "object": {
-                "trust": true, // Endicates if the subject is trusted or not.
-                "confirm": true, // Endicates if the subject is confirmed to be real.
-                "reason": "....." // Some text describing the reason for the trust. Max 100 bytes
-              }
-            },
-            {
-              "index": 1,
-              "type": "tc-binaryaccess-1.0", // tc=Trustchain, binaryaccess=graph, 1.0=version
-              "object": {
-                "access": true // Endicates if the subject has access or not.
-              }
-            }
-          ],
+          "type": "tc-binarytrust-1.0", // tc=Trustchain, binarytrust=graph, 1.0=version
+          "data": { // the object that match the tc-binarytrust-1.0
+            "trust": true, // Endicates if the subject is trusted or not.
+            "confirm": true // Endicates if the subject is confirmed to be real.
+          },
           // This is a cost when resolving the trust. A more nodes are followed with low values.
           // The cost property can only have a value below 100 if the subject signature is provided. This helps e.g. search companies.
           // The cost value cannot be below 1 (avoid infinite loop).
@@ -48,7 +35,8 @@
           "activate": 1231006505, // When will the trust be active. unixepoch
           "expire": 2231006505, // When will the trust deactivate. unixepoch
           // Scope is used to filter on trust resolvement. It can be any text
-          "scope": "global" // The scope could also be specefic to country, area, products, articles or social medias etc. Global is default.
+          "scope": "global", // The scope could also be specefic to country, area, products, articles or social medias etc. Global is default.
+          "note": "....." // Text describing the reason for the trust. (Max 100 bytes, however optional per server)
         }
       ],
       // The timestamp is used when the trust is repackaged into an other package
