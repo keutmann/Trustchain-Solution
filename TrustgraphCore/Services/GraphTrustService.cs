@@ -42,7 +42,7 @@ namespace TrustgraphCore.Services
                 unixTime = DateTime.Now.ToUnixTime();
 
             var index = ModelService.EnsureId(trust.Issuer.Address);
-            var issuer = ModelService.Graph.Issuers[index]; // Remember its a copy of Issuer!
+            var issuer = ModelService.Graph.Issuer[index]; // Remember its a copy of Issuer!
             //var nameIndex = ModelService.EnsureName(trust.Name);
             var subjects = new List<GraphSubject>(issuer.Subjects ?? (new GraphSubject[0]));
 
@@ -55,7 +55,7 @@ namespace TrustgraphCore.Services
             subjects.RemoveAll(e => e.Expire > 0 && e.Expire < unixTime);
 
             issuer.Subjects = subjects.ToArray();
-            ModelService.Graph.Issuers[index] = issuer;
+            ModelService.Graph.Issuer[index] = issuer;
 
         }
 

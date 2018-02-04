@@ -9,9 +9,9 @@ namespace TrustgraphCore.Model
         [FieldOffset(0)]
         public Int64 Value;
         [FieldOffset(0)]
-        public Int32 Scope;
-        [FieldOffset(4)]
         public Int32 Index;
+        [FieldOffset(4)]
+        public Int32 Scope;
 
         public SubjectClaimIndex(Int64 value)
         {

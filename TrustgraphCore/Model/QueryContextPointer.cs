@@ -11,30 +11,6 @@ using TrustchainCore.Builders;
 namespace TrustgraphCore.Model
 {
 
-    /// <summary>
-    /// Used to run though the Graph and track the path of search expantion. Enableds iterative free functions.
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct GraphTracker
-    {
-
-        public int SubjectIndex;
-        public GraphIssuerPointer Issuer;
-
-
-        
-        //public int SubjectIndex;
-        //public int Cost;
-
-        //public VisitItem(int parentIndex, int subjectIndex)
-        //{
-        //    ParentIndex = parentIndex;
-        //    SubjectIndex = subjectIndex;
-        //    //Cost = cost;
-        //}
-    }
-
-
     [JsonObject(MemberSerialization.OptIn)]
     public class QueryContextPointer
     {
@@ -42,7 +18,7 @@ namespace TrustgraphCore.Model
 
         public List<GraphIssuerPointer> Issuers { get; set; }
         public List<GraphIssuerPointer> Targets { get; set; }
-        public bool SearchGlobalScope; // scope of the trust
+        public bool SearchGlobalScope = true; // scope of the trust
         public GraphClaimPointer Claim; // Claims 
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
         public Dictionary<byte[], IssuerResultPointer> Results { get; set; }
@@ -131,6 +107,10 @@ namespace TrustgraphCore.Model
             trustClaim.Data = query.Claim;
 
             Claim = GraphService.CreateClaim(trustClaim);
+            var id = Claim.RIPEMD160();
+            if (!GraphService.Graph.ClaimIndex.ContainsKey(id))
+                throw new ApplicationException("Unknown claim!");
+            Claim.Index = GraphService.Graph.ClaimIndex[id];
 
         }
     }

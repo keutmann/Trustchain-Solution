@@ -8,7 +8,7 @@ namespace TrustgraphCore.Model
     public class GraphModel
     {
         
-        public List<GraphIssuer> Issuers = new List<GraphIssuer>();
+        public List<GraphIssuer> Issuer = new List<GraphIssuer>();
         public Dictionary<byte[], int> IssuersIndex = new Dictionary<byte[], int>(ByteComparer.Standard);
 
         public Dictionary<string, int> SubjectTypesIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);

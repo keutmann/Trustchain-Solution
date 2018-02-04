@@ -55,7 +55,7 @@ namespace TrustgraphCore.Model
             MaxLevel = 5; // About 5 levels down, nobody known people 5 levels down.
         }
 
-        public QueryContext(IGraphModelService graphService, QueryRequest query) : this(graphService.Graph.Issuers.Count)
+        public QueryContext(IGraphModelService graphService, QueryRequest query) : this(graphService.Graph.Issuer.Count)
         {
             GraphService = graphService;
             foreach (var issuer in query.Issuers)

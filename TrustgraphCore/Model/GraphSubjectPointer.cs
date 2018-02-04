@@ -32,7 +32,7 @@ namespace TrustgraphCore.Model
 
         public string StringID()
         {
-            return $"{Cost}:{Scope}:{Data.StringID()}";
+            return $"{Scope}:{Data.StringID()}";
         }
 
         public byte[] RIPEMD160()

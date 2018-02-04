@@ -51,15 +51,15 @@ namespace UnitTest.TrustgraphCore
 
             graphTrustService.Add(trustBuilder.Package);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers.Count == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer.Count == 2);
             //Assert.AreEqual(graphModelService.Graph.Issuers[0].Subjects[0].NameIndex, 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects.Length == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Claim.Types == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].SubjectId == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Cost == trust.Claims[0].Cost);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Activate == trust.Claims[0].Activate);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Expire == trust.Claims[0].Expire);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Claim.Types == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].SubjectId == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Cost == trust.Claims[0].Cost);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Activate == trust.Claims[0].Activate);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Expire == trust.Claims[0].Expire);
 
             Assert.IsTrue(graphModelService.Graph.IssuersIndex.Count == 2);
             Assert.IsTrue(graphModelService.Graph.SubjectTypesIndex.Count == 2);
@@ -83,16 +83,16 @@ namespace UnitTest.TrustgraphCore
 
             graphTrustService.Add(trustBuilder.Package);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers.Count == 3);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer.Count == 3);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects.Length == 1);
             //Assert.AreEqual(graphModelService.Graph.Issuers[0].Subjects[0].NameIndex, 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].SubjectId == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].SubjectId == 1);
 
             //Assert.AreEqual(graphModelService.Graph.Issuers[1].Subjects[0].NameIndex, 2);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects.Length == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects[0].SubjectId == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects[0].SubjectId == 2);
 
             Assert.IsTrue(graphModelService.Graph.IssuersIndex.Count == 3);
             Assert.IsTrue(graphModelService.Graph.SubjectTypesIndex.Count == 2);
@@ -118,15 +118,15 @@ namespace UnitTest.TrustgraphCore
 
             graphTrustService.Add(trustBuilder.Package);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers.Count == 3);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer.Count == 3);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects.Length == 1);
             //Assert.AreEqual(graphModelService.Graph.Issuers[0].Subjects[0].NameIndex, 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].SubjectId == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].SubjectId == 1);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects.Length == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects[0].SubjectId == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects[0].SubjectId == 2);
 
             Assert.IsTrue(graphModelService.Graph.IssuersIndex.Count == 3);
             Assert.IsTrue(graphModelService.Graph.SubjectTypesIndex.Count == 2);
@@ -134,9 +134,9 @@ namespace UnitTest.TrustgraphCore
             Assert.IsTrue(graphModelService.Graph.ScopeIndex.Count == 1);
             Assert.IsTrue(graphModelService.Graph.ScopeIndex.ContainsKey(""));
 
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects.Length == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects[0].SubjectId == 0);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects[0].SubjectId == 0);
         }
 
         [TestMethod]
@@ -155,22 +155,22 @@ namespace UnitTest.TrustgraphCore
 
             graphTrustService.Add(trustBuilder.Package);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers.Count == 3);
+            Assert.IsTrue(graphModelService.Graph.Issuer.Count == 3);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects.Length == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects.Length == 2);
             //Assert.AreEqual(graphModelService.Graph.Issuers[0].Subjects[0].NameIndex, 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].SubjectId == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[1].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[1].SubjectId == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].SubjectId == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[1].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[1].SubjectId == 2);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects.Length == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects[0].SubjectId == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects[0].SubjectId == 2);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects.Length == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects[0].SubjectId == 0);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects[0].SubjectId == 0);
 
             Assert.IsTrue(graphModelService.Graph.IssuersIndex.Count == 3);
             Assert.IsTrue(graphModelService.Graph.SubjectTypesIndex.Count == 2);
@@ -198,22 +198,22 @@ namespace UnitTest.TrustgraphCore
 
             graphTrustService.Add(trustBuilder.Package);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers.Count == 5);
+            Assert.IsTrue(graphModelService.Graph.Issuer.Count == 5);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects.Length == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects.Length == 2);
             //Assert.AreEqual(graphModelService.Graph.Issuers[0].Subjects[0].NameIndex, 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[0].SubjectId == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[1].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[0].Subjects[1].SubjectId == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[0].SubjectId == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[1].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[0].Subjects[1].SubjectId == 2);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects.Length == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[1].Subjects[0].SubjectId == 2);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[1].Subjects[0].SubjectId == 2);
 
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects.Length == 1);
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects[0].Claim.Flags == ClaimType.Trust);
-            Assert.IsTrue(graphModelService.Graph.Issuers[2].Subjects[0].SubjectId == 0);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects.Length == 1);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects[0].Claim.Flags == ClaimType.Trust);
+            Assert.IsTrue(graphModelService.Graph.Issuer[2].Subjects[0].SubjectId == 0);
 
             Assert.IsTrue(graphModelService.Graph.IssuersIndex.Count == 5);
             Assert.IsTrue(graphModelService.Graph.SubjectTypesIndex.Count == 2);

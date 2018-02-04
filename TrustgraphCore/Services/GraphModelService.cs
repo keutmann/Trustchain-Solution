@@ -44,7 +44,7 @@ namespace TrustgraphCore.Services
 
         public void InitSubjectModel(Subject node, Claim claim, GraphSubject edge)
         {
-            node.Address = Graph.Issuers[edge.SubjectId].Id;
+            node.Address = Graph.Issuer[edge.SubjectId].Id;
             node.Kind = Graph.SubjectTypesIndexReverse[edge.SubjectType];
             claim.Scope = Graph.ScopeIndexReverse[edge.Scope];
             claim.Activate = edge.Activate;
@@ -59,9 +59,9 @@ namespace TrustgraphCore.Services
             if (Graph.IssuersIndex.ContainsKey(id))
                 return Graph.IssuersIndex[id];
 
-            var index = Graph.Issuers.Count;
+            var index = Graph.Issuer.Count;
             Graph.IssuersIndex.Add(id, index);
-            Graph.Issuers.Add(new GraphIssuer { Id = id });
+            Graph.Issuer.Add(new GraphIssuer { Id = id });
 
             return index;
         }

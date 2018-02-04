@@ -18,7 +18,7 @@ namespace TrustgraphCore.Services
             var package = new Package();
             package.Trusts = new List<Trust>();
 
-            foreach (var address in ModelService.Graph.Issuers)
+            foreach (var address in ModelService.Graph.Issuer)
             {
                 var trust = new Trust();
                 trust.Issuer = new Identity();

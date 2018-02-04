@@ -114,7 +114,7 @@ namespace TrustgraphCore.Services
                         continue;
                     }
 
-                    var issuer = ModelService.Graph.Issuers[parentNode.SubjectIndex];
+                    var issuer = ModelService.Graph.Issuer[parentNode.SubjectIndex];
                     parentNode.Address = issuer.Id;
 
                     if (visited.SubjectIndex >= 0)
@@ -178,7 +178,7 @@ namespace TrustgraphCore.Services
         {
             int found = 0;
             context.SetVisitItemSafely(item.Index, new VisitItem(item.ParentIndex, item.EdgeIndex)); // Makes sure that we do not run this block again.
-            var subjects = ModelService.Graph.Issuers[item.Index].Subjects;
+            var subjects = ModelService.Graph.Issuer[item.Index].Subjects;
             if (subjects == null)
                 return false;
 
@@ -221,7 +221,7 @@ namespace TrustgraphCore.Services
         protected List<QueueItem> Enqueue(QueueItem item, QueryContext context)
         {
             var list = new List<QueueItem>();
-            var address = ModelService.Graph.Issuers[item.Index];
+            var address = ModelService.Graph.Issuer[item.Index];
 
             var subjects = address.Subjects;
             if (subjects == null)
@@ -244,7 +244,7 @@ namespace TrustgraphCore.Services
                 var visited = context.GetVisitItemSafely(subjects[i].SubjectId);
                 if(visited.ParentIndex > -1) // If parentIndex is -1 then it has not been used yet!
                 {
-                    var parentAddress = ModelService.Graph.Issuers[visited.ParentIndex];
+                    var parentAddress = ModelService.Graph.Issuer[visited.ParentIndex];
                     var visitedEdge = parentAddress.Subjects[visited.SubjectIndex];
                     if (visitedEdge.Cost > subjects[i].Cost) // If the current cost is lower then its a better route.
                         context.Visited[subjects[i].SubjectId] = new VisitItem(item.Index, i); // Overwrite the old visit with the new because of lower cost

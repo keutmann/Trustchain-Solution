@@ -41,7 +41,7 @@ namespace TrustgraphCore.Controllers
                 return NotFound();
 
             var index = _graphTrustService.ModelService.Graph.IssuersIndex[issuerId];
-            var issuer = _graphTrustService.ModelService.Graph.Issuers[index];
+            var issuer = _graphTrustService.ModelService.Graph.Issuer[index];
 
             for (int i = 0; i < issuer.Subjects.Length; i++)
             {

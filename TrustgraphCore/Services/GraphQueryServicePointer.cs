@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
 using TrustchainCore.Interfaces;
-using TrustgraphCore.Enumerations;
-using TrustchainCore.Model;
 using System.Runtime.CompilerServices;
 using TrustgraphCore.Extensions;
 
@@ -55,11 +51,7 @@ namespace TrustgraphCore.Services
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void SearchIssuer(QueryContextPointer context, GraphIssuerPointer issuer)
         {
-            var tracker = new GraphTracker
-            {
-                Issuer = issuer,
-                SubjectIndex = 0
-            };
+            var tracker = new GraphTracker(issuer);
             context.Tracker.Push(tracker);
 
             // Set the Issuer to visited bit, avoiding researching the issuer
@@ -68,9 +60,11 @@ namespace TrustgraphCore.Services
             // Process current level
             if (context.Tracker.Count == context.Level)
             {
-                for (; tracker.SubjectIndex < issuer.Subjects.Count; tracker.SubjectIndex++)
+                foreach (var key in issuer.Subjects.Keys)
                 {
-                    SearchSubject(context, tracker);
+                    tracker.SubjectKey = key;
+                    SearchSubject(context, issuer, key);
+
                 }
             }
             else
@@ -95,26 +89,24 @@ namespace TrustgraphCore.Services
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SearchSubject(QueryContextPointer context, GraphTracker tracker)
+        protected void SearchSubject(QueryContextPointer context, GraphIssuerPointer issuer, int subjectKey)
         {
-            var i = tracker.SubjectIndex;
-            var subjects = tracker.Issuer.Subjects; 
-
-            if ((subjects[i].TargetIssuer.Visited & context.Visited) != 0)
+            var subjects = issuer.Subjects;
+            if ((subjects[subjectKey].TargetIssuer.Visited & context.Visited) != 0)
                 return; // The targetIssuer has already been visited!
             
             // Check local scope for claims
-            var claimExist = subjects[i].Claims.Exist(context.Claim.Scope, context.Claim.Index);
+            var claimExist = subjects[subjectKey].Claims.Exist(context.Claim.Scope, context.Claim.Index);
 
             if(!claimExist && context.SearchGlobalScope) // Check global scope for claims
-                claimExist = subjects[i].Claims.Exist(ModelService.GlobalScopeIndex, context.Claim.Index); // Do a subject contain a global scope index
+                claimExist = subjects[subjectKey].Claims.Exist(ModelService.GlobalScopeIndex, context.Claim.Index); // Do a subject contain a global scope index
 
             if (claimExist)
             {
                 // Do any of the subjects match the Targets
                 for (var t = 0; t < context.Targets.Count; t++)
                 {
-                    if (!ReferenceEquals(context.Targets[t], subjects[i].TargetIssuer))
+                    if (!ReferenceEquals(context.Targets[t], subjects[subjectKey].TargetIssuer))
                         continue;
 
                     context.MatchLevel = context.Tracker.Count; // The number of levels before a search hit!                
@@ -134,8 +126,8 @@ namespace TrustgraphCore.Services
                 
                 var issuerResult = context.Results[tracker.Issuer.Address];
 
-                if (!issuerResult.Subjects.ContainsKey(tracker.SubjectIndex))
-                    issuerResult.Subjects.Add(tracker.SubjectIndex, tracker.Issuer.Subjects[tracker.SubjectIndex]);
+                if (!issuerResult.Subjects.ContainsKey(tracker.SubjectKey)) // Only subjects with unique keys
+                    issuerResult.Subjects.Add(tracker.SubjectKey, tracker.Issuer.Subjects[tracker.SubjectKey]);
             }
         }
 
