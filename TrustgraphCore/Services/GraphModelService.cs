@@ -8,9 +8,9 @@ using TrustgraphCore.Model;
 
 namespace TrustgraphCore.Services
 {
-    public class GraphModelServicePointer : IGraphModelService
+    public class GraphModelService : IGraphModelService
     {
-        public GraphModelPointer Graph
+        public GraphModel Graph
         {
             get;
             set;
@@ -19,13 +19,13 @@ namespace TrustgraphCore.Services
         public GraphClaimPointer TrustTrueClaim { get; set; }
         public int GlobalScopeIndex { get; set; }
 
-        public GraphModelServicePointer()
+        public GraphModelService()
         {
-            Graph = new GraphModelPointer();
+            Graph = new GraphModel();
             EnsureSetup();
         }
 
-        public GraphModelServicePointer(GraphModelPointer model)
+        public GraphModelService(GraphModel model)
         {
             Graph = model;
             EnsureSetup();
@@ -47,13 +47,13 @@ namespace TrustgraphCore.Services
             return EnsureGraphClaim(claim);
         }
 
-        public GraphIssuerPointer EnsureGraphIssuer(byte[] address)
+        public GraphIssuer EnsureGraphIssuer(byte[] address)
         {
             
             if (!Graph.IssuerIndex.TryGetValue(address, out int index))
             {
                 index = Graph.Issuers.Count;
-                var issuer = new GraphIssuerPointer { Address = address, Index = index };
+                var issuer = new GraphIssuer { Address = address, Index = index };
                 Graph.Issuers.Add(issuer);
                 Graph.IssuerIndex.Add(address, index);
                 return issuer;
@@ -62,7 +62,7 @@ namespace TrustgraphCore.Services
             return Graph.Issuers[index];
         }
 
-        public GraphSubjectPointer EnsureGraphSubject(GraphIssuerPointer graphIssuer, Subject trustSubject)
+        public GraphSubject EnsureGraphSubject(GraphIssuer graphIssuer, Subject trustSubject)
         {
             var index = EnsureGraphIssuer(trustSubject.Address).Index;
             if(!graphIssuer.Subjects.ContainsKey(index))
@@ -74,9 +74,9 @@ namespace TrustgraphCore.Services
 
         }
 
-        public GraphSubjectPointer CreateGraphSubject(Subject trustSubject)
+        public GraphSubject CreateGraphSubject(Subject trustSubject)
         {
-            var graphSubject = new GraphSubjectPointer
+            var graphSubject = new GraphSubject
             {
                 TargetIssuer = EnsureGraphIssuer(trustSubject.Address),
                 IssuerKind = EnsureSubjectType(trustSubject.Kind),

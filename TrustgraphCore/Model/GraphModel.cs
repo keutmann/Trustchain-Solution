@@ -5,11 +5,11 @@ using TrustchainCore.Collections.Generic;
 
 namespace TrustgraphCore.Model
 {
-    public class GraphModelPointer
+    public class GraphModel
     {
 
         public Dictionary<byte[], int> IssuerIndex = new Dictionary<byte[], int>(ByteComparer.Standard);
-        public List<GraphIssuerPointer> Issuers = new List<GraphIssuerPointer>();
+        public List<GraphIssuer> Issuers = new List<GraphIssuer>();
 
         public Dictionary<byte[], int> ClaimIndex = new Dictionary<byte[], int>(ByteComparer.Standard);
         public List<GraphClaimPointer> Claims = new List<GraphClaimPointer>();
@@ -24,7 +24,7 @@ namespace TrustgraphCore.Model
         public Dictionary<string, int> AliasIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public Dictionary<int, string> AliasIndexReverse = new Dictionary<int, string>();
 
-        public GraphModelPointer()
+        public GraphModel()
         {
             AliasIndex.Add("", 0);
             AliasIndexReverse.Add(0, "");

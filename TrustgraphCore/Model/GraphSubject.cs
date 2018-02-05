@@ -9,10 +9,10 @@ using TrustchainCore.Model;
 namespace TrustgraphCore.Model
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct GraphSubjectPointer
+    public struct GraphSubject
     {
         //public int DatabaseID; // Ensures that we can get back to the Trust subject with claim in the database,
-        public GraphIssuerPointer TargetIssuer; // The type of the subject
+        public GraphIssuer TargetIssuer; // The type of the subject
 
         public int IssuerKind; // Use lookup table to handle subject type
         public int AliasIndex; // The name of the issuer for this subject

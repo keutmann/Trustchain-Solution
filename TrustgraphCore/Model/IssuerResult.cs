@@ -4,7 +4,7 @@ using TrustchainCore.Model;
 
 namespace TrustgraphCore.Model
 {
-    public class IssuerResultPointer
+    public class IssuerResult
     {
         [JsonProperty(PropertyName = "address", Order = 10)]
         public byte[] Address { get; set; }
@@ -13,11 +13,11 @@ namespace TrustgraphCore.Model
         public int DataBaseID;
 
         [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
-        public Dictionary<int, GraphSubjectPointer> Subjects { get; set; }
+        public Dictionary<int, GraphSubject> Subjects { get; set; }
 
-        public IssuerResultPointer()
+        public IssuerResult()
         {
-            Subjects = new Dictionary<int, GraphSubjectPointer>();
+            Subjects = new Dictionary<int, GraphSubject>();
         }
     }
 }

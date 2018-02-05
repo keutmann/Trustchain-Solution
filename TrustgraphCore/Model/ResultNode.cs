@@ -7,6 +7,6 @@ namespace TrustgraphCore.Model
     {
         public int IssuerIndex { get; set; }
         public int ParentIndex { get; set; }
-        public GraphSubjectPointer Subject { get; set; }
+        public GraphSubject Subject { get; set; }
     }
 }

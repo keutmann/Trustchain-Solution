@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace TrustgraphCore.Model
 {
     //[StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class GraphIssuerPointer
+    public class GraphIssuer
     {
         [JsonProperty(PropertyName = "address", Order = 10)]
         public byte[] Address;
@@ -22,6 +22,6 @@ namespace TrustgraphCore.Model
         public ulong Visited; // Max 64 concurrent threads can search the graph at the same time.
 
         [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
-        public Dictionary<int, GraphSubjectPointer> Subjects = new Dictionary<int, GraphSubjectPointer>();
+        public Dictionary<int, GraphSubject> Subjects = new Dictionary<int, GraphSubject>();
     }
 }

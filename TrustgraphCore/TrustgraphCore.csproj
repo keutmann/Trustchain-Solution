@@ -5,17 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Model\GraphIssuer.cs" />
-    <Compile Remove="Model\GraphModel.cs" />
-    <Compile Remove="Model\GraphSubject.cs" />
-    <Compile Remove="Model\QueryContext.cs" />
-    <Compile Remove="Model\SubjectResult.cs" />
-    <Compile Remove="Services\GraphModelService.cs" />
-    <Compile Remove="Services\GraphQueryService.cs" />
-    <Compile Remove="Services\GraphTrustService.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\TrustchainCore\TrustchainCore.csproj" />
     <ProjectReference Include="..\TruststampCore\TruststampCore.csproj" />
   </ItemGroup>

@@ -8,22 +8,22 @@ using TrustgraphCore.Extensions;
 
 namespace TrustgraphCore.Services
 {
-    public class GraphQueryServicePointer : IGraphQueryService
+    public class GraphQueryService : IGraphQueryService
     {
         public IGraphModelService ModelService { get; }
         public long UnixTime { get; set; }
         private ITrustDBService _trustDBService;
 
-        public GraphQueryServicePointer(IGraphModelService modelService, ITrustDBService trustDBService)
+        public GraphQueryService(IGraphModelService modelService, ITrustDBService trustDBService)
         {
             ModelService = modelService;
             _trustDBService = trustDBService;
             UnixTime = DateTime.Now.ToUnixTime();
         }
 
-        public QueryContextPointer Execute(QueryRequest query)
+        public QueryContext Execute(QueryRequest query)
         {
-            var context = new QueryContextPointer(ModelService, query);
+            var context = new QueryContext(ModelService, query);
 
             if (context.Issuers.Count > 0 && context.Targets.Count > 0)
                 ExecuteQueryContext(context);
@@ -32,7 +32,7 @@ namespace TrustgraphCore.Services
         }
 
 
-        protected void ExecuteQueryContext(QueryContextPointer context)
+        protected void ExecuteQueryContext(QueryContext context)
         {
             // Keep search until the maxlevel is hit or matchlevel is hit
             while (context.Level <= context.MaxLevel && context.Level < context.MatchLevel)
@@ -49,7 +49,7 @@ namespace TrustgraphCore.Services
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SearchIssuer(QueryContextPointer context, GraphIssuerPointer issuer)
+        protected void SearchIssuer(QueryContext context, GraphIssuer issuer)
         {
             var tracker = new GraphTracker(issuer);
             context.Tracker.Push(tracker);
@@ -89,7 +89,7 @@ namespace TrustgraphCore.Services
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SearchSubject(QueryContextPointer context, GraphIssuerPointer issuer, int subjectKey)
+        protected void SearchSubject(QueryContext context, GraphIssuer issuer, int subjectKey)
         {
             var subjects = issuer.Subjects;
             if ((subjects[subjectKey].TargetIssuer.Visited & context.Visited) != 0)
@@ -117,12 +117,12 @@ namespace TrustgraphCore.Services
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void BuildResult(QueryContextPointer context)
+        protected void BuildResult(QueryContext context)
         {
             foreach (var tracker in context.Tracker)
             {
                 if (!context.Results.ContainsKey(tracker.Issuer.Address))
-                    context.Results.Add(tracker.Issuer.Address, new IssuerResultPointer{ Address = tracker.Issuer.Address, DataBaseID = tracker.Issuer.DataBaseID });
+                    context.Results.Add(tracker.Issuer.Address, new IssuerResult{ Address = tracker.Issuer.Address, DataBaseID = tracker.Issuer.DataBaseID });
                 
                 var issuerResult = context.Results[tracker.Issuer.Address];
 

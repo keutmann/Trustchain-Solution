@@ -12,16 +12,16 @@ namespace TrustgraphCore.Model
 {
 
     [JsonObject(MemberSerialization.OptIn)]
-    public class QueryContextPointer
+    public class QueryContext
     {
         public IGraphModelService GraphService { get; set; }
 
-        public List<GraphIssuerPointer> Issuers { get; set; }
-        public List<GraphIssuerPointer> Targets { get; set; }
+        public List<GraphIssuer> Issuers { get; set; }
+        public List<GraphIssuer> Targets { get; set; }
         public bool SearchGlobalScope = true; // scope of the trust
         public GraphClaimPointer Claim; // Claims 
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
-        public Dictionary<byte[], IssuerResultPointer> Results { get; set; }
+        public Dictionary<byte[], IssuerResult> Results { get; set; }
         public int MaxCost { get; set; }
         public int Level { get; set; }
         public int MaxLevel { get; set; }
@@ -52,11 +52,11 @@ namespace TrustgraphCore.Model
         //[JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
         //public List<SubjectResult> Subjects { get; set; }
 
-        public QueryContextPointer()
+        public QueryContext()
         {
-            Issuers = new List<GraphIssuerPointer>();
-            Targets = new List<GraphIssuerPointer>();
-            Results = new Dictionary<byte[], IssuerResultPointer>(ByteComparer.Standard);
+            Issuers = new List<GraphIssuer>();
+            Targets = new List<GraphIssuer>();
+            Results = new Dictionary<byte[], IssuerResult>(ByteComparer.Standard);
 
             MaxCost = 500; 
             Level = 0;
@@ -65,7 +65,7 @@ namespace TrustgraphCore.Model
             Visited = 1; // Use bit 1!
         }
 
-        public QueryContextPointer(IGraphModelService graphService, QueryRequest query) : this()
+        public QueryContext(IGraphModelService graphService, QueryRequest query) : this()
         {
             GraphService = graphService;
             foreach (var issuerId in query.Issuers)

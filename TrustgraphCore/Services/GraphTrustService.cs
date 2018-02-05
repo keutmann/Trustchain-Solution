@@ -9,15 +9,15 @@ using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Services
 {
-    public class GraphTrustServicePointer : IGraphTrustService
+    public class GraphTrustService : IGraphTrustService
     {
         public IGraphModelService ModelService { get; }
 
-        public GraphTrustServicePointer() : this(new GraphModelServicePointer())
+        public GraphTrustService() : this(new GraphModelService())
         {
         }
 
-        public GraphTrustServicePointer(IGraphModelService modelService)
+        public GraphTrustService(IGraphModelService modelService)
         {
             ModelService = modelService;
         }

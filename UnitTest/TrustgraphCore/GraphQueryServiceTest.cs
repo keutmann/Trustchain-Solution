@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NBitcoin;
+using System.Linq;
 using System;
 using TrustchainCore.Extensions;
 using TrustchainCore.Builders;
@@ -27,7 +27,7 @@ namespace UnitTest.TrustgraphCore
         private IGraphTrustService _graphTrustService = null;
         private TrustBuilder _trustBuilder = null;
         private ITrustDBService _trustDBService = null;
-        private IGraphQueryService _graphQueryService = null;
+        private GraphQueryService _graphQueryService = null;
         private JObject ClaimTrustTrueTest = null;
 
 
@@ -39,7 +39,7 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder = new TrustBuilder(ServiceProvider);
             _trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
             _graphQueryService = new GraphQueryService(_graphTrustService.ModelService, null);
-            ClaimTrustTrueTest = TrustBuilder.CreateTrustTrue("Test");
+            ClaimTrustTrueTest = TrustBuilder.CreateTrustTrue();
         }
 
         [TestMethod]
@@ -59,21 +59,25 @@ namespace UnitTest.TrustgraphCore
 
             Console.WriteLine("Query object");
             Console.WriteLine(JsonConvert.SerializeObject(queryBuilder.Query, Formatting.Indented));
-            var result = _graphQueryService.Execute(queryBuilder.Query);
-            var issuer = result.Subjects[0];
-            Assert.IsNotNull(result.Subjects);
-            Assert.AreEqual(result.Subjects.Count, 1);
+            var queryContext = _graphQueryService.Execute(queryBuilder.Query);
+            Assert.AreEqual(queryContext.Results.Count, 1, "Should be one result!");
 
+            var issuer = queryContext.Results.First().Value;
+            Assert.AreEqual(issuer.Subjects.Count, 1, "Should be one subject!");
+
+            var subject = issuer.Subjects.First().Value;
+            //Assert.IsNotNull(queryContext.Subjects);
+            var targetIssuer = subject.TargetIssuer;
             Console.WriteLine("Issuer ID: " + JsonConvert.SerializeObject(trusts[0].Issuer.Address));
-            Console.WriteLine("result ID: " + JsonConvert.SerializeObject(issuer.Subjects[0].Address) + " : Trust SubjectID: " + JsonConvert.SerializeObject(trusts[0].Subjects[0].Address));
+            Console.WriteLine("result ID: " + JsonConvert.SerializeObject(targetIssuer.Address) + " : Trust SubjectID: " + JsonConvert.SerializeObject(trusts[0].Subjects[0].Address));
 
             //Assert.AreEqual(issuer.Name, trust.Name);
-            Assert.IsTrue(issuer.Subjects[0].Address.Equals(trust.Subjects[0].Address));
-            Assert.AreEqual(issuer.Subjects[0].ClaimModel.Metadata, ClaimMetadata.Reason);
+            Assert.IsTrue(targetIssuer.Address.Equals(trust.Subjects[0].Address));
+            //Assert.AreEqual(subject.Claims.ClaimModel.Metadata, ClaimMetadata.Reason);
             //Assert.IsTrue(issuer.Subjects[0].Claim.ContainsIgnoreCase("Test"));
 
             Console.WriteLine("Query Result");
-            Console.WriteLine(JsonConvert.SerializeObject(result.Subjects, Formatting.Indented));
+            Console.WriteLine(JsonConvert.SerializeObject(queryContext.Results, Formatting.Indented));
             //PrintResult(result.Nodes, search.GraphService, 1);
         }
 

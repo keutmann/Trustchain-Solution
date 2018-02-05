@@ -10,9 +10,9 @@ namespace TrustgraphCore.Model
     {
 
         public int SubjectKey;
-        public GraphIssuerPointer Issuer;
+        public GraphIssuer Issuer;
 
-        public GraphTracker(GraphIssuerPointer issuer)
+        public GraphTracker(GraphIssuer issuer)
         {
             SubjectKey = -1;
             Issuer = issuer;
