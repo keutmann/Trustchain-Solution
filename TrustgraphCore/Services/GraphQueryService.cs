@@ -36,7 +36,7 @@ namespace TrustgraphCore.Services
         protected void ExecuteQueryContext(QueryContext context)
         {
             // Keep search until the maxlevel is hit or matchlevel is hit
-            while (context.Level <= context.MaxLevel && context.Targets.Count > 0)
+            while (context.Level < context.MaxLevel && context.Targets.Count > 0)
             {
                 context.Level++; 
 

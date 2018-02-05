@@ -23,23 +23,14 @@ using TrustchainCore.Model;
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
-    public class GraphQueryServiceTest : StartupMock
+    public class GraphTrustTrueTest : GraphQueryMock
     {
-        private IGraphTrustService _graphTrustService = null;
-        private TrustBuilder _trustBuilder = null;
-        private ITrustDBService _trustDBService = null;
-        private GraphQueryService _graphQueryService = null;
         private JObject ClaimTrustTrueTest = null;
-
 
         [TestInitialize]
         public override void Init()
         {
             base.Init();
-            _graphTrustService = new GraphTrustService();
-            _trustBuilder = new TrustBuilder(ServiceProvider);
-            _trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
-            _graphQueryService = new GraphQueryService(_graphTrustService.ModelService, null);
             ClaimTrustTrueTest = TrustBuilder.CreateTrustTrue();
         }
 
@@ -82,8 +73,11 @@ namespace UnitTest.TrustgraphCore
             //PrintResult(result.Nodes, search.GraphService, 1);
         }
 
+        /// <summary>
+        /// 1 Source, 1 targets
+        /// </summary>
         [TestMethod]
-        public void Search2()
+        public void Source1Target1()
         {
             // Build up
             _trustBuilder.AddTrust("A", "B", ClaimTrustTrueTest);
@@ -105,9 +99,11 @@ namespace UnitTest.TrustgraphCore
 
 
 
-
+        /// <summary>
+        /// 1 Source, 2 targets
+        /// </summary>
         [TestMethod]
-        public void Search3()
+        public void Source1Target2()
         {
             ClaimTrustTrueGraph();
 
@@ -120,12 +116,63 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
+            Assert.AreEqual(context.Results.Count, 4, $"Should be {4} results!");
+
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
             VerfifyResult(context, "B", "E");
             VerfifyResult(context, "B", "F");
             VerfifyResult(context, "C", "D");
             VerfifyResult(context, "E", "D");
+        }
+
+        /// <summary>
+        /// 2 Source, 1 targets
+        /// </summary>
+        [TestMethod]
+        public void Source2Target1()
+        {
+            ClaimTrustTrueGraph();
+
+            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+
+            BuildQuery(queryBuilder, "A", "D");
+            BuildQuery(queryBuilder, "F", "D");
+
+            // Execute
+            var context = _graphQueryService.Execute(queryBuilder.Query);
+
+            // Verify
+            Assert.AreEqual(context.Results.Count, 6, $"Should be {6} results!");
+
+            VerfifyResult(context, "A", "B");
+            VerfifyResult(context, "B", "C");
+            VerfifyResult(context, "C", "D");
+            VerfifyResult(context, "B", "E");
+            VerfifyResult(context, "E", "D");
+
+            VerfifyResult(context, "F", "G");
+            VerfifyResult(context, "G", "D");
+        }
+
+
+        /// <summary>
+        /// 1 Source, 1 targets unreachable
+        /// </summary>
+        [TestMethod]
+        public void Source1Target1Unreachable()
+        {
+            ClaimTrustTrueGraph();
+
+            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+
+            BuildQuery(queryBuilder, "A", "Unreach");
+
+            // Execute
+            var context = _graphQueryService.Execute(queryBuilder.Query);
+
+            // Verify
+            Assert.AreEqual(context.Results.Count, 0, $"Should be {0} results!");
         }
 
 
@@ -139,41 +186,8 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("B", "F", ClaimTrustTrueTest);
             _trustBuilder.AddTrust("F", "G", ClaimTrustTrueTest);
             _trustBuilder.AddTrust("G", "D", ClaimTrustTrueTest); // Long way, no trust
+            _trustBuilder.AddTrust("G", "Unreach", ClaimTrustTrueTest); // Long way, no trust
             _graphTrustService.Add(_trustBuilder.Package);
-        }
-
-
-        private void PrintJson(object data)
-        {
-            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            Console.WriteLine(json);
-        }
-
-        private QueryRequest BuildQuery(QueryRequestBuilder queryBuilder, string source, string target)
-        {
-            var sourceAddress = TrustBuilderExtensions.GetAddress(source);
-            var subject = new Subject
-            {
-                Address = TrustBuilderExtensions.GetAddress(target),
-                Type = "person"
-            };
-            queryBuilder.Add(sourceAddress, subject);
-
-            return queryBuilder.Query;
-        }
-
-        private void VerfifyResult(QueryContext context, string source, string target)
-        {
-            var sourceAddress = TrustBuilderExtensions.GetAddress(source);
-            var targetAddress = TrustBuilderExtensions.GetAddress(target);
-            var sourceIndex = _graphTrustService.ModelService.Graph.IssuerIndex.GetValueOrDefault(sourceAddress);
-            var targetIndex = _graphTrustService.ModelService.Graph.IssuerIndex.GetValueOrDefault(targetAddress);
-
-            var tracker = context.Results.GetValueOrDefault(sourceIndex);
-            Assert.IsNotNull(tracker, $"Result is missing source: {source}");
-
-            var subject = tracker.Subjects.GetValueOrDefault(targetIndex);
-            Assert.IsNotNull(subject, $"Result is missing for subject for: {source} - subject: {target}");
         }
     }
 }
