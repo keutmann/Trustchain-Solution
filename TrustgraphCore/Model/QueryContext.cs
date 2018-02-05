@@ -21,7 +21,7 @@ namespace TrustgraphCore.Model
         public bool SearchGlobalScope = true; // scope of the trust
         public GraphClaimPointer Claim; // Claims 
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
-        public Dictionary<byte[], IssuerResult> Results { get; set; }
+        public Dictionary<int, GraphTracker> Results { get; set; }
         public int MaxCost { get; set; }
         public int Level { get; set; }
         public int MaxLevel { get; set; }
@@ -56,7 +56,7 @@ namespace TrustgraphCore.Model
         {
             Issuers = new List<GraphIssuer>();
             Targets = new List<GraphIssuer>();
-            Results = new Dictionary<byte[], IssuerResult>(ByteComparer.Standard);
+            Results = new Dictionary<int, GraphTracker>();
 
             MaxCost = 500; 
             Level = 0;
@@ -101,10 +101,12 @@ namespace TrustgraphCore.Model
 
             //ScopeIndex = GraphService.Graph.ScopeIndex[query.Scope];
 
-            var trustClaim = new TrustchainCore.Model.Claim();
-            trustClaim.Cost = 100;
-            trustClaim.Scope = query.Scope;
-            trustClaim.Data = query.Claim;
+            var trustClaim = new TrustchainCore.Model.Claim
+            {
+                Cost = 100,
+                Scope = query.Scope,
+                Data = query.Claim
+            };
 
             Claim = GraphService.CreateClaim(trustClaim);
             var id = Claim.RIPEMD160();

@@ -169,8 +169,8 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "address")]
         public byte[] Address { get; set; }
 
-        [JsonProperty(PropertyName = "kind")]
-        public string Kind { get; set; }
+        [JsonProperty(PropertyName = "type")]
+        public string Type { get; set; }
     }
 
     [Table("Claim")]

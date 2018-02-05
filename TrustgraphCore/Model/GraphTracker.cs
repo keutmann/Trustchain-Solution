@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TrustgraphCore.Model
 {
@@ -8,9 +9,15 @@ namespace TrustgraphCore.Model
     //[StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class GraphTracker
     {
-
-        public int SubjectKey;
         public GraphIssuer Issuer;
+
+        /// <summary>
+        /// Dictionary Id of subject in Issuer Subjects
+        /// </summary>
+        public int SubjectKey;
+
+        [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
+        public Dictionary<int, GraphSubject> Subjects { get; set; }
 
         public GraphTracker(GraphIssuer issuer)
         {

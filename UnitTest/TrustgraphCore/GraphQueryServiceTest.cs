@@ -18,6 +18,7 @@ using TrustgraphCore.Enumerations;
 using UnitTest.TrustchainCore.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using TrustchainCore.Model;
 
 namespace UnitTest.TrustgraphCore
 {
@@ -62,10 +63,10 @@ namespace UnitTest.TrustgraphCore
             var queryContext = _graphQueryService.Execute(queryBuilder.Query);
             Assert.AreEqual(queryContext.Results.Count, 1, "Should be one result!");
 
-            var issuer = queryContext.Results.First().Value;
-            Assert.AreEqual(issuer.Subjects.Count, 1, "Should be one subject!");
+            var tracker = queryContext.Results.First().Value;
+            Assert.AreEqual(tracker.Subjects.Count, 1, "Should be one subject!");
 
-            var subject = issuer.Subjects.First().Value;
+            var subject = tracker.Subjects.First().Value;
             //Assert.IsNotNull(queryContext.Subjects);
             var targetIssuer = subject.TargetIssuer;
             Console.WriteLine("Issuer ID: " + JsonConvert.SerializeObject(trusts[0].Issuer.Address));
@@ -84,30 +85,35 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void Search2()
         {
-            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue());
-            _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrue());
+            // Build up
+            _trustBuilder.AddTrust("A", "B", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("B", "C", ClaimTrustTrueTest);
+            _graphTrustService.Add(_trustBuilder.Package);
+            var query = BuildQuery("A", "C");
 
-            //var trusts = _trustBuilder.Package.Trusts;
-            //var trust1 = trusts[0];
-            //var trust2 = trusts[1];
-            //var query = new QueryRequest();
-            //query.Issuers = new List<byte[]>();
-            //query.Issuers.Add(trusts[0].IssuerId);
-            //query.Subjects = new List<SubjectQuery>();
-            //query.Subjects.Add(new SubjectQuery { Id = trust2.Subjects[0].SubjectId, Type = trust2.Subjects[0].SubjectType });
+            // Execute
+            var queryContext = _graphQueryService.Execute(query);
 
-            //query.Scope = trust2.Subjects[0].Scope;
-            //query.Claim = trust2.Subjects[0].Claim;
+            // Verify
+            Assert.AreEqual(queryContext.Results.Count, 2, "Should be one result!");
 
-            //var json = JsonConvert.SerializeObject(query, Formatting.Indented);
-            //Console.WriteLine(json);
+            PrintJson(queryContext.Results);
+        }
 
-            //var result = _graphQueryService.Execute(query);
-            //Assert.IsNotNull(result.Subjects);
+        private QueryRequest BuildQuery(string source, string target, string claim = null)
+        {
+            if (claim == null)
+                claim = ClaimTrustTrueTest.ToString();
+            var queryBuilder = new QueryRequestBuilder(claim);
+            var sourceAddress = TrustBuilderExtensions.GetAddress(source);
+            var subject = new Subject
+            {
+                Address = TrustBuilderExtensions.GetAddress(target),
+                Type = "person"
+            };
+            queryBuilder.Add(sourceAddress, subject);
 
-            //Console.WriteLine("Start id: "+search.GraphService.Graph.IdIndex[0].ConvertToHex()); // A
-            //PrintResult(result.Nodes, search.GraphService, 1);
-            //PrintJson(result.Nodes);
+            return queryBuilder.Query;
         }
 
 
@@ -147,19 +153,11 @@ namespace UnitTest.TrustgraphCore
             ////PrintResult(result.Nodes, search.GraphService, 0);
         }
 
-        //private void PrintJson(List<SubjectNode> nodes)
-        //{
-        //    var json = JsonConvert.SerializeObject(nodes, Formatting.Indented);
-        //    Console.WriteLine(json);
-        //}
-
-        //private void PrintResult(List<SubjectNode> nodes, IGraphContext service, int level)
-        //{
-        //    foreach (var node in nodes)
-        //    {
-        //        PrintResult(node, service, level);
-        //    }
-        //}
+        private void PrintJson(object data)
+        {
+            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
+            Console.WriteLine(json);
+        }
 
         //private void PrintResult(SubjectNode node, IGraphContext service, int level)
         //{

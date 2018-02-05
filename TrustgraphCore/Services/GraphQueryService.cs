@@ -5,6 +5,7 @@ using TrustgraphCore.Interfaces;
 using TrustchainCore.Interfaces;
 using System.Runtime.CompilerServices;
 using TrustgraphCore.Extensions;
+using System.Collections.Generic;
 
 namespace TrustgraphCore.Services
 {
@@ -71,17 +72,19 @@ namespace TrustgraphCore.Services
             {   // Otherwise continue down!
                 var subjects = issuer.Subjects;
 
-                for (var i = 0; i < subjects.Count; i++) // Use the index for accessing struct directly, no memory copy!
+                foreach (var key in subjects.Keys)
                 {
+                    tracker.SubjectKey = key;
+
                     // Check local index
-                    bool follow = subjects[i].Claims.Exist(context.Claim.Scope, ModelService.TrustTrueClaim.Index);
+                    bool follow = subjects[key].Claims.Exist(context.Claim.Scope, ModelService.TrustTrueClaim.Index);
 
                     // Check global
                     if (!follow && context.SearchGlobalScope) // Create the Global index
-                        follow = subjects[i].Claims.Exist(ModelService.GlobalScopeIndex, ModelService.TrustTrueClaim.Index);
+                        follow = subjects[key].Claims.Exist(ModelService.GlobalScopeIndex, ModelService.TrustTrueClaim.Index);
 
                     if(follow)
-                        SearchIssuer(context, subjects[i].TargetIssuer);
+                        SearchIssuer(context, subjects[key].TargetIssuer);
                 }
             }
 
@@ -121,13 +124,16 @@ namespace TrustgraphCore.Services
         {
             foreach (var tracker in context.Tracker)
             {
-                if (!context.Results.ContainsKey(tracker.Issuer.Address))
-                    context.Results.Add(tracker.Issuer.Address, new IssuerResult{ Address = tracker.Issuer.Address, DataBaseID = tracker.Issuer.DataBaseID });
+                if (!context.Results.ContainsKey(tracker.Issuer.Index))
+                {
+                    tracker.Subjects = new Dictionary<int, GraphSubject>();
+                    context.Results.Add(tracker.Issuer.Index, tracker);
+                }
                 
-                var issuerResult = context.Results[tracker.Issuer.Address];
+                var resultTraker = context.Results[tracker.Issuer.Index];
 
-                if (!issuerResult.Subjects.ContainsKey(tracker.SubjectKey)) // Only subjects with unique keys
-                    issuerResult.Subjects.Add(tracker.SubjectKey, tracker.Issuer.Subjects[tracker.SubjectKey]);
+                if (!resultTraker.Subjects.ContainsKey(tracker.SubjectKey)) // Only subjects with unique keys
+                    resultTraker.Subjects.Add(tracker.SubjectKey, tracker.Issuer.Subjects[tracker.SubjectKey]);
             }
         }
 

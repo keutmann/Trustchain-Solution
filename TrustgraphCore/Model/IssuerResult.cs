@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using TrustchainCore.Model;
 
 namespace TrustgraphCore.Model
 {

@@ -38,8 +38,10 @@ namespace TrustchainCore.Builders
 
         public TrustBuilder(IDerivationStrategyFactory derivationServiceFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
         {
-            Package = new Package();
-            Package.Trusts = new List<Trust>();
+            Package = new Package
+            {
+                Trusts = new List<Trust>()
+            };
             _derivationServiceFactory = derivationServiceFactory;
             _merkleStrategyFactory = merkleStrategyFactory;
             _hashAlgorithmFactory = hashAlgorithmFactory;
@@ -225,7 +227,7 @@ namespace TrustchainCore.Builders
         }
 
 
-        public TrustBuilder AddSubject(byte[] address, string alias, string kind, byte[] claimIndex)
+        public TrustBuilder AddSubject(byte[] address, string alias, string type, byte[] claimIndex)
         {
             if(_currentTrust.Subjects == null)
                 _currentTrust.Subjects = new List<Subject>();
@@ -234,7 +236,7 @@ namespace TrustchainCore.Builders
             {
                 Alias = alias,
                 Address = address,
-                Kind = kind,
+                Type = type,
                 ClaimIndexs = claimIndex
             });
 

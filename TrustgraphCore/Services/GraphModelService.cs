@@ -39,10 +39,12 @@ namespace TrustgraphCore.Services
 
         public GraphClaimPointer EnsureTrustTrueClaim()
         {
-            var claim = new Claim();
-            claim.Cost = 100;
-            claim.Data = TrustBuilder.CreateTrustTrue().ToString();
-            claim.Scope = string.Empty; // Global scope
+            var claim = new Claim
+            {
+                Cost = 100,
+                Data = TrustBuilder.CreateTrustTrue().ToString(),
+                Scope = string.Empty // Global scope
+            };
 
             return EnsureGraphClaim(claim);
         }
@@ -79,7 +81,7 @@ namespace TrustgraphCore.Services
             var graphSubject = new GraphSubject
             {
                 TargetIssuer = EnsureGraphIssuer(trustSubject.Address),
-                IssuerKind = EnsureSubjectType(trustSubject.Kind),
+                IssuerType = EnsureSubjectType(trustSubject.Type),
                 AliasIndex = EnsureAlias(trustSubject.Alias),
                 Claims = new Dictionary<long, GraphClaimPointer>()
             };
@@ -107,14 +109,15 @@ namespace TrustgraphCore.Services
 
         public GraphClaimPointer CreateClaim(Claim trustClaim)
         {
-            var gclaim = new GraphClaimPointer();
-
-            gclaim.Scope = EnsureGraphScope(trustClaim.Scope);
-            //gclaim.Activate = edge.Activate;
-            //gclaim.Expire = edge.Expire;
-            gclaim.Cost = trustClaim.Cost;
-            //claim.Timestamp = edge.Timestamp;
-            gclaim.Data = trustClaim.Data;
+            var gclaim = new GraphClaimPointer
+            {
+                Scope = EnsureGraphScope(trustClaim.Scope),
+                //gclaim.Activate = edge.Activate;
+                //gclaim.Expire = edge.Expire;
+                Cost = trustClaim.Cost,
+                //claim.Timestamp = edge.Timestamp;
+                Data = trustClaim.Data
+            };
             return gclaim;
         }
 

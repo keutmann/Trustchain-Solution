@@ -21,7 +21,7 @@ namespace TrustchainCore.Strategy
                 foreach (var subject in trust.Subjects)
                 {
                     ms.WriteBytes(subject.Address);
-                    ms.WriteString(subject.Kind);
+                    ms.WriteString(subject.Type);
                     ms.WriteString(subject.Alias);
                     
                     foreach (int index in subject.ClaimIndexs)

@@ -14,6 +14,14 @@ namespace UnitTest.TrustchainCore.Extensions
         public static IDerivationStrategy ScriptService = new DerivationBTCPKH();
 
 
+        public static byte[] GetAddress(string name)
+        {
+            var issuerKey = ScriptService.GetKey(Encoding.UTF8.GetBytes(name));
+            var address = ScriptService.GetAddress(issuerKey);
+
+            return address;
+        }
+
         public static TrustBuilder AddTrust(this TrustBuilder builder, string name)
         {
             var issuerKey = ScriptService.GetKey(Encoding.UTF8.GetBytes(name));
@@ -62,8 +70,10 @@ namespace UnitTest.TrustchainCore.Extensions
 
         public static TrustBuilder AddClaim(this TrustBuilder builder, JObject data, out Claim claim)
         {
-            claim = new Claim();
-            claim.Data = data.ToString(Formatting.None);
+            claim = new Claim
+            {
+                Data = data.ToString(Formatting.None)
+            };
 
             builder.AddClaim(claim);
 
