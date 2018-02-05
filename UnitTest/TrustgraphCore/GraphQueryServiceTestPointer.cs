@@ -24,7 +24,7 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class GraphQueryServiceTestPointer : StartupMock
     {
-        private IGraphTrustServicePointer _graphTrustService = null;
+        private IGraphTrustService _graphTrustService = null;
         private TrustBuilder _trustBuilder = null;
         private ITrustDBService _trustDBService = null;
         private GraphQueryServicePointer _graphQueryService = null;

@@ -8,13 +8,13 @@ using TrustgraphCore.Extensions;
 
 namespace TrustgraphCore.Services
 {
-    public class GraphQueryServicePointer 
+    public class GraphQueryServicePointer : IGraphQueryService
     {
-        public IGraphModelServicePointer ModelService { get; }
+        public IGraphModelService ModelService { get; }
         public long UnixTime { get; set; }
         private ITrustDBService _trustDBService;
 
-        public GraphQueryServicePointer(IGraphModelServicePointer modelService, ITrustDBService trustDBService)
+        public GraphQueryServicePointer(IGraphModelService modelService, ITrustDBService trustDBService)
         {
             ModelService = modelService;
             _trustDBService = trustDBService;

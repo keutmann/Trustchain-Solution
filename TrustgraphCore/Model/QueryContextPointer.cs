@@ -14,7 +14,7 @@ namespace TrustgraphCore.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class QueryContextPointer
     {
-        public IGraphModelServicePointer GraphService { get; set; }
+        public IGraphModelService GraphService { get; set; }
 
         public List<GraphIssuerPointer> Issuers { get; set; }
         public List<GraphIssuerPointer> Targets { get; set; }
@@ -65,7 +65,7 @@ namespace TrustgraphCore.Model
             Visited = 1; // Use bit 1!
         }
 
-        public QueryContextPointer(IGraphModelServicePointer graphService, QueryRequest query) : this()
+        public QueryContextPointer(IGraphModelService graphService, QueryRequest query) : this()
         {
             GraphService = graphService;
             foreach (var issuerId in query.Issuers)

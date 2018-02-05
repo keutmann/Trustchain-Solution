@@ -6,13 +6,19 @@ namespace TrustgraphCore.Interfaces
 {
     public interface IGraphModelService
     {
-        GraphModel Graph { get; set; }
+        GraphModelPointer Graph { get; set; }
+        GraphClaimPointer TrustTrueClaim { get; set; }
+        int GlobalScopeIndex { get; set; }
 
-        GraphSubject CreateGraphSubject(Subject subject, Claim claim, int nameIndex, int timestamp);
-        void InitSubjectModel(Subject node, Claim claim, GraphSubject edge);
-        int EnsureId(byte[] id);
-        int EnsureName(string name);
-        int EnsureScopeIndex(string scope);
+        GraphClaimPointer EnsureTrustTrueClaim();
+        GraphSubjectPointer CreateGraphSubject(Subject trustSubject);
+        //void InitSubjectModel(Subject node, Claim claim, GraphSubject edge);
+        GraphIssuerPointer EnsureGraphIssuer(byte[] id);
+        GraphClaimPointer EnsureGraphClaim(Claim trustClaim);
+        GraphClaimPointer CreateClaim(Claim trustClaim);
+        GraphSubjectPointer EnsureGraphSubject(GraphIssuerPointer graphIssuer, Subject trustSubject);
+        int EnsureAlias(string alias);
+        int EnsureGraphScope(string scope);
         int EnsureSubjectType(string subjectType);
     }
 }

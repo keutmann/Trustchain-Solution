@@ -89,19 +89,19 @@ namespace TrustchainCore.Services
                 return result;
             }
 
-            private void ValidateServer(HeadModel head, SchemaValidationResult result)
-            {
+            //private void ValidateServer(Head head, SchemaValidationResult result)
+            //{
 
-                if (head == null)
-                    return;
+            //    if (head == null)
+            //        return;
 
-                if (string.IsNullOrEmpty(head.Script))
-                    result.Errors.Add("Missing Head Script");
+            //    if (string.IsNullOrEmpty(head.Script))
+            //        result.Errors.Add("Missing Head Script");
 
-                if (string.IsNullOrEmpty(head.Version))
-                    result.Errors.Add("Missing Head Version");
+            //    if (string.IsNullOrEmpty(head.Version))
+            //        result.Errors.Add("Missing Head Version");
 
-            }
+            //}
 
             private void ValidateTrust(int trustIndex, Trust trust, SchemaValidationResult result)
             {

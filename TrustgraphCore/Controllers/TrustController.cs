@@ -37,13 +37,13 @@ namespace TrustgraphCore.Controllers
         [Route("api/graph/[controller]/{issuerId}/{subjectId}/{scope}")]
         public ActionResult Get(byte[] issuerId, byte[] subjectId, string scope)
         {
-            if (!_graphTrustService.ModelService.Graph.IssuersIndex.ContainsKey(issuerId))
+            if (!_graphTrustService.ModelService.Graph.IssuerIndex.ContainsKey(issuerId))
                 return NotFound();
 
-            var index = _graphTrustService.ModelService.Graph.IssuersIndex[issuerId];
-            var issuer = _graphTrustService.ModelService.Graph.Issuer[index];
+            var index = _graphTrustService.ModelService.Graph.IssuerIndex[issuerId];
+            var issuer = _graphTrustService.ModelService.Graph.Issuers[index];
 
-            for (int i = 0; i < issuer.Subjects.Length; i++)
+            for (int i = 0; i < issuer.Subjects.Count; i++)
             {
 
             }

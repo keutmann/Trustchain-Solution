@@ -8,7 +8,7 @@ using TrustgraphCore.Model;
 
 namespace TrustgraphCore.Services
 {
-    public class GraphModelServicePointer : IGraphModelServicePointer
+    public class GraphModelServicePointer : IGraphModelService
     {
         public GraphModelPointer Graph
         {

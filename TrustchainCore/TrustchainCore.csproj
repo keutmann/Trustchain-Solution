@@ -9,7 +9,14 @@
     <Compile Remove="Diagnostics\EventLoggerTextWriter.cs" />
     <Compile Remove="Extensions\SQLiteDataReaderExtensions.cs" />
     <Compile Remove="Model\ClaimModel.cs" />
+    <Compile Remove="Model\CoreModel.cs" />
+    <Compile Remove="Model\HeadModel.cs" />
     <Compile Remove="Model\IssuerModel.cs" />
+    <Compile Remove="Model\PackageModel.cs" />
+    <Compile Remove="Model\ServerModel.cs" />
+    <Compile Remove="Model\SubjectModel.cs" />
+    <Compile Remove="Model\TimestampModel.cs" />
+    <Compile Remove="Model\TrustModel.cs" />
     <Compile Remove="Repository\TrustDBContextOld.cs" />
     <Compile Remove="Trust\TrustECDSASignature.cs" />
     <Compile Remove="Trust\TrustManager.cs" />

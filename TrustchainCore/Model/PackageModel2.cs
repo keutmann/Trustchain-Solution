@@ -177,14 +177,17 @@ namespace TrustchainCore.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class Claim : DatabaseEntity
     {
-        /// <summary>
-        /// Trust Database ID
-        /// </summary>
         [JsonIgnore]
         public int TrustID { get; set; }
 
+        /// <summary>
+        /// Optional, specify index, if the possibility of claim object gets reordered.
+        /// </summary>
         [JsonProperty(PropertyName = "index")]
         public int Index { get; set; }
+
+        [JsonProperty(PropertyName = "type")]
+        public string Type { get; set; }
 
         [UIHint("JSON")]
         [JsonProperty(PropertyName = "data")]
@@ -201,6 +204,9 @@ namespace TrustchainCore.Model
 
         [JsonProperty(PropertyName = "scope")]
         public string Scope { get; set; }
+
+        [JsonProperty(PropertyName = "note")]
+        public string Note { get; set; }
 
         public bool ShouldSerializeIndex()
         {

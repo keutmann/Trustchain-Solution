@@ -7,6 +7,6 @@ namespace TrustgraphCore.Interfaces
     {
         IGraphModelService ModelService { get; }
 
-        QueryContext Execute(QueryRequest query);
+        QueryContextPointer Execute(QueryRequest query);
     }
 }
