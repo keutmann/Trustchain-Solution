@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Model\TargetIndex.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TrustchainCore\TrustchainCore.csproj" />
     <ProjectReference Include="..\TruststampCore\TruststampCore.csproj" />
   </ItemGroup>
