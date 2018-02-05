@@ -23,5 +23,10 @@ namespace TrustgraphCore.Model
 
         [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
         public Dictionary<int, GraphSubject> Subjects = new Dictionary<int, GraphSubject>();
+
+        public override int GetHashCode()
+        {
+            return Index;
+        }
     }
 }

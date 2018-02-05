@@ -89,22 +89,68 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("A", "B", ClaimTrustTrueTest);
             _trustBuilder.AddTrust("B", "C", ClaimTrustTrueTest);
             _graphTrustService.Add(_trustBuilder.Package);
-            var query = BuildQuery("A", "C");
+
+            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+            BuildQuery(queryBuilder, "A", "C");
 
             // Execute
-            var queryContext = _graphQueryService.Execute(query);
+            var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(queryContext.Results.Count, 2, "Should be one result!");
+            Assert.AreEqual(context.Results.Count, 2, $"Should be {2} results!");
 
-            PrintJson(queryContext.Results);
+            VerfifyResult(context, "A", "B");
+            VerfifyResult(context, "B", "C");
         }
 
-        private QueryRequest BuildQuery(string source, string target, string claim = null)
+
+
+
+        [TestMethod]
+        public void Search3()
         {
-            if (claim == null)
-                claim = ClaimTrustTrueTest.ToString();
-            var queryBuilder = new QueryRequestBuilder(claim);
+            ClaimTrustTrueGraph();
+
+            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+
+            BuildQuery(queryBuilder, "A", "D");
+            BuildQuery(queryBuilder, "A", "F");
+
+            // Execute
+            var context = _graphQueryService.Execute(queryBuilder.Query);
+
+            // Verify
+            VerfifyResult(context, "A", "B");
+            VerfifyResult(context, "B", "C");
+            VerfifyResult(context, "B", "E");
+            VerfifyResult(context, "B", "F");
+            VerfifyResult(context, "C", "D");
+            VerfifyResult(context, "E", "D");
+        }
+
+
+        private void ClaimTrustTrueGraph()
+        {
+            _trustBuilder.AddTrust("A", "B", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("B", "C", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("C", "D", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("B", "E", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("E", "D", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("B", "F", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("F", "G", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("G", "D", ClaimTrustTrueTest); // Long way, no trust
+            _graphTrustService.Add(_trustBuilder.Package);
+        }
+
+
+        private void PrintJson(object data)
+        {
+            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
+            Console.WriteLine(json);
+        }
+
+        private QueryRequest BuildQuery(QueryRequestBuilder queryBuilder, string source, string target)
+        {
             var sourceAddress = TrustBuilderExtensions.GetAddress(source);
             var subject = new Subject
             {
@@ -116,65 +162,18 @@ namespace UnitTest.TrustgraphCore
             return queryBuilder.Query;
         }
 
-
-        [TestMethod]
-        public void Search3()
+        private void VerfifyResult(QueryContext context, string source, string target)
         {
-            //_trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue());
-            //_trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrue());
-            //_trustBuilder.AddTrust("C", "D", TrustBuilder.CreateTrustTrue());
-            //_trustBuilder.AddTrust("B", "E", TrustBuilder.CreateTrustTrue());
-            //_trustBuilder.AddTrust("E", "D", TrustBuilder.CreateTrustTrue());
-            //_trustBuilder.AddTrust("B", "F", TrustBuilder.CreateTrustTrue());
-            //_trustBuilder.AddTrust("F", "G", TrustBuilder.CreateTrustTrue());
-            //_trustBuilder.AddTrust("G", "D", TrustBuilder.CreateTrustTrue()); // Long way, no trust
+            var sourceAddress = TrustBuilderExtensions.GetAddress(source);
+            var targetAddress = TrustBuilderExtensions.GetAddress(target);
+            var sourceIndex = _graphTrustService.ModelService.Graph.IssuerIndex.GetValueOrDefault(sourceAddress);
+            var targetIndex = _graphTrustService.ModelService.Graph.IssuerIndex.GetValueOrDefault(targetAddress);
 
-            //var trusts = _trustBuilder.Package.Trust;
-            //var trust1 = trusts[0];
-            //var trust2 = trusts[1];
-            //var trust3 = trusts[2];
+            var tracker = context.Results.GetValueOrDefault(sourceIndex);
+            Assert.IsNotNull(tracker, $"Result is missing source: {source}");
 
-
-            //var query = new QueryRequest();
-            //query.Issuers = new List<byte[]>();
-            //query.Issuers.Add(trusts[0].IssuerId);
-            //query.Subjects = new List<SubjectQuery>();
-            //query.Subjects.Add(new SubjectQuery { Id = trust3.Subjects[0].SubjectId, Type = trust3.Subjects[0].SubjectType});
-
-            //query.Scope = trust2.Subjects[0].Scope;
-            //query.Claim = trust2.Subjects[0].Claim;
-
-            //var result = _graphQueryService.Execute(query);
-            //Assert.IsNotNull(result.Subjects);
-            ////Assert.IsTrue(result.Node.Children.Count == 1);
-            ////Assert.IsTrue(result.Node.Children[0].Children.Count == 1);
-
-            ////Console.WriteLine("Start id: " + search.GraphService.Graph.IdIndex[0].ConvertToHex()); // A
-            ////PrintResult(result.Nodes, search.GraphService, 0);
+            var subject = tracker.Subjects.GetValueOrDefault(targetIndex);
+            Assert.IsNotNull(subject, $"Result is missing for subject for: {source} - subject: {target}");
         }
-
-        private void PrintJson(object data)
-        {
-            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            Console.WriteLine(json);
-        }
-
-        //private void PrintResult(SubjectNode node, IGraphContext service, int level)
-        //{
-        //    if (node.Nodes == null)
-        //    {
-        //        Console.Write("".PadLeft(level, '-'));
-        //        Console.WriteLine("Issuer: {1} trust subject {2}", level, node.NodeIndex, node.Id.ConvertToHex());
-        //        return;
-        //    }
-
-        //    foreach (var child in node.Nodes)
-        //    {
-        //        Console.Write("".PadLeft(level, '-'));
-        //        Console.WriteLine("Issuer: {1} trust subject {2}", level, node.NodeIndex, child.NodeIndex);
-
-        //        PrintResult(child, service, level + 1);
-        //    }
-        //}
     }
 }

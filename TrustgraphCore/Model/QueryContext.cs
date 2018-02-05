@@ -25,8 +25,13 @@ namespace TrustgraphCore.Model
         public int MaxCost { get; set; }
         public int Level { get; set; }
         public int MaxLevel { get; set; }
-        public int MatchLevel { get; set; }
+        //public int MatchLevel { get; set; }
         public ulong Visited = 0;
+
+        internal Dictionary<int, GraphIssuer> TargetsFound = new Dictionary<int, GraphIssuer>();
+
+
+
 
 
 
@@ -61,7 +66,7 @@ namespace TrustgraphCore.Model
             MaxCost = 500; 
             Level = 0;
             MaxLevel = 3; // About 3 levels down max!
-            MatchLevel = int.MaxValue; // At watch level do we have the first match
+            //MatchLevel = int.MaxValue; // At watch level do we have the first match
             Visited = 1; // Use bit 1!
         }
 

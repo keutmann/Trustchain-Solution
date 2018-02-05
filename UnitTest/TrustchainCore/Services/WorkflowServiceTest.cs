@@ -188,8 +188,10 @@ namespace UnitTest.TrustchainCore.Workflow
             for (int i = 0; i < 5; i++)
             {
                 var workflow = workflowService.Create<IWorkflowContext>();
-                var step = new BlockingWorkflowStep();
-                step.Seconds = i;
+                var step = new BlockingWorkflowStep
+                {
+                    Seconds = i
+                };
                 workflow.Steps.Add(step);
                 var id = workflowService.Save(workflow);
             }

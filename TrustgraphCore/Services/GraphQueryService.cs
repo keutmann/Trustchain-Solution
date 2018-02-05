@@ -36,7 +36,7 @@ namespace TrustgraphCore.Services
         protected void ExecuteQueryContext(QueryContext context)
         {
             // Keep search until the maxlevel is hit or matchlevel is hit
-            while (context.Level <= context.MaxLevel && context.Level < context.MatchLevel)
+            while (context.Level <= context.MaxLevel && context.Targets.Count > 0)
             {
                 context.Level++; 
 
@@ -44,6 +44,21 @@ namespace TrustgraphCore.Services
                 {
                     SearchIssuer(context, issuer);
                 }
+
+                ClearTargets(context);
+            }
+        }
+        
+        /// <summary>
+        /// Remove the targets that have been found in the last run.
+        /// </summary>
+        /// <param name="context"></param>
+        protected void ClearTargets(QueryContext context)
+        {
+            foreach (var targetIssuer in context.TargetsFound.Values)
+            {
+                if (context.Targets.Contains(targetIssuer))
+                    context.Targets.Remove(targetIssuer);
             }
         }
 
@@ -112,7 +127,7 @@ namespace TrustgraphCore.Services
                     if (!ReferenceEquals(context.Targets[t], subjects[subjectKey].TargetIssuer))
                         continue;
 
-                    context.MatchLevel = context.Tracker.Count; // The number of levels before a search hit!                
+                    //context.MatchLevel = context.Tracker.Count; // The number of levels before a search hit!                
                                                                 // Add the hit to the context result!
                     BuildResult(context);
                 }
@@ -132,8 +147,12 @@ namespace TrustgraphCore.Services
                 
                 var resultTraker = context.Results[tracker.Issuer.Index];
 
-                if (!resultTraker.Subjects.ContainsKey(tracker.SubjectKey)) // Only subjects with unique keys
+                if (!resultTraker.Subjects.ContainsKey(tracker.SubjectKey))
+                {// Only subjects with unique keys
                     resultTraker.Subjects.Add(tracker.SubjectKey, tracker.Issuer.Subjects[tracker.SubjectKey]);
+                    // Register the target found 
+                    context.TargetsFound[tracker.Issuer.Subjects[tracker.SubjectKey].TargetIssuer.Index] = tracker.Issuer.Subjects[tracker.SubjectKey].TargetIssuer;
+                }
             }
         }
 

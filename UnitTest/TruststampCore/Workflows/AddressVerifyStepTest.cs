@@ -29,10 +29,12 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
             workflow.NextExecution = 0;
-            workflow.Proof = new BlockchainProof();
-            workflow.Proof.Blockchain = "btctest";
-            workflow.Proof.MerkleRoot = Guid.NewGuid().ToByteArray();
-            workflow.Proof.Confirmations = -1;
+            workflow.Proof = new BlockchainProof
+            {
+                Blockchain = "btctest",
+                MerkleRoot = Guid.NewGuid().ToByteArray(),
+                Confirmations = -1
+            };
 
             var addressVerifyStep = ServiceProvider.GetRequiredService<IAddressVerifyStep>();
             addressVerifyStep.Context = workflow;
@@ -65,10 +67,12 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
             workflow.NextExecution = 0;
-            workflow.Proof = new BlockchainProof();
-            workflow.Proof.Blockchain = "btctest";
-            workflow.Proof.MerkleRoot = Guid.NewGuid().ToByteArray();
-            workflow.Proof.Confirmations = -1;
+            workflow.Proof = new BlockchainProof
+            {
+                Blockchain = "btctest",
+                MerkleRoot = Guid.NewGuid().ToByteArray(),
+                Confirmations = -1
+            };
 
             var addressVerifyStep = ServiceProvider.GetRequiredService<IAddressVerifyStep>();
             addressVerifyStep.Context = workflow;
@@ -95,10 +99,12 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
             workflow.NextExecution = 0;
-            workflow.Proof = new BlockchainProof();
-            workflow.Proof.Blockchain = "btctest";
-            workflow.Proof.MerkleRoot = Guid.NewGuid().ToByteArray();
-            workflow.Proof.Confirmations = -1;
+            workflow.Proof = new BlockchainProof
+            {
+                Blockchain = "btctest",
+                MerkleRoot = Guid.NewGuid().ToByteArray(),
+                Confirmations = -1
+            };
 
             var addressVerifyStep = ServiceProvider.GetRequiredService<IAddressVerifyStep>();
             addressVerifyStep.Context = workflow;
