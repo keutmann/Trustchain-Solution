@@ -12,7 +12,7 @@ namespace TrustgraphCore.Model
         public List<GraphIssuer> Issuers = new List<GraphIssuer>();
 
         public Dictionary<byte[], int> ClaimIndex = new Dictionary<byte[], int>(ByteComparer.Standard);
-        public List<GraphClaimPointer> Claims = new List<GraphClaimPointer>();
+        public List<GraphClaim> Claims = new List<GraphClaim>();
         
 
         public Dictionary<string, int> SubjectTypesIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);

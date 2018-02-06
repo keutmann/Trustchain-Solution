@@ -19,7 +19,7 @@ namespace UnitTest.TrustgraphCore
         public override void Init()
         {
             base.Init();
-            ClaimTrustTrueTest = TrustBuilder.CreateTrustTrue();
+            ClaimTrustTrueTest = TrustBuilder.CreateTrust();
         }
 
 

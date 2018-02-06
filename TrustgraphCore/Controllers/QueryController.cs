@@ -34,7 +34,7 @@ namespace TrustgraphCore.Controllers
             query.Subjects = new List<SubjectQuery>();
             query.Subjects.Add(new SubjectQuery { Id = Convert.FromBase64String(subject), Type = "" });
 
-            query.Claim = TrustBuilder.CreateTrustTrue().ToString();
+            query.Claim = TrustBuilder.CreateTrust().ToString();
             query.Scope = string.Empty; // Global
 
             _queryRequestService.Verify(query);

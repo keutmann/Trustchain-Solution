@@ -19,7 +19,7 @@ namespace TrustgraphCore.Model
         public List<GraphIssuer> Issuers { get; set; }
         public List<GraphIssuer> Targets { get; set; }
         public bool SearchGlobalScope = true; // scope of the trust
-        public GraphClaimPointer Claim; // Claims 
+        public GraphClaim Claim; // Claims 
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
         public Dictionary<int, GraphTracker> Results { get; set; }
         public int MaxCost { get; set; }
@@ -113,7 +113,7 @@ namespace TrustgraphCore.Model
                 Data = query.Claim
             };
 
-            Claim = GraphService.CreateClaim(trustClaim);
+            Claim = GraphService.CreateGraphClaim(trustClaim);
             var id = Claim.RIPEMD160();
             if (!GraphService.Graph.ClaimIndex.ContainsKey(id))
                 throw new ApplicationException("Unknown claim!");

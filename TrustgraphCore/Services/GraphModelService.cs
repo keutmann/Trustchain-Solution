@@ -16,7 +16,7 @@ namespace TrustgraphCore.Services
             set;
         }
 
-        public GraphClaimPointer TrustTrueClaim { get; set; }
+        public GraphClaim TrustTrueClaim { get; set; }
         public int GlobalScopeIndex { get; set; }
 
         public GraphModelService()
@@ -37,17 +37,13 @@ namespace TrustgraphCore.Services
             TrustTrueClaim = EnsureTrustTrueClaim();
         }
 
-        public GraphClaimPointer EnsureTrustTrueClaim()
+        public GraphClaim EnsureTrustTrueClaim()
         {
-            var claim = new Claim
-            {
-                Cost = 100,
-                Data = TrustBuilder.CreateTrustTrue().ToString(),
-                Scope = string.Empty // Global scope
-            };
+            var claim = CreateClaim();
 
             return EnsureGraphClaim(claim);
         }
+
 
         public GraphIssuer EnsureGraphIssuer(byte[] address)
         {
@@ -83,15 +79,15 @@ namespace TrustgraphCore.Services
                 TargetIssuer = EnsureGraphIssuer(trustSubject.Address),
                 IssuerType = EnsureSubjectType(trustSubject.Type),
                 AliasIndex = EnsureAlias(trustSubject.Alias),
-                Claims = new Dictionary<long, GraphClaimPointer>()
+                Claims = new Dictionary<long, GraphClaim>()
             };
 
             return graphSubject;
         }
 
-        public GraphClaimPointer EnsureGraphClaim(Claim trustClaim)
+        public GraphClaim EnsureGraphClaim(Claim trustClaim)
         {
-            var gc = CreateClaim(trustClaim); // Need to created the GraphClaim before the RIPEMD160 can be calculated
+            var gc = CreateGraphClaim(trustClaim); // Need to created the GraphClaim before the RIPEMD160 can be calculated
             var gcID = gc.RIPEMD160();
 
             if (!Graph.ClaimIndex.TryGetValue(gcID, out int index))
@@ -107,9 +103,9 @@ namespace TrustgraphCore.Services
 
         }
 
-        public GraphClaimPointer CreateClaim(Claim trustClaim)
+        public GraphClaim CreateGraphClaim(Claim trustClaim)
         {
-            var gclaim = new GraphClaimPointer
+            var gclaim = new GraphClaim
             {
                 Scope = EnsureGraphScope(trustClaim.Scope),
                 //gclaim.Activate = edge.Activate;
@@ -121,6 +117,32 @@ namespace TrustgraphCore.Services
             return gclaim;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data">Default Trust=true</param>
+        /// <returns></returns>
+        public Claim CreateClaim(string data = null)
+        {
+            if (data == null)
+                data = TrustBuilder.CreateTrust().ToString();
+
+            var claim = new Claim
+            {
+                Cost = 100,
+                Data = data,
+                Scope = string.Empty // Global scope
+            };
+
+            return claim;
+        }
+
+        public int GetClaimDataIndex(string data = null)
+        {
+            var graphClaim = CreateGraphClaim(CreateClaim(data));
+            var index = Graph.ClaimIndex.GetValueOrDefault(graphClaim.RIPEMD160());
+            return index;
+        }
 
         public int EnsureAlias(string alias = null)
         {

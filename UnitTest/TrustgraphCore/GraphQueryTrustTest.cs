@@ -23,7 +23,7 @@ using TrustchainCore.Model;
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
-    public class GraphTrustTrueTest : GraphQueryMock
+    public class GraphQueryTrustTest : GraphQueryMock
     {
         private JObject ClaimTrustTrueTest = null;
 
@@ -31,7 +31,7 @@ namespace UnitTest.TrustgraphCore
         public override void Init()
         {
             base.Init();
-            ClaimTrustTrueTest = TrustBuilder.CreateTrustTrue();
+            ClaimTrustTrueTest = TrustBuilder.CreateTrust();
         }
 
         [TestMethod]

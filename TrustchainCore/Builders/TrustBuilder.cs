@@ -331,13 +331,11 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public static JObject CreateTrustTrue(string message = null)
+        public static JObject CreateTrust(bool value = true)
         {
             var obj = new JObject(
-                    new JProperty("trust", true)
+                    new JProperty("trust", value)
                     );
-            if (!string.IsNullOrWhiteSpace(message))
-                obj.Add(new JProperty("reason", message));
             return obj;
         }
 
@@ -348,6 +346,12 @@ namespace TrustchainCore.Builders
                     );
         }
 
+        public static JObject CreateConfirm(bool value = true)
+        {
+            return new JObject(
+                    new JProperty("confirm", value)
+                    );
+        }
 
 
     }

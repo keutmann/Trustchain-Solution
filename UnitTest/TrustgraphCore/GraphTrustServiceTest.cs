@@ -44,7 +44,7 @@ namespace UnitTest.TrustgraphCore
             var graphTrustService = new GraphTrustService(graphModelService);
 
             var trustBuilder = new TrustBuilder(ServiceProvider);
-            var trust = trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrue()).Package.Trusts[0];
+            var trust = trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrust()).Package.Trusts[0];
 
             trust.Claims[0].Activate = (uint)DateTime.Now.UnixTimestamp() - 1000;
             trust.Claims[0].Expire = (uint)DateTime.Now.UnixTimestamp() + 1000;

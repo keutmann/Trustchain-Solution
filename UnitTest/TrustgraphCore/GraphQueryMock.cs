@@ -11,6 +11,7 @@ using TrustgraphCore.Builders;
 using System.Collections.Generic;
 using TrustgraphCore.Model;
 using TrustchainCore.Model;
+using Newtonsoft.Json.Linq;
 
 namespace UnitTest.TrustgraphCore
 {
@@ -51,8 +52,11 @@ namespace UnitTest.TrustgraphCore
             return queryBuilder.Query;
         }
 
-        protected void VerfifyResult(QueryContext context, string source, string target)
+        protected void VerfifyResult(QueryContext context, string source, string target, JObject claimData = null)
         {
+            if(claimData == null)
+                claimData = TrustBuilder.CreateTrust();
+
             var sourceAddress = TrustBuilderExtensions.GetAddress(source);
             var targetAddress = TrustBuilderExtensions.GetAddress(target);
             var sourceIndex = _graphTrustService.ModelService.Graph.IssuerIndex.GetValueOrDefault(sourceAddress);
@@ -63,6 +67,11 @@ namespace UnitTest.TrustgraphCore
 
             var subject = tracker.Subjects.GetValueOrDefault(targetIndex);
             Assert.IsNotNull(subject, $"Result is missing for subject for: {source} - subject: {target}");
+
+            var index = _graphTrustService.ModelService.GetClaimDataIndex(claimData.ToString());
+            var subjectClaimIndex = new SubjectClaimIndex(0, index); // Global scope
+            var graphClaim = subject.Claims.GetValueOrDefault(subjectClaimIndex.Value);
+            Assert.IsTrue(graphClaim.Index == index, "Subject missing the claim data: "+claimData.ToString());
         }
     }
 }
