@@ -6,9 +6,9 @@ namespace TrustgraphCore.Services
 {
     public class GraphExportService : IGraphExportService
     {
-        public IGraphModelService ModelService { get; }
+        public IGraphTrustService ModelService { get; }
 
-        public GraphExportService(IGraphModelService modelService)
+        public GraphExportService(IGraphTrustService modelService)
         {
             ModelService = modelService;
         }

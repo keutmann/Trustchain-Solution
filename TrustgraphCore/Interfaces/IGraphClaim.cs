@@ -4,9 +4,9 @@ using System.Text;
 
 namespace TrustchainCore.Interfaces
 {
-    public interface ObjectID
+    public interface IGraphClaim
     {
         string StringID();
-        byte[] RIPEMD160();
+        byte[] ByteID();
     }
 }

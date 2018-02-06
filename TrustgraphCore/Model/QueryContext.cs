@@ -14,7 +14,7 @@ namespace TrustgraphCore.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class QueryContext
     {
-        public IGraphModelService GraphService { get; set; }
+        public IGraphTrustService GraphTrustService { get; set; }
 
         public List<GraphIssuer> Issuers { get; set; }
         public List<GraphIssuer> Targets { get; set; }
@@ -70,15 +70,15 @@ namespace TrustgraphCore.Model
             Visited = 1; // Use bit 1!
         }
 
-        public QueryContext(IGraphModelService graphService, QueryRequest query) : this()
+        public QueryContext(IGraphTrustService graphService, QueryRequest query) : this()
         {
-            GraphService = graphService;
+            GraphTrustService = graphService;
             foreach (var issuerId in query.Issuers)
             {
-                if (GraphService.Graph.IssuerIndex.ContainsKey(issuerId))
+                if (GraphTrustService.Graph.IssuerIndex.ContainsKey(issuerId))
                 {
-                    var index = GraphService.Graph.IssuerIndex[issuerId];
-                    Issuers.Add(GraphService.Graph.Issuers[index]);
+                    var index = GraphTrustService.Graph.IssuerIndex[issuerId];
+                    Issuers.Add(GraphTrustService.Graph.Issuers[index]);
                 }
                     
                 else
@@ -87,21 +87,21 @@ namespace TrustgraphCore.Model
 
             foreach (var subject in query.Subjects)
             {
-                if (GraphService.Graph.IssuerIndex.ContainsKey(subject.Id))
+                if (GraphTrustService.Graph.IssuerIndex.ContainsKey(subject.Id))
                 {
-                    var index = GraphService.Graph.IssuerIndex[subject.Id];
-                    Targets.Add(GraphService.Graph.Issuers[index]);
+                    var index = GraphTrustService.Graph.IssuerIndex[subject.Id];
+                    Targets.Add(GraphTrustService.Graph.Issuers[index]);
                 }
                 else
                     UnknownIssuers.Add(subject.Id);
 
-                var type = GraphService.Graph.SubjectTypesIndex.ContainsKey(subject.Type) ? GraphService.Graph.SubjectTypesIndex[subject.Type] : -1;
+                var type = GraphTrustService.Graph.SubjectTypes.ContainsKey(subject.Type) ? GraphTrustService.Graph.SubjectTypes.GetIndex(subject.Type) : -1;
                 if (type == -1)
                     UnknownSubjectTypes.Add(subject.Type);
                     //throw new ApplicationException("Unknown subject type: " + subject.Type);
             }
 
-            if(!GraphService.Graph.ScopeIndex.ContainsKey(query.Scope))
+            if(!GraphTrustService.Graph.Scopes.ContainsKey(query.Scope))
                 throw new ApplicationException("Unknown scope in query: " + query.Scope);
 
             //ScopeIndex = GraphService.Graph.ScopeIndex[query.Scope];
@@ -113,11 +113,11 @@ namespace TrustgraphCore.Model
                 Data = query.Claim
             };
 
-            Claim = GraphService.CreateGraphClaim(trustClaim);
-            var id = Claim.RIPEMD160();
-            if (!GraphService.Graph.ClaimIndex.ContainsKey(id))
+            Claim = GraphTrustService.CreateGraphClaim(trustClaim);
+            var id = Claim.ByteID();
+            if (!GraphTrustService.Graph.ClaimIndex.ContainsKey(id))
                 throw new ApplicationException("Unknown claim!");
-            Claim.Index = GraphService.Graph.ClaimIndex[id];
+            Claim.Index = GraphTrustService.Graph.ClaimIndex[id];
 
         }
     }

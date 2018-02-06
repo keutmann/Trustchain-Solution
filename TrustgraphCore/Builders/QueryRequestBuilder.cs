@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using TrustchainCore.Model;
 using TrustgraphCore.Model;
 
@@ -7,6 +8,10 @@ namespace TrustgraphCore.Builders
     public class QueryRequestBuilder
     {
         public QueryRequest Query { get; }
+
+        public QueryRequestBuilder(JObject claimData) : this("", claimData.ToString())
+        {
+        }
 
         public QueryRequestBuilder(string claimData) : this("", claimData)
         {

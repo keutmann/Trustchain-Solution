@@ -6,25 +6,24 @@ using TrustchainCore.Interfaces;
 using System.Runtime.CompilerServices;
 using TrustgraphCore.Extensions;
 using System.Collections.Generic;
+using TrustchainCore.Builders;
 
 namespace TrustgraphCore.Services
 {
     public class GraphQueryService : IGraphQueryService
     {
-        public IGraphModelService ModelService { get; }
+        public IGraphTrustService TrustService { get; private set; }
         public long UnixTime { get; set; }
-        private ITrustDBService _trustDBService;
 
-        public GraphQueryService(IGraphModelService modelService, ITrustDBService trustDBService)
+        public GraphQueryService(IGraphTrustService trustService)
         {
-            ModelService = modelService;
-            _trustDBService = trustDBService;
+            TrustService = trustService;
             UnixTime = DateTime.Now.ToUnixTime();
         }
 
         public QueryContext Execute(QueryRequest query)
         {
-            var context = new QueryContext(ModelService, query);
+            var context = new QueryContext(TrustService, query);
 
             if (context.Issuers.Count > 0 && context.Targets.Count > 0)
                 ExecuteQueryContext(context);
@@ -91,12 +90,12 @@ namespace TrustgraphCore.Services
                 {
                     tracker.SubjectKey = key;
 
-                    // Check local index
-                    bool follow = subjects[key].Claims.Exist(context.Claim.Scope, ModelService.TrustTrueClaim.Index);
+                    //// Check local index
+                    bool follow = subjects[key].Claims.Exist(context.Claim.Scope, TrustService.TrustTrueClaim.Index);
 
-                    // Check global
-                    if (!follow && context.SearchGlobalScope) // Create the Global index
-                        follow = subjects[key].Claims.Exist(ModelService.GlobalScopeIndex, ModelService.TrustTrueClaim.Index);
+                    //// Check global
+                    //if (!follow && context.SearchGlobalScope) // Create the Global index
+                    //    follow = subjects[key].Claims.Exist(ModelService.GlobalScopeIndex, ModelService.TrustTrueClaim.Index);
 
                     if(follow)
                         SearchIssuer(context, subjects[key].TargetIssuer);
@@ -117,7 +116,7 @@ namespace TrustgraphCore.Services
             var claimExist = subjects[subjectKey].Claims.Exist(context.Claim.Scope, context.Claim.Index);
 
             if(!claimExist && context.SearchGlobalScope) // Check global scope for claims
-                claimExist = subjects[subjectKey].Claims.Exist(ModelService.GlobalScopeIndex, context.Claim.Index); // Do a subject contain a global scope index
+                claimExist = subjects[subjectKey].Claims.Exist(TrustService.GlobalScopeIndex, context.Claim.Index); // Do a subject contain a global scope index
 
             if (claimExist)
             {

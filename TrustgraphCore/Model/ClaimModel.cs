@@ -23,7 +23,7 @@ namespace TrustgraphCore.Model
             return $"{Types}:{Flags}:{Rating}:{Metadata}";
         }
 
-        public byte[] RIPEMD160()
+        public byte[] ByteID()
         {
             var data = Encoding.UTF8.GetBytes(StringID());
             return Hashes.RIPEMD160(data, data.Length);

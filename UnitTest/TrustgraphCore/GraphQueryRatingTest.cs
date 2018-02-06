@@ -23,58 +23,20 @@ using TrustchainCore.Model;
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
-    public class GraphQueryConfirmTest : GraphQueryMock
+    public class GraphQueryRatingTest : GraphQueryMock
     {
         private JObject ClaimTrustTrue = null;
-        private JObject ClaimConfirmTrue = null;
+        private JObject ClaimRating = null;
 
         [TestInitialize]
         public override void Init()
         {
             base.Init();
             ClaimTrustTrue = TrustBuilder.CreateTrust();
-            ClaimConfirmTrue = TrustBuilder.CreateConfirm(true);
+            ClaimRating = TrustBuilder.CreateRating(1);
 
         }
 
-        //[TestMethod]
-        //public void Search1()
-        //{
-            //_trustBuilder.AddTrust("A", "B", TestClaim);
-
-            //_graphTrustService.Add(_trustBuilder.Package);  // Build graph!
-
-            //var trusts = _trustBuilder.Package.Trusts;
-            //var trust = trusts[0];
-            //Console.WriteLine("Trust object");
-            //Console.WriteLine(JsonConvert.SerializeObject(trusts[0], Formatting.Indented));
-
-            //var queryBuilder = new QueryRequestBuilder(TestClaim.ToString());
-            //queryBuilder.Add(trusts[0].Issuer.Address, trusts[0].Subjects[0]);
-
-            //Console.WriteLine("Query object");
-            //Console.WriteLine(JsonConvert.SerializeObject(queryBuilder.Query, Formatting.Indented));
-            //var queryContext = _graphQueryService.Execute(queryBuilder.Query);
-            //Assert.AreEqual(queryContext.Results.Count, 1, "Should be one result!");
-
-            //var tracker = queryContext.Results.First().Value;
-            //Assert.AreEqual(tracker.Subjects.Count, 1, "Should be one subject!");
-
-            //var subject = tracker.Subjects.First().Value;
-            ////Assert.IsNotNull(queryContext.Subjects);
-            //var targetIssuer = subject.TargetIssuer;
-            //Console.WriteLine("Issuer ID: " + JsonConvert.SerializeObject(trusts[0].Issuer.Address));
-            //Console.WriteLine("result ID: " + JsonConvert.SerializeObject(targetIssuer.Address) + " : Trust SubjectID: " + JsonConvert.SerializeObject(trusts[0].Subjects[0].Address));
-
-            ////Assert.AreEqual(issuer.Name, trust.Name);
-            //Assert.IsTrue(targetIssuer.Address.Equals(trust.Subjects[0].Address));
-            ////Assert.AreEqual(subject.Claims.ClaimModel.Metadata, ClaimMetadata.Reason);
-            ////Assert.IsTrue(issuer.Subjects[0].Claim.ContainsIgnoreCase("Test"));
-
-            //Console.WriteLine("Query Result");
-            //Console.WriteLine(JsonConvert.SerializeObject(queryContext.Results, Formatting.Indented));
-            ////PrintResult(result.Nodes, search.GraphService, 1);
-        //}
 
         /// <summary>
         /// 1 Source, 1 targets
@@ -87,7 +49,7 @@ namespace UnitTest.TrustgraphCore
 
             _graphTrustService.Add(_trustBuilder.Package);
 
-            var queryBuilder = new QueryRequestBuilder(ClaimConfirmTrue.ToString());
+            var queryBuilder = new QueryRequestBuilder(ClaimRating.ToString());
             BuildQuery(queryBuilder, "A", "person"); // Query if "person" have a confimation within A's trust sphere.
 
             // Execute
@@ -98,7 +60,7 @@ namespace UnitTest.TrustgraphCore
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", ClaimConfirmTrue);
+            VerfifyResult(context, "C", "D", ClaimRating);
         }
 
 
@@ -111,7 +73,7 @@ namespace UnitTest.TrustgraphCore
         {
             BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimConfirmTrue);
+            var queryBuilder = new QueryRequestBuilder(ClaimRating);
 
             BuildQuery(queryBuilder, "A", "D");
             BuildQuery(queryBuilder, "A", "B");
@@ -123,9 +85,9 @@ namespace UnitTest.TrustgraphCore
             Assert.AreEqual(context.Results.Count, 4, $"Should be {4} results!");
 
             VerfifyResult(context, "A", "B");
-            VerfifyResult(context, "A", "B", ClaimConfirmTrue);
+            VerfifyResult(context, "A", "B", ClaimRating);
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", ClaimConfirmTrue);
+            VerfifyResult(context, "C", "D", ClaimRating);
         }
 
         /// <summary>
@@ -136,7 +98,7 @@ namespace UnitTest.TrustgraphCore
         {
             BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimConfirmTrue);
+            var queryBuilder = new QueryRequestBuilder(ClaimRating);
 
             BuildQuery(queryBuilder, "A", "D");
             BuildQuery(queryBuilder, "F", "D");
@@ -149,10 +111,10 @@ namespace UnitTest.TrustgraphCore
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", ClaimConfirmTrue);
+            VerfifyResult(context, "C", "D", ClaimRating);
 
             VerfifyResult(context, "F", "G");
-            VerfifyResult(context, "G", "D", ClaimConfirmTrue);
+            VerfifyResult(context, "G", "D", ClaimRating);
         }
 
 
@@ -164,7 +126,7 @@ namespace UnitTest.TrustgraphCore
         {
             BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimConfirmTrue);
+            var queryBuilder = new QueryRequestBuilder(ClaimRating);
 
             BuildQuery(queryBuilder, "A", "Unreach");
 
@@ -188,9 +150,9 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("G", "D", ClaimTrustTrue); // Long way, no trust
             _trustBuilder.AddTrust("G", "Unreach", ClaimTrustTrue); // Long way, no trust
 
-            _trustBuilder.AddTrust("A", "B", ClaimConfirmTrue);
-            _trustBuilder.AddTrust("A", "D", ClaimConfirmTrue);
-            _trustBuilder.AddTrust("G", "D", ClaimConfirmTrue);
+            _trustBuilder.AddTrust("A", "B", ClaimRating);
+            _trustBuilder.AddTrust("A", "D", ClaimRating);
+            _trustBuilder.AddTrust("G", "D", ClaimRating);
 
             _graphTrustService.Add(_trustBuilder.Package);
         }

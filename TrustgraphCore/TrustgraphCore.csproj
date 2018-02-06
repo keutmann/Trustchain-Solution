@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Model\ClaimModel.cs" />
     <Compile Remove="Model\TargetIndex.cs" />
   </ItemGroup>
 

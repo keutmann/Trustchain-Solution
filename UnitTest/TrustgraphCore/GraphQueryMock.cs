@@ -29,7 +29,7 @@ namespace UnitTest.TrustgraphCore
             _graphTrustService = new GraphTrustService();
             _trustBuilder = new TrustBuilder(ServiceProvider);
             _trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
-            _graphQueryService = new GraphQueryService(_graphTrustService.ModelService, null);
+            _graphQueryService = new GraphQueryService(_graphTrustService);
         }
 
 
@@ -59,8 +59,8 @@ namespace UnitTest.TrustgraphCore
 
             var sourceAddress = TrustBuilderExtensions.GetAddress(source);
             var targetAddress = TrustBuilderExtensions.GetAddress(target);
-            var sourceIndex = _graphTrustService.ModelService.Graph.IssuerIndex.GetValueOrDefault(sourceAddress);
-            var targetIndex = _graphTrustService.ModelService.Graph.IssuerIndex.GetValueOrDefault(targetAddress);
+            var sourceIndex = _graphTrustService.Graph.IssuerIndex.GetValueOrDefault(sourceAddress);
+            var targetIndex = _graphTrustService.Graph.IssuerIndex.GetValueOrDefault(targetAddress);
 
             var tracker = context.Results.GetValueOrDefault(sourceIndex);
             Assert.IsNotNull(tracker, $"Result is missing source: {source}");
@@ -68,7 +68,7 @@ namespace UnitTest.TrustgraphCore
             var subject = tracker.Subjects.GetValueOrDefault(targetIndex);
             Assert.IsNotNull(subject, $"Result is missing for subject for: {source} - subject: {target}");
 
-            var index = _graphTrustService.ModelService.GetClaimDataIndex(claimData.ToString());
+            var index = _graphTrustService.GetClaimDataIndex(claimData.ToString());
             var subjectClaimIndex = new SubjectClaimIndex(0, index); // Global scope
             var graphClaim = subject.Claims.GetValueOrDefault(subjectClaimIndex.Value);
             Assert.IsTrue(graphClaim.Index == index, "Subject missing the claim data: "+claimData.ToString());
