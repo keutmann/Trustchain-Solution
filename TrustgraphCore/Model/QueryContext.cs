@@ -18,22 +18,15 @@ namespace TrustgraphCore.Model
 
         public List<GraphIssuer> Issuers { get; set; }
         public List<GraphIssuer> Targets { get; set; }
-        public bool SearchGlobalScope = true; // scope of the trust
-        public GraphClaim Claim; // Claims 
+        public GraphClaim TargetClaim; // Claims 
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
         public Dictionary<int, GraphTracker> Results { get; set; }
         public int MaxCost { get; set; }
         public int Level { get; set; }
         public int MaxLevel { get; set; }
-        //public int MatchLevel { get; set; }
         public ulong Visited = 0;
 
         internal Dictionary<int, GraphIssuer> TargetsFound = new Dictionary<int, GraphIssuer>();
-
-
-
-
-
 
 
         [JsonProperty(PropertyName = "TotalIssuerCount")]
@@ -95,9 +88,9 @@ namespace TrustgraphCore.Model
                 else
                     UnknownIssuers.Add(subject.Id);
 
-                var type = GraphTrustService.Graph.SubjectTypes.ContainsKey(subject.Type) ? GraphTrustService.Graph.SubjectTypes.GetIndex(subject.Type) : -1;
-                if (type == -1)
-                    UnknownSubjectTypes.Add(subject.Type);
+                //var type = GraphTrustService.Graph.SubjectTypes.ContainsKey(subject.Type) ? GraphTrustService.Graph.SubjectTypes.GetIndex(subject.Type) : -1;
+                //if (type == -1)
+                    //UnknownSubjectTypes.Add(subject.Type);
                     //throw new ApplicationException("Unknown subject type: " + subject.Type);
             }
 
@@ -106,19 +99,8 @@ namespace TrustgraphCore.Model
 
             //ScopeIndex = GraphService.Graph.ScopeIndex[query.Scope];
 
-            var trustClaim = new TrustchainCore.Model.Claim
-            {
-                Cost = 100,
-                Scope = query.Scope,
-                Data = query.Claim
-            };
-
-            Claim = GraphTrustService.CreateGraphClaim(trustClaim);
-            var id = Claim.ID();
-            if (!GraphTrustService.Graph.ClaimIndex.ContainsKey(id))
-                throw new ApplicationException("Unknown claim!");
-            Claim.Index = GraphTrustService.Graph.ClaimIndex[id];
-
+            var trustClaim = TrustBuilder.CreateClaim(query.Claim, query.Scope, string.Empty);
+            TargetClaim = GraphTrustService.CreateGraphClaim(trustClaim);
         }
     }
 }

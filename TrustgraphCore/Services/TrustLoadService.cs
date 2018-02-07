@@ -26,7 +26,7 @@ namespace TrustgraphCore.Services
             foreach (var trust in _trustDBService.Trusts)
             {
                 count++;
-                _graphTrustService.Add(trust, 0);
+                _graphTrustService.Add(trust);
             }
             _logger.LogInformation($"Trust loaded: {count}");
         }

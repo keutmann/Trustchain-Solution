@@ -37,33 +37,33 @@ namespace UnitTest.TrustgraphCore
             Assert.IsTrue(graphModelService.Graph.IssuerIndex[keyB] == 1);
         }
 
-        [TestMethod]
-        public void BuildEdge1()
-        {
-            var graphTrustService = new GraphTrustService();
+        //[TestMethod]
+        //public void BuildEdge1()
+        //{
+        //    var graphTrustService = new GraphTrustService();
 
-            var trustBuilder = new TrustBuilder(ServiceProvider);
-            var trust = trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrust()).Package.Trusts[0];
+        //    var trustBuilder = new TrustBuilder(ServiceProvider);
+        //    var trust = trustBuilder.AddTrust("A", "B", TrustBuilder.CreateFollowClaim()).Package.Trusts[0];
 
-            trust.Claims[0].Activate = (uint)DateTime.Now.UnixTimestamp() - 1000;
-            trust.Claims[0].Expire = (uint)DateTime.Now.UnixTimestamp() + 1000;
-            trust.Claims[0].Cost = 112;
+        //    trust.Claims[0].Activate = (uint)DateTime.Now.UnixTimestamp() - 1000;
+        //    trust.Claims[0].Expire = (uint)DateTime.Now.UnixTimestamp() + 1000;
+        //    trust.Claims[0].Cost = 112;
 
-            graphTrustService.Add(trustBuilder.Package);
-            var graph = graphTrustService.Graph;
-            Assert.IsTrue(graph.Issuers.Count == 2);
+        //    graphTrustService.Add(trustBuilder.Package);
+        //    var graph = graphTrustService.Graph;
+        //    Assert.IsTrue(graph.Issuers.Count == 2);
 
-            Assert.IsTrue(graph.Issuers[0].Subjects.Count == 1);
-            Assert.IsTrue(graph.Issuers[0].Subjects.First().Value.TargetIssuer.Index == 1);
-            Assert.IsTrue(graph.Issuers[0].Subjects.First().Value.Claims.Count == 1);
-            //Assert.IsTrue(graph.Issuers[0].Subjects.First().Value.Claims.First().Value.Data.Types == ClaimType.Trust);
+        //    Assert.IsTrue(graph.Issuers[0].Subjects.Count == 1);
+        //    Assert.IsTrue(graph.Issuers[0].Subjects.First().Value.TargetIssuer.Index == 1);
+        //    Assert.IsTrue(graph.Issuers[0].Subjects.First().Value.Claims.Count == 1);
+        //    //Assert.IsTrue(graph.Issuers[0].Subjects.First().Value.Claims.First().Value.Data.Types == ClaimType.Trust);
 
-            Assert.IsTrue(graph.IssuerIndex.Count == 2);
-            Assert.IsTrue(graph.SubjectTypes.Count() == 2);
-            Assert.IsTrue(graph.SubjectTypes.ContainsKey("person"));
-            Assert.IsTrue(graph.Scopes.Count() == 1);
-            Assert.IsTrue(graph.Scopes.ContainsKey(""));
-        }
+        //    Assert.IsTrue(graph.IssuerIndex.Count == 2);
+        //    Assert.IsTrue(graph.SubjectTypes.Count() == 2);
+        //    Assert.IsTrue(graph.SubjectTypes.ContainsKey("person"));
+        //    Assert.IsTrue(graph.Scopes.Count() == 1);
+        //    Assert.IsTrue(graph.Scopes.ContainsKey(""));
+        //}
 
         //[TestMethod]
         //public void BuildEdge2()

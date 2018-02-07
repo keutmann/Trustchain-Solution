@@ -13,7 +13,10 @@ namespace TrustchainCore.Builders
 {
     public class TrustBuilder
     {
+        public const string FOLLOWTRUST_TC1 = "follow.tc1";
         public const string BINARYTRUST_TC1 = "binarytrust.tc1";
+        public const string CONFIRMTRUST_TC1 = "confirm.tc1";
+        public const string RATING_TC1 = "rating.tc1";
 
         public Package Package { get; set; }
         private ITrustBinary _trustBinary;
@@ -333,14 +336,34 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public static Claim CreateTrustTrueClaim()
+        public static Claim CreateFollowClaim()
+        {
+            return CreateClaim(FOLLOWTRUST_TC1, "", "");
+        }
+
+        public static Claim CreateTrustTrueClaim(string scope = "")
+        {
+            return CreateClaim(BINARYTRUST_TC1, scope, CreateTrust(true).ToString());
+        }
+
+        public static Claim CreateConfirmClaim(string scope = "")
+        {
+            return CreateClaim(CONFIRMTRUST_TC1, scope, CreateConfirm().ToString());
+        }
+
+        public static Claim CreateRatingClaim(byte rating = 100, string scope = "")
+        {
+            return CreateClaim(RATING_TC1, scope, CreateRating(rating).ToString());
+        }
+
+        public static Claim CreateClaim(string type, string scope, string data)
         {
             var claim = new Claim
             {
-                Type = BINARYTRUST_TC1,
+                Type = type,
                 Cost = 100,
-                Data = TrustBuilder.CreateTrust().ToString(),
-                Scope = string.Empty // Global scope
+                Data = data,
+                Scope = scope // Global scope
             };
 
             return claim;
@@ -353,7 +376,7 @@ namespace TrustchainCore.Builders
 
             var jData = JObject.Parse(data);
 
-            if (jData["trust"].HasValues && jData["trust"].Value<bool>() == true)
+            if (jData["trust"] != null && jData["trust"].Value<bool>() == true)
                 return true;
 
             return false;

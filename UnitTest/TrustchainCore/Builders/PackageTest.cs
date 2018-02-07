@@ -19,9 +19,9 @@ namespace UnitTest.TrustchainCore.Builders
             var builder = new TrustBuilder(this.ServiceProvider);
             builder.SetServer("testserver");
             builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrust())
-                .AddSubject("testsubject2", TrustBuilder.CreateTrust());
-            builder.AddTrust("testissuer2", "testsubject1", TrustBuilder.CreateTrust());
+                .AddSubject("testsubject1", TrustBuilder.CreateFollowClaim())
+                .AddSubject("testsubject2", TrustBuilder.CreateFollowClaim());
+            builder.AddTrust("testissuer2", "testsubject1", TrustBuilder.CreateFollowClaim());
             builder.Build();
             builder.Sign();
 

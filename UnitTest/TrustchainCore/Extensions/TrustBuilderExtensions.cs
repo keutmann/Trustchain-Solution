@@ -35,23 +35,23 @@ namespace UnitTest.TrustchainCore.Extensions
             return builder;
         }
 
-        public static TrustBuilder AddTrust(this TrustBuilder builder, string issuerName, string subjectName, JObject claimData)
+        public static TrustBuilder AddTrust(this TrustBuilder builder, string issuerName, string subjectName, Claim trustClaim)
         {
             builder.AddTrust(issuerName);
-            builder.AddSubject(subjectName, claimData);
+            builder.AddSubject(subjectName, trustClaim);
             return builder;
         }
 
-        public static TrustBuilder AddSubject(this TrustBuilder builder, string subjectName, JObject data)
+        public static TrustBuilder AddSubject(this TrustBuilder builder, string subjectName, Claim trustClaim)
         {
             var key = ScriptService.GetKey(Encoding.UTF8.GetBytes(subjectName));
             var address = ScriptService.GetAddress(key);
 
             int[] indexs = new int[] { 0 };
 
-            builder.AddClaim(data, out Claim claim);
+            builder.AddClaim(trustClaim);
 
-            builder.AddSubject(address, subjectName, "person", new byte[] { (byte)claim.Index });
+            builder.AddSubject(address, subjectName, "", new byte[] { (byte)trustClaim.Index });
             return builder;
         }
 
@@ -68,17 +68,17 @@ namespace UnitTest.TrustchainCore.Extensions
             return builder;
         }
 
-        public static TrustBuilder AddClaim(this TrustBuilder builder, JObject data, out Claim claim)
-        {
-            claim = new Claim
-            {
-                Data = data.ToString(Formatting.None)
-            };
+        //public static TrustBuilder AddClaim(this TrustBuilder builder, JObject data, out Claim claim)
+        //{
+        //    claim = new Claim
+        //    {
+        //        Data = data.ToString(Formatting.None)
+        //    };
 
-            builder.AddClaim(claim);
+        //    builder.AddClaim(claim);
 
-            return builder;
-        }
+        //    return builder;
+        //}
 
     }
 }

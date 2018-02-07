@@ -25,19 +25,20 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class GraphQueryTrustTest : GraphQueryMock
     {
-        private JObject ClaimTrustTrueTest = null;
+        private Claim TrustTrueClaim = null;
+        private const string ClaimType = TrustBuilder.BINARYTRUST_TC1;
 
         [TestInitialize]
         public override void Init()
         {
             base.Init();
-            ClaimTrustTrueTest = TrustBuilder.CreateTrust();
+            TrustTrueClaim = TrustBuilder.CreateClaim(TrustBuilder.BINARYTRUST_TC1, "", TrustBuilder.CreateTrust().ToString());
         }
 
         [TestMethod]
         public void Search1()
         {
-            _trustBuilder.AddTrust("A", "B", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("A", "B", TrustTrueClaim);
 
             _graphTrustService.Add(_trustBuilder.Package);  // Build graph!
 
@@ -46,7 +47,7 @@ namespace UnitTest.TrustgraphCore
             Console.WriteLine("Trust object");
             Console.WriteLine(JsonConvert.SerializeObject(trusts[0], Formatting.Indented));
 
-            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
             queryBuilder.Add(trusts[0].Issuer.Address, trusts[0].Subjects[0]);
 
             Console.WriteLine("Query object");
@@ -80,11 +81,11 @@ namespace UnitTest.TrustgraphCore
         public void Source1Target1()
         {
             // Build up
-            _trustBuilder.AddTrust("A", "B", ClaimTrustTrueTest);
-            _trustBuilder.AddTrust("B", "C", ClaimTrustTrueTest);
+            _trustBuilder.AddTrust("A", "B", TrustTrueClaim);
+            _trustBuilder.AddTrust("B", "C", TrustTrueClaim);
             _graphTrustService.Add(_trustBuilder.Package);
 
-            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
             BuildQuery(queryBuilder, "A", "C");
 
             // Execute
@@ -107,7 +108,7 @@ namespace UnitTest.TrustgraphCore
         {
             ClaimTrustTrueGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
 
             BuildQuery(queryBuilder, "A", "D");
             BuildQuery(queryBuilder, "A", "F");
@@ -134,7 +135,7 @@ namespace UnitTest.TrustgraphCore
         {
             ClaimTrustTrueGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
 
             BuildQuery(queryBuilder, "A", "D");
             BuildQuery(queryBuilder, "F", "D");
@@ -164,7 +165,7 @@ namespace UnitTest.TrustgraphCore
         {
             ClaimTrustTrueGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
 
             BuildQuery(queryBuilder, "A", "Unreach");
 
@@ -178,15 +179,15 @@ namespace UnitTest.TrustgraphCore
 
         private void ClaimTrustTrueGraph()
         {
-            _trustBuilder.AddTrust("A", "B", ClaimTrustTrueTest);
-            _trustBuilder.AddTrust("B", "C", ClaimTrustTrueTest);
-            _trustBuilder.AddTrust("C", "D", ClaimTrustTrueTest);
-            _trustBuilder.AddTrust("B", "E", ClaimTrustTrueTest);
-            _trustBuilder.AddTrust("E", "D", ClaimTrustTrueTest);
-            _trustBuilder.AddTrust("B", "F", ClaimTrustTrueTest);
-            _trustBuilder.AddTrust("F", "G", ClaimTrustTrueTest);
-            _trustBuilder.AddTrust("G", "D", ClaimTrustTrueTest); // Long way, no trust
-            _trustBuilder.AddTrust("G", "Unreach", ClaimTrustTrueTest); // Long way, no trust
+            _trustBuilder.AddTrust("A", "B", TrustTrueClaim);
+            _trustBuilder.AddTrust("B", "C", TrustTrueClaim);
+            _trustBuilder.AddTrust("C", "D", TrustTrueClaim);
+            _trustBuilder.AddTrust("B", "E", TrustTrueClaim);
+            _trustBuilder.AddTrust("E", "D", TrustTrueClaim);
+            _trustBuilder.AddTrust("B", "F", TrustTrueClaim);
+            _trustBuilder.AddTrust("F", "G", TrustTrueClaim);
+            _trustBuilder.AddTrust("G", "D", TrustTrueClaim); // Long way, no trust
+            _trustBuilder.AddTrust("G", "Unreach", TrustTrueClaim); // Long way, no trust
             _graphTrustService.Add(_trustBuilder.Package);
         }
     }

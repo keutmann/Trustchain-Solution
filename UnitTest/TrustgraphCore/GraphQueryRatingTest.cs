@@ -25,15 +25,16 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class GraphQueryRatingTest : GraphQueryMock
     {
-        private JObject ClaimTrustTrue = null;
-        private JObject ClaimRating = null;
+        private Claim ClaimTrustTrue = null;
+        private Claim ClaimRating = null;
+        private string ClaimType = TrustBuilder.RATING_TC1;
 
         [TestInitialize]
         public override void Init()
         {
             base.Init();
-            ClaimTrustTrue = TrustBuilder.CreateTrust();
-            ClaimRating = TrustBuilder.CreateRating(1);
+            ClaimTrustTrue = TrustBuilder.CreateTrustTrueClaim();
+            ClaimRating = TrustBuilder.CreateRatingClaim(100,"");
 
         }
 
@@ -49,8 +50,8 @@ namespace UnitTest.TrustgraphCore
 
             _graphTrustService.Add(_trustBuilder.Package);
 
-            var queryBuilder = new QueryRequestBuilder(ClaimRating.ToString());
-            BuildQuery(queryBuilder, "A", "person"); // Query if "person" have a confimation within A's trust sphere.
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
+            BuildQuery(queryBuilder, "A", "D"); // Query if "person" have a confimation within A's trust sphere.
 
             // Execute
             var context = _graphQueryService.Execute(queryBuilder.Query);
@@ -73,7 +74,7 @@ namespace UnitTest.TrustgraphCore
         {
             BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimRating);
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
 
             BuildQuery(queryBuilder, "A", "D");
             BuildQuery(queryBuilder, "A", "B");
@@ -82,7 +83,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(context.Results.Count, 4, $"Should be {4} results!");
+            Assert.AreEqual(3, context.Results.Count, $"Should be {3} results!");
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "A", "B", ClaimRating);
@@ -98,7 +99,7 @@ namespace UnitTest.TrustgraphCore
         {
             BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimRating);
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
 
             BuildQuery(queryBuilder, "A", "D");
             BuildQuery(queryBuilder, "F", "D");
@@ -107,7 +108,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(context.Results.Count, 6, $"Should be {6} results!");
+            Assert.AreEqual(5, context.Results.Count, $"Should be {5} results!");
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
@@ -126,7 +127,7 @@ namespace UnitTest.TrustgraphCore
         {
             BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimRating);
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
 
             BuildQuery(queryBuilder, "A", "Unreach");
 
@@ -151,7 +152,7 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("G", "Unreach", ClaimTrustTrue); // Long way, no trust
 
             _trustBuilder.AddTrust("A", "B", ClaimRating);
-            _trustBuilder.AddTrust("A", "D", ClaimRating);
+            _trustBuilder.AddTrust("C", "D", ClaimRating);
             _trustBuilder.AddTrust("G", "D", ClaimRating);
 
             _graphTrustService.Add(_trustBuilder.Package);

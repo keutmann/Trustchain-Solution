@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TrustchainCore.Model;
 using TrustgraphCore.Model;
-using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
-using TrustgraphCore.Enumerations;
 using TrustchainCore.Builders;
 using TrustgraphCore.Extensions;
 
@@ -15,9 +11,9 @@ namespace TrustgraphCore.Services
     {
         public GraphModel Graph { get; set;}
 
-        public GraphClaim TrustTrueClaim { get; set; }
+        public GraphClaim FollowClaim { get; set; }
         public int GlobalScopeIndex { get; set; }
-        public int TrustTrueType { get; set; }
+        public int FollowTypeIndex { get; set; }
 
         public GraphTrustService() : this(new GraphModel())
         {
@@ -31,13 +27,7 @@ namespace TrustgraphCore.Services
 
         private void EnsureSetup()
         {
-            TrustTrueClaim = EnsureTrustTrueClaim();
-        }
-
-        private GraphClaim EnsureTrustTrueClaim()
-        {
-            var graphClaim = CreateGraphClaim(TrustBuilder.CreateTrustTrueClaim()); // Need to created the GraphClaim before the ByteID can be calculated
-            return EnsureGraphClaim(graphClaim);
+            FollowClaim = EnsureGraphClaim(TrustBuilder.CreateFollowClaim());
         }
 
         public GraphIssuer EnsureGraphIssuer(byte[] address)
@@ -79,8 +69,10 @@ namespace TrustgraphCore.Services
             return graphSubject;
         }
 
-        public GraphClaim EnsureGraphClaim(GraphClaim graphClaim)
+        public GraphClaim EnsureGraphClaim(Claim trustClaim)
         {
+            var graphClaim = CreateGraphClaim(trustClaim);
+
             var id = graphClaim.ID();
             if (!Graph.ClaimIndex.TryGetValue(id, out int index))
             {
@@ -123,43 +115,40 @@ namespace TrustgraphCore.Services
 
         public void Add(IEnumerable<Trust> trusts)
         {
-            long unixTime = DateTime.Now.ToUnixTime();
             foreach (var trust in trusts)
             {
-                Add(trust, unixTime);
+                Add(trust);
             }
         }
 
-        public void Add(Trust trust, long unixTime = 0)
+        public void Add(Trust trust)
         {
-            if (unixTime == 0)
-                unixTime = DateTime.Now.ToUnixTime();
-
             var issuer = EnsureGraphIssuer(trust.Issuer.Address);
-            
 
-            foreach (var subject in trust.Subjects)
+            foreach (var trustSubject in trust.Subjects)
             {
 
-                var graphSubject = EnsureGraphSubject(issuer, subject);
+                var graphSubject = EnsureGraphSubject(issuer, trustSubject);
 
-
-                foreach (var index in subject.ClaimIndexs)
+                foreach (var index in trustSubject.ClaimIndexs)
                 {
                     var trustClaim = trust.Claims[index];
-                    var graphClaim = CreateGraphClaim(trustClaim);
-                    graphClaim = EnsureGraphClaim(graphClaim);
 
-                    graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Index);
-
-                    // If the claim is Trust = true
-                    if (TrustBuilder.IsTrustTrueClaim(trustClaim.Type, trustClaim.Data))
-                        graphSubject.Claims.Ensure(graphClaim.Scope, TrustTrueClaim.Index);
-
+                    EnsureSubjectClaim(graphSubject, trustClaim);
                 }
-
-
             }
+        }
+
+        public GraphClaim EnsureSubjectClaim(GraphSubject graphSubject, Claim trustClaim)
+        {
+            var graphClaim = EnsureGraphClaim(trustClaim);
+            graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Type, graphClaim.Index);
+
+            // If the claim is Trust = true
+            if (TrustBuilder.IsTrustTrueClaim(trustClaim.Type, trustClaim.Data))
+                graphSubject.Claims.Ensure(graphClaim.Scope, FollowClaim.Type, FollowClaim.Index);
+
+            return graphClaim;
         }
     }
 }
