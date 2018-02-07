@@ -5,6 +5,7 @@ using TrustgraphCore.Interfaces;
 using System.Runtime.CompilerServices;
 using TrustgraphCore.Extensions;
 using System.Collections.Generic;
+using TrustchainCore.Collections;
 
 namespace TrustgraphCore.Services
 {
@@ -67,12 +68,12 @@ namespace TrustgraphCore.Services
             var tracker = new GraphTracker(issuer);
             context.Tracker.Push(tracker);
 
-            // Set the Issuer to visited bit, avoiding researching the issuer
-            issuer.Visited |= context.Visited;
-
             // Process current level
             if (context.Tracker.Count == context.Level)
             {
+                // Set the Issuer to visited bit, avoiding re-searching the issuer
+                context.Visited.SetFast(issuer.Index, true);
+
                 foreach (var key in issuer.Subjects.Keys)
                 {
                     tracker.SubjectKey = key;
@@ -98,20 +99,18 @@ namespace TrustgraphCore.Services
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void SearchSubject(QueryContext context, GraphIssuer issuer, int subjectKey)
         {
-            var subjects = issuer.Subjects;
-            if ((subjects[subjectKey].TargetIssuer.Visited & context.Visited) != 0)
-                return; // The targetIssuer has already been visited!
-            
+            if (context.Visited.GetFast(issuer.Subjects[subjectKey].TargetIssuer.Index))
+                return;
+
             // Check local scope for claims
-            var claimExist = subjects[subjectKey].Claims.Exist(context.TargetClaim.Scope, context.TargetClaim.Type);
+            var claimExist = issuer.Subjects[subjectKey].Claims.Exist(context.TargetClaim.Scope, context.TargetClaim.Type);
 
             if (claimExist)
             {
                 // Do any of the subjects match the Targets
                 for (var t = 0; t < context.Targets.Count; t++)
                 {
-                    //if (!ReferenceEquals(context.Targets[t], subjects[subjectKey].TargetIssuer))
-                    if (context.Targets[t].Index != subjects[subjectKey].TargetIssuer.Index)
+                    if (context.Targets[t].Index != issuer.Subjects[subjectKey].TargetIssuer.Index)
                             continue;
 
                     BuildResult(context);

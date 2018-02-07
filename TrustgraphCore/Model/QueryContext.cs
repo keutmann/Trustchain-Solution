@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using TrustchainCore.Collections.Generic;
 using System.Security.Claims;
 using TrustchainCore.Builders;
+using TrustchainCore.Collections;
 
 namespace TrustgraphCore.Model
 {
@@ -24,7 +25,9 @@ namespace TrustgraphCore.Model
         public int MaxCost { get; set; }
         public int Level { get; set; }
         public int MaxLevel { get; set; }
-        public ulong Visited = 0;
+
+        public BitArrayFast Visited;
+
 
         internal Dictionary<int, GraphIssuer> TargetsFound = new Dictionary<int, GraphIssuer>();
 
@@ -47,9 +50,6 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "unknownsubjecttypes", NullValueHandling = NullValueHandling.Ignore, Order = 90)]
         public List<string> UnknownSubjectTypes = new List<string>();
 
-        //[JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
-        //public List<SubjectResult> Subjects { get; set; }
-
         public QueryContext()
         {
             Issuers = new List<GraphIssuer>();
@@ -59,13 +59,12 @@ namespace TrustgraphCore.Model
             MaxCost = 500; 
             Level = 0;
             MaxLevel = 3; // About 3 levels down max!
-            //MatchLevel = int.MaxValue; // At watch level do we have the first match
-            Visited = 1; // Use bit 1!
         }
 
         public QueryContext(IGraphTrustService graphService, QueryRequest query) : this()
         {
             GraphTrustService = graphService;
+
             foreach (var issuerId in query.Issuers)
             {
                 if (GraphTrustService.Graph.IssuerIndex.ContainsKey(issuerId))
@@ -97,10 +96,10 @@ namespace TrustgraphCore.Model
             if(!GraphTrustService.Graph.Scopes.ContainsKey(query.Scope))
                 throw new ApplicationException("Unknown scope in query: " + query.Scope);
 
-            //ScopeIndex = GraphService.Graph.ScopeIndex[query.Scope];
-
             var trustClaim = TrustBuilder.CreateClaim(query.Claim, query.Scope, string.Empty);
             TargetClaim = GraphTrustService.CreateGraphClaim(trustClaim);
+
+            Visited = new BitArrayFast(GraphTrustService.Graph.Issuers.Count + 1024, false); // 1024 is buffer for new Issuers when searching
         }
     }
 }
