@@ -7,27 +7,29 @@ using TrustchainCore.Interfaces;
 namespace TrustgraphCore.Model
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct GraphClaim : IGraphClaim
+    public struct GraphClaim //: IGraphClaim
     {
         public int Index;
         public short Cost;  // cost of following the trust, lower the better
         public int Scope; // scope of the trust
         public int Type; // Type of the trust
-        //public Int32 Timestamp; // The timestamp of the trust. This will be moved to an external event, do not check every time traversing the Graph
         public int Data; // Claims 
-        //public UInt32 Activate; // When to begin consider the trust. This will be moved to an external event, do not check every time traversing the Graph
-        //public UInt32 Expire;    // When the trust expire, This will be moved to an external event
+        public int Note;
+        //public int Activate; // When to begin consider the trust. This will be moved to an external event, do not check every time traversing the Graph
+        //public int Expire;    // When the trust expire, This will be moved to an external event
 
-        public string StringID()
+        public string ID()
         {
-            return $"{Scope}:{Data}";
+            return $"T:{Type}:{Scope}:{Data}:{Note}";
         }
 
-        public byte[] ByteID()
-        {
-            var data = Encoding.UTF8.GetBytes(StringID());
-            return Hashes.RIPEMD160(data, data.Length);
-        }
+        //public static byte[] ByteID(string id)
+        //{
+        //    var data = Encoding.UTF8.GetBytes(id);
+        //    return Hashes.RIPEMD160(data, data.Length);
+        //}
+
+
 
     }
 }

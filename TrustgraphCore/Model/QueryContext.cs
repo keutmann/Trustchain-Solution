@@ -114,7 +114,7 @@ namespace TrustgraphCore.Model
             };
 
             Claim = GraphTrustService.CreateGraphClaim(trustClaim);
-            var id = Claim.ByteID();
+            var id = Claim.ID();
             if (!GraphTrustService.Graph.ClaimIndex.ContainsKey(id))
                 throw new ApplicationException("Unknown claim!");
             Claim.Index = GraphTrustService.Graph.ClaimIndex[id];

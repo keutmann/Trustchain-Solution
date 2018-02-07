@@ -23,7 +23,7 @@
         {
           "index": 0, // Optional, specify index, if the possibility of claim object gets reordered.
           // Claim made about the subject. The format is specified by the version property in the header section.
-          "type": "tc-binarytrust-1.0", // tc=Trustchain, binarytrust=graph, 1.0=version
+          "type": "binarytrust.tc1", // tc1=Trustchain version 1, binarytrust=graph
           "data": { // the object that match the tc-binarytrust-1.0
             "trust": true, // Endicates if the subject is trusted or not.
             "confirm": true // Endicates if the subject is confirmed to be real.

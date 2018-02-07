@@ -68,10 +68,10 @@ namespace UnitTest.TrustgraphCore
             var subject = tracker.Subjects.GetValueOrDefault(targetIndex);
             Assert.IsNotNull(subject, $"Result is missing for subject for: {source} - subject: {target}");
 
-            var index = _graphTrustService.GetClaimDataIndex(claimData.ToString());
-            var subjectClaimIndex = new SubjectClaimIndex(0, index); // Global scope
-            var graphClaim = subject.Claims.GetValueOrDefault(subjectClaimIndex.Value);
-            Assert.IsTrue(graphClaim.Index == index, "Subject missing the claim data: "+claimData.ToString());
+            //var index = _graphTrustService.GetClaimDataIndex(claimData.ToString());
+            //var subjectClaimIndex = new SubjectClaimIndex(0, index); // Global scope
+            //var graphClaim = subject.Claims.GetValueOrDefault(subjectClaimIndex.Value);
+            //Assert.IsTrue(graphClaim.Index == index, "Subject missing the claim data: "+claimData.ToString());
         }
     }
 }

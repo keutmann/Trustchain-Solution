@@ -16,14 +16,12 @@ namespace TrustgraphCore.Interfaces
         void Add(IEnumerable<Trust> trusts);
         void Add(Trust trust, long unixTime);
 
-        GraphClaim EnsureTrustTrueClaim();
         GraphSubject CreateGraphSubject(Subject trustSubject);
         //void InitSubjectModel(Subject node, Claim claim, GraphSubject edge);
         GraphIssuer EnsureGraphIssuer(byte[] id);
-        GraphClaim EnsureGraphClaim(Claim trustClaim);
+        GraphClaim EnsureGraphClaim(GraphClaim graphClaim);
         GraphClaim CreateGraphClaim(Claim trustClaim);
-        int GetClaimDataIndex(string data = null);
-        Claim CreateClaim(string data);
+        int GetClaimDataIndex(Claim trustClaim);
         GraphSubject EnsureGraphSubject(GraphIssuer graphIssuer, Subject trustSubject);
 
     }

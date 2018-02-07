@@ -27,6 +27,9 @@ namespace TrustchainCore.Collections.Generic
 
         public int Ensure(T2 value)
         {
+            if (value == null)
+                return 0;
+
             if (!_forward.ContainsKey(value))
             {
                 var index = Count();

@@ -15,6 +15,6 @@ namespace TrustgraphCore.Model
         public GraphIssuer TargetIssuer; // The type of the subject
         public int IssuerType; // Use lookup table to handle subject type
         public int AliasIndex; // The name of the issuer for this subject
-        public Dictionary<long, GraphClaim> Claims;  // Int is scope index
+        public Dictionary<long, int> Claims;  // Int is scope index
     }
 }

@@ -7,6 +7,7 @@ using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
 using TrustgraphCore.Enumerations;
 using TrustchainCore.Builders;
+using TrustgraphCore.Extensions;
 
 namespace TrustgraphCore.Services
 {
@@ -33,11 +34,10 @@ namespace TrustgraphCore.Services
             TrustTrueClaim = EnsureTrustTrueClaim();
         }
 
-        public GraphClaim EnsureTrustTrueClaim()
+        private GraphClaim EnsureTrustTrueClaim()
         {
-            var claim = CreateClaim();
-
-            return EnsureGraphClaim(claim);
+            var graphClaim = CreateGraphClaim(TrustBuilder.CreateTrustTrueClaim()); // Need to created the GraphClaim before the ByteID can be calculated
+            return EnsureGraphClaim(graphClaim);
         }
 
         public GraphIssuer EnsureGraphIssuer(byte[] address)
@@ -73,26 +73,22 @@ namespace TrustgraphCore.Services
                 TargetIssuer =  EnsureGraphIssuer(trustSubject.Address),
                 IssuerType = Graph.SubjectTypes.Ensure(trustSubject.Type),
                 AliasIndex = Graph.Alias.Ensure(trustSubject.Alias),
-                Claims = new Dictionary<long, GraphClaim>()
+                Claims = new Dictionary<long, int>()
             };
 
             return graphSubject;
         }
 
-        public GraphClaim EnsureGraphClaim(Claim trustClaim)
+        public GraphClaim EnsureGraphClaim(GraphClaim graphClaim)
         {
-            var gc = CreateGraphClaim(trustClaim); // Need to created the GraphClaim before the ByteID can be calculated
-            var gcID = gc.ByteID();
-
-            if (!Graph.ClaimIndex.TryGetValue(gcID, out int index))
+            var id = graphClaim.ID();
+            if (!Graph.ClaimIndex.TryGetValue(id, out int index))
             {
-                gc.Index = Graph.Claims.Count;
-                Graph.Claims.Add(gc);
-                Graph.ClaimIndex.Add(gcID, gc.Index);
+                graphClaim.Index = Graph.Claims.Count;
+                Graph.Claims.Add(graphClaim);
+                Graph.ClaimIndex.Add(id, graphClaim.Index);
 
-                //Graph.ClaimIndexReverse.Add(gc.Index, gcID);
-
-                return gc;
+                return graphClaim;
             }
 
             return Graph.Claims[index];
@@ -103,40 +99,19 @@ namespace TrustgraphCore.Services
         {
             var gclaim = new GraphClaim
             {
+                Type = Graph.SubjectTypes.Ensure(trustClaim.Type),
                 Scope = Graph.Scopes.Ensure(trustClaim.Scope),
-                //gclaim.Activate = edge.Activate;
-                //gclaim.Expire = edge.Expire;
                 Cost = trustClaim.Cost,
-                //claim.Timestamp = edge.Timestamp;
-                Data = Graph.ClaimData.Ensure(trustClaim.Data)
+                Data = Graph.ClaimData.Ensure(trustClaim.Data),
+                Note = Graph.Notes.Ensure(trustClaim.Note)
             };
             return gclaim;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data">Default Trust=true</param>
-        /// <returns></returns>
-        public Claim CreateClaim(string data = null)
+        public int GetClaimDataIndex(Claim trustClaim)
         {
-            if (data == null)
-                data = TrustBuilder.CreateTrust().ToString();
-
-            var claim = new Claim
-            {
-                Cost = 100,
-                Data = data,
-                Scope = string.Empty // Global scope
-            };
-
-            return claim;
-        }
-
-        public int GetClaimDataIndex(string data = null)
-        {
-            var graphClaim = CreateGraphClaim(CreateClaim(data));
-            var index = Graph.ClaimIndex.GetValueOrDefault(graphClaim.ByteID());
+            var graphClaim = CreateGraphClaim(trustClaim);
+            var index = Graph.ClaimIndex.GetValueOrDefault(graphClaim.ID());
             return index;
         }
 
@@ -172,16 +147,15 @@ namespace TrustgraphCore.Services
                 foreach (var index in subject.ClaimIndexs)
                 {
                     var trustClaim = trust.Claims[index];
-                    var graphClaim = EnsureGraphClaim(trustClaim);
+                    var graphClaim = CreateGraphClaim(trustClaim);
+                    graphClaim = EnsureGraphClaim(graphClaim);
 
-                    if (graphClaim.Index == 0)  // If the claim is Trust = true
-                    {
-                        //var claimIndex = new SubjectClaimIndex { Scope = graphClaim.Scope, Index = graphClaim.Index };
-                        //graphSubject.Claims[claimIndex.Value] = graphClaim;
-                    }
+                    graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Index);
 
-                    var claimIndex = new SubjectClaimIndex { Scope = graphClaim.Scope, Index = graphClaim.Index };
-                    graphSubject.Claims[claimIndex.Value] = graphClaim;
+                    // If the claim is Trust = true
+                    if (TrustBuilder.IsTrustTrueClaim(trustClaim.Type, trustClaim.Data))
+                        graphSubject.Claims.Ensure(graphClaim.Scope, TrustTrueClaim.Index);
+
                 }
 
 

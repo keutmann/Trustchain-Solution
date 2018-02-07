@@ -91,7 +91,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(context.Results.Count, 2, $"Should be {2} results!");
+            Assert.AreEqual(2, context.Results.Count, $"Should be {2} results!");
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");

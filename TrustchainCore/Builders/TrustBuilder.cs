@@ -13,6 +13,8 @@ namespace TrustchainCore.Builders
 {
     public class TrustBuilder
     {
+        public const string BINARYTRUST_TC1 = "binarytrust.tc1";
+
         public Package Package { get; set; }
         private ITrustBinary _trustBinary;
 
@@ -329,6 +331,32 @@ namespace TrustchainCore.Builders
             CurrentTrust.Claims.Add(claim);
 
             return this;
+        }
+
+        public static Claim CreateTrustTrueClaim()
+        {
+            var claim = new Claim
+            {
+                Type = BINARYTRUST_TC1,
+                Cost = 100,
+                Data = TrustBuilder.CreateTrust().ToString(),
+                Scope = string.Empty // Global scope
+            };
+
+            return claim;
+        }
+
+        public static bool IsTrustTrueClaim(string type, string data)
+        {
+            if (!BINARYTRUST_TC1.EqualsIgnoreCase(type))
+                return false;
+
+            var jData = JObject.Parse(data);
+
+            if (jData["trust"].HasValues && jData["trust"].Value<bool>() == true)
+                return true;
+
+            return false;
         }
 
         public static JObject CreateTrust(bool value = true)
