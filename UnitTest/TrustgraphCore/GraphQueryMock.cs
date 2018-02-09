@@ -61,12 +61,15 @@ namespace UnitTest.TrustgraphCore
 
             return queryBuilder.Query;
         }
+        protected void VerfifyContext(QueryContext context, int exspectedResults)
+        {
+            Assert.AreEqual(0, context.Errors.Count, $"{string.Join("\r\n", context.Errors.ToArray())}");
+            Assert.AreEqual(exspectedResults, context.Results.Count, $"Should be {exspectedResults} results!");
+
+        }
 
         protected void VerfifyResult(QueryContext context, string source, string target, Claim trustClaim = null)
         {
-            if(trustClaim == null)
-                trustClaim = TrustBuilder.CreateTrustTrueClaim();
-
             var sourceAddress = TrustBuilderExtensions.GetAddress(source);
             var targetAddress = TrustBuilderExtensions.GetAddress(target);
             var sourceIndex = _graphTrustService.Graph.IssuerIndex.GetValueOrDefault(sourceAddress);
@@ -78,9 +81,12 @@ namespace UnitTest.TrustgraphCore
             var subject = tracker.Subjects.GetValueOrDefault(targetIndex);
             Assert.IsNotNull(subject, $"Result is missing for subject for: {source} - subject: {target}");
 
-            var graphClaim = _graphTrustService.CreateGraphClaim(trustClaim);
-            var exist = subject.Claims.Exist(graphClaim.Scope, graphClaim.Type);
-            Assert.IsTrue(exist, "Subject missing the claim type: " +trustClaim.Type);
+            if (trustClaim != null)
+            {
+                var graphClaim = _graphTrustService.CreateGraphClaim(trustClaim);
+                var exist = subject.Claims.Exist(graphClaim.Scope, graphClaim.Type);
+                Assert.IsTrue(exist, "Subject missing the claim type: " + trustClaim.Type);
+            }
         }
     }
 }

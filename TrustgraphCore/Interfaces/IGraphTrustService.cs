@@ -18,7 +18,7 @@ namespace TrustgraphCore.Interfaces
         GraphSubject CreateGraphSubject(Subject trustSubject);
         //void InitSubjectModel(Subject node, Claim claim, GraphSubject edge);
         GraphIssuer EnsureGraphIssuer(byte[] id);
-        GraphClaim EnsureSubjectClaim(GraphSubject graphSubject, Claim trustClaim);
+        //GraphClaim EnsureSubjectClaim(GraphSubject graphSubject, Claim trustClaim);
         GraphClaim EnsureGraphClaim(Claim trustClaim);
         GraphClaim CreateGraphClaim(Claim trustClaim);
         int GetClaimDataIndex(Claim trustClaim);

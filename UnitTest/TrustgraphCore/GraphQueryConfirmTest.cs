@@ -51,7 +51,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(2, context.Results.Count, $"Should be {2} results!");
+            VerfifyContext(context, 2);
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C", ClaimConfirmTrue);
@@ -76,7 +76,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(3, context.Results.Count, $"Should be {3} results!");
+            VerfifyContext(context, 3);
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "A", "B", ClaimConfirmTrue);
@@ -101,14 +101,14 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(5, context.Results.Count, $"Should be {5} results!");
-
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
             VerfifyResult(context, "C", "D", ClaimConfirmTrue);
 
             VerfifyResult(context, "F", "G");
             VerfifyResult(context, "G", "D", ClaimConfirmTrue);
+
+            VerfifyContext(context, 5);
         }
 
 
@@ -128,7 +128,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(context.Results.Count, 0, $"Should be {0} results!");
+            VerfifyContext(context, 0);
         }
 
 

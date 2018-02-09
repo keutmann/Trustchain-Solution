@@ -113,7 +113,7 @@ namespace TrustgraphCore.Model
                 if (GraphTrustService.Graph.IssuerIndex.ContainsKey(subject.Id))
                 {
                     var index = GraphTrustService.Graph.IssuerIndex[subject.Id];
-                    Targets.Add(index, GraphTrustService.Graph.Issuers[index]);
+                    Targets[index] = GraphTrustService.Graph.Issuers[index];
                 }
                 else
                     Errors.Add($"Unknown subject {subject.Id.ConvertToBase64()}");

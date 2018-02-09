@@ -102,7 +102,7 @@ namespace UnitTest.TrustgraphCore
 
             var queryBuilder = new QueryRequestBuilder(ClaimType);
             BuildQuery(queryBuilder, "A", "D");
-            queryBuilder.Query.Claims.Add(new ClaimQuery { Scope = "", Type = TrustBuilder.CONFIRMTRUST_TC1 });
+            queryBuilder.Query.ClaimTypes.Add(TrustBuilder.CONFIRMTRUST_TC1);
 
             // Execute
             var context = _graphQueryService.Execute(queryBuilder.Query);

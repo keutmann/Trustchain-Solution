@@ -81,7 +81,7 @@ namespace TrustgraphCore.Services
                     tracker.SubjectKey = key;
                     context.SubjectCount++;
 
-                    SearchSubject(context, issuer, key);
+                    SearchSubject(context, tracker);
                 }
             }
             else
@@ -107,8 +107,11 @@ namespace TrustgraphCore.Services
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SearchSubject(QueryContext context, GraphIssuer issuer, int key)
+        protected void SearchSubject(QueryContext context, GraphTracker tracker)
         {
+            GraphIssuer issuer = tracker.Issuer;
+            int key = tracker.SubjectKey;
+
             if (context.Visited.GetFast(issuer.Subjects[key].TargetIssuer.Index))
                 return;
 
@@ -117,21 +120,34 @@ namespace TrustgraphCore.Services
 
 
             var claims = new List<Tuple<long, int>>();
+            int index = 0;
             foreach (var type in context.ClaimTypes)
             {
-                if (!issuer.Subjects[key].Claims.Exist(context.ClaimScope, type)) // Check local scope for claims
-                    if (!issuer.Subjects[key].Claims.Exist(TrustService.GlobalScopeIndex, type)) // Check global scope for claims
-                        continue;
-
-                BuildResult(context); // Target found!
-                break;
+                if (issuer.Subjects[key].Claims.GetIndex(context.ClaimScope, type, out index)) // Check local scope for claims
+                    claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, type).Value, index));
+                else
+                    if (issuer.Subjects[key].Claims.GetIndex(TrustService.GlobalScopeIndex, type, out index)) // Check global scope for claims
+                        claims.Add(new Tuple<long, int>(new SubjectClaimIndex(TrustService.GlobalScopeIndex, type).Value, index));
             }
 
+            if (claims.Count == 0)
+                return;
+
+            if (issuer.Subjects[key].Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out index)) // Check local scope for claims
+                claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex).Value, index));
+            else
+                if (issuer.Subjects[key].Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index)) // Check global scope for claims
+                    claims.Add(new Tuple<long, int>(new SubjectClaimIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex).Value, index));
+            
+            BuildResult(context, tracker, claims); // Target found!
+
+            var targetIssuer = tracker.Issuer.Subjects[tracker.SubjectKey].TargetIssuer;
+            context.TargetsFound[targetIssuer.Index] = targetIssuer;
         }
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void BuildResult(QueryContext context)
+        protected void BuildResult(QueryContext context, GraphTracker currentTracker, List<Tuple<long, int>> claimsFound)
         {
             foreach (var tracker in context.Tracker)
             {
@@ -146,12 +162,17 @@ namespace TrustgraphCore.Services
                 if (!resultTracker.Subjects.ContainsKey(tracker.SubjectKey))
                 {   // Only subjects with unique keys
                     var graphSubject = tracker.Issuer.Subjects[tracker.SubjectKey]; // GraphSubject is a value type and therefore its copied
-                    //var tempClaims = new Dictionary<long, int>(); // 
-                    //graphSubject.Claims = tempClaims;
-                    
+                    graphSubject.Claims = new Dictionary<long, int>();
                     resultTracker.Subjects.Add(tracker.SubjectKey, graphSubject);
                     // Register the target found 
-                    context.TargetsFound[tracker.Issuer.Subjects[tracker.SubjectKey].TargetIssuer.Index] = tracker.Issuer.Subjects[tracker.SubjectKey].TargetIssuer;
+                }
+
+                if(resultTracker.Issuer.Index == currentTracker.Issuer.Index)
+                {
+                    foreach (var item in claimsFound)
+                    {
+                        resultTracker.Subjects[tracker.SubjectKey].Claims.Add(item.Item1, item.Item2);
+                    }
                 }
             }
         }

@@ -23,7 +23,8 @@ namespace TrustgraphCore.Builders
             {
                 Issuers = new List<byte[]>(),
                 Subjects = new List<SubjectQuery>(),
-                Claims = new List<ClaimQuery>() { new ClaimQuery { Scope = scope, Type = claim } }
+                ClaimScope = scope,
+                ClaimTypes = new List<string>() { claim }
             };
         }
 

@@ -14,7 +14,7 @@ namespace TrustgraphCore.Services
 
         //public GraphClaim FollowClaim { get; set; }
         public int GlobalScopeIndex { get; set; }
-        public int FollowTypeIndex { get; set; }
+        public int BinaryTrustTypeIndex { get; set; }
 
         public GraphTrustService() : this(new GraphModel())
         {
@@ -96,7 +96,7 @@ namespace TrustgraphCore.Services
         {
             var gclaim = new GraphClaim
             {
-                Type = Graph.SubjectTypes.Ensure(trustClaim.Type),
+                Type = Graph.ClaimType.Ensure(trustClaim.Type),
                 Scope = Graph.Scopes.Ensure(trustClaim.Scope),
                 Cost = trustClaim.Cost,
                 Data = Graph.ClaimData.Ensure(trustClaim.Data),
