@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using TrustchainCore.Interfaces;
+using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Model
 {
@@ -15,6 +16,8 @@ namespace TrustgraphCore.Model
         public int Type; // Type of the trust
         public int Data; // Claims 
         public int Note;
+        public ClaimFlags Flags;
+
         //public int Activate; // When to begin consider the trust. This will be moved to an external event, do not check every time traversing the Graph
         //public int Expire;    // When the trust expire, This will be moved to an external event
 

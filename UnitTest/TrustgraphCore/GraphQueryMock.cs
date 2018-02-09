@@ -23,6 +23,11 @@ namespace UnitTest.TrustgraphCore
         protected ITrustDBService _trustDBService = null;
         protected GraphQueryService _graphQueryService = null;
 
+        protected Claim ClaimTrustTrue = null;
+        protected Claim ClaimConfirmTrue = null;
+        protected Claim ClaimRating = null;
+
+
         [TestInitialize]
         public override void Init()
         {
@@ -31,6 +36,10 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder = new TrustBuilder(ServiceProvider);
             _trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
             _graphQueryService = new GraphQueryService(_graphTrustService);
+
+            ClaimTrustTrue = TrustBuilder.CreateTrustTrueClaim();
+            ClaimConfirmTrue = TrustBuilder.CreateConfirmClaim();
+            ClaimRating = TrustBuilder.CreateRatingClaim(100, "");
         }
 
 

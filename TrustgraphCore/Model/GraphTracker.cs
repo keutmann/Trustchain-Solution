@@ -6,7 +6,6 @@ namespace TrustgraphCore.Model
     /// <summary>
     /// Used to run though the Graph and track the path of search expantion. Enableds iterative free functions.
     /// </summary>
-    //[StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class GraphTracker
     {
         public GraphIssuer Issuer;

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace TrustgraphCore.Model
@@ -13,12 +12,15 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "subjects")]
         public List<SubjectQuery> Subjects;
 
-        [JsonProperty(PropertyName = "scope")]
-        public string Scope;
+        [JsonProperty(PropertyName = "ClaimTypes")]
+        public List<string> ClaimTypes;
 
-        [JsonProperty(PropertyName = "claim")]
-        public string Claim;
+        [JsonProperty(PropertyName = "ClaimScope")]
+        public string ClaimScope;
 
+        /// <summary>
+        /// Limit the search level. Cannot be more than the predefined max level.
+        /// </summary>
         [JsonProperty(PropertyName = "level")]
         public int Level;
 

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using TrustgraphCore.Extensions;
 using System.Collections.Generic;
 using TrustchainCore.Collections;
+using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Services
 {
@@ -55,8 +56,8 @@ namespace TrustgraphCore.Services
         {
             foreach (var targetIssuer in context.TargetsFound.Values)
             {
-                if (context.Targets.Contains(targetIssuer))
-                    context.Targets.Remove(targetIssuer);
+                if (context.Targets.ContainsKey(targetIssuer.Index))
+                    context.Targets.Remove(targetIssuer.Index);
             }
         }
 
@@ -73,10 +74,13 @@ namespace TrustgraphCore.Services
             {
                 // Set the Issuer to visited bit, avoiding re-searching the issuer
                 context.Visited.SetFast(issuer.Index, true);
+                context.IssuerCount++;
 
                 foreach (var key in issuer.Subjects.Keys)
                 {
                     tracker.SubjectKey = key;
+                    context.SubjectCount++;
+
                     SearchSubject(context, issuer, key);
                 }
             }
@@ -86,9 +90,15 @@ namespace TrustgraphCore.Services
                 {
                     tracker.SubjectKey = key;
 
-                    bool follow = issuer.Subjects[key].Claims.Exist(context.TargetClaim.Scope, TrustService.FollowClaim.Type);
+                    var follow = false;
+                    if (issuer.Subjects[key].Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out int index))
+                        follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
 
-                    if(follow)
+                    if(!follow) // Check global
+                        if (issuer.Subjects[key].Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index))
+                            follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
+
+                    if (follow)
                         SearchIssuer(context, issuer.Subjects[key].TargetIssuer);
                 }
             }
@@ -97,26 +107,28 @@ namespace TrustgraphCore.Services
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SearchSubject(QueryContext context, GraphIssuer issuer, int subjectKey)
+        protected void SearchSubject(QueryContext context, GraphIssuer issuer, int key)
         {
-            if (context.Visited.GetFast(issuer.Subjects[subjectKey].TargetIssuer.Index))
+            if (context.Visited.GetFast(issuer.Subjects[key].TargetIssuer.Index))
                 return;
 
-            // Check local scope for claims
-            var claimExist = issuer.Subjects[subjectKey].Claims.Exist(context.TargetClaim.Scope, context.TargetClaim.Type);
+            if (!context.Targets.ContainsKey(issuer.Subjects[key].TargetIssuer.Index))
+                return;
 
-            if (claimExist)
+
+            var claims = new List<Tuple<long, int>>();
+            foreach (var type in context.ClaimTypes)
             {
-                // Do any of the subjects match the Targets
-                for (var t = 0; t < context.Targets.Count; t++)
-                {
-                    if (context.Targets[t].Index != issuer.Subjects[subjectKey].TargetIssuer.Index)
-                            continue;
+                if (!issuer.Subjects[key].Claims.Exist(context.ClaimScope, type)) // Check local scope for claims
+                    if (!issuer.Subjects[key].Claims.Exist(TrustService.GlobalScopeIndex, type)) // Check global scope for claims
+                        continue;
 
-                    BuildResult(context);
-                }
+                BuildResult(context); // Target found!
+                break;
             }
+
         }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void BuildResult(QueryContext context)
@@ -129,11 +141,15 @@ namespace TrustgraphCore.Services
                     context.Results.Add(tracker.Issuer.Index, tracker);
                 }
                 
-                var resultTraker = context.Results[tracker.Issuer.Index];
+                var resultTracker = context.Results[tracker.Issuer.Index];
 
-                if (!resultTraker.Subjects.ContainsKey(tracker.SubjectKey))
-                {// Only subjects with unique keys
-                    resultTraker.Subjects.Add(tracker.SubjectKey, tracker.Issuer.Subjects[tracker.SubjectKey]);
+                if (!resultTracker.Subjects.ContainsKey(tracker.SubjectKey))
+                {   // Only subjects with unique keys
+                    var graphSubject = tracker.Issuer.Subjects[tracker.SubjectKey]; // GraphSubject is a value type and therefore its copied
+                    //var tempClaims = new Dictionary<long, int>(); // 
+                    //graphSubject.Claims = tempClaims;
+                    
+                    resultTracker.Subjects.Add(tracker.SubjectKey, graphSubject);
                     // Register the target found 
                     context.TargetsFound[tracker.Issuer.Subjects[tracker.SubjectKey].TargetIssuer.Index] = tracker.Issuer.Subjects[tracker.SubjectKey].TargetIssuer;
                 }

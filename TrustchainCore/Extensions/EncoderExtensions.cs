@@ -1,4 +1,5 @@
 ﻿using NBitcoin.DataEncoders;
+using System;
 using System.Text.RegularExpressions;
 
 namespace TrustchainCore.Extensions
@@ -13,6 +14,11 @@ namespace TrustchainCore.Extensions
         public static string ConvertToHex(this byte[] data)
         {
             return Encoders.Hex.EncodeData(data);
+        }
+
+        public static string ConvertToBase64(this byte[] data)
+        {
+            return Encoders.Base64.EncodeData(data);  
         }
 
         /// <summary>

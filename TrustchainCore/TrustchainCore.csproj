@@ -12,7 +12,6 @@
     <Compile Remove="Model\CoreModel.cs" />
     <Compile Remove="Model\HeadModel.cs" />
     <Compile Remove="Model\IssuerModel.cs" />
-    <Compile Remove="Model\PackageModel.cs" />
     <Compile Remove="Model\ServerModel.cs" />
     <Compile Remove="Model\SubjectModel.cs" />
     <Compile Remove="Model\TimestampModel.cs" />

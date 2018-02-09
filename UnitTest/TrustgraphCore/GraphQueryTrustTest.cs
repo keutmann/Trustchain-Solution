@@ -25,20 +25,12 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class GraphQueryTrustTest : GraphQueryMock
     {
-        private Claim TrustTrueClaim = null;
         private const string ClaimType = TrustBuilder.BINARYTRUST_TC1;
-
-        [TestInitialize]
-        public override void Init()
-        {
-            base.Init();
-            TrustTrueClaim = TrustBuilder.CreateClaim(TrustBuilder.BINARYTRUST_TC1, "", TrustBuilder.CreateTrust().ToString());
-        }
 
         [TestMethod]
         public void Search1()
         {
-            _trustBuilder.AddTrust("A", "B", TrustTrueClaim);
+            _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
 
             _graphTrustService.Add(_trustBuilder.Package);  // Build graph!
 
@@ -81,8 +73,8 @@ namespace UnitTest.TrustgraphCore
         public void Source1Target1()
         {
             // Build up
-            _trustBuilder.AddTrust("A", "B", TrustTrueClaim);
-            _trustBuilder.AddTrust("B", "C", TrustTrueClaim);
+            _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
+            _trustBuilder.AddTrust("B", "C", ClaimTrustTrue);
             _graphTrustService.Add(_trustBuilder.Package);
 
             var queryBuilder = new QueryRequestBuilder(ClaimType);
@@ -93,6 +85,30 @@ namespace UnitTest.TrustgraphCore
 
             // Verify
             Assert.AreEqual(2, context.Results.Count, $"Should be {2} results!");
+
+            VerfifyResult(context, "A", "B");
+            VerfifyResult(context, "B", "C");
+        }
+
+
+        /// <summary>
+        /// 1 Source, 1 targets, 2 claims
+        /// </summary>
+        [TestMethod]
+        public void Source1Target1Claim2()
+        {
+            // Build up
+            ClaimTrustTrueGraph();
+
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
+            BuildQuery(queryBuilder, "A", "D");
+            queryBuilder.Query.Claims.Add(new ClaimQuery { Scope = "", Type = TrustBuilder.CONFIRMTRUST_TC1 });
+
+            // Execute
+            var context = _graphQueryService.Execute(queryBuilder.Query);
+
+            // Verify
+            Assert.AreEqual(context.Results.Count, 2, $"Should be {2} results!");
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
@@ -179,15 +195,24 @@ namespace UnitTest.TrustgraphCore
 
         private void ClaimTrustTrueGraph()
         {
-            _trustBuilder.AddTrust("A", "B", TrustTrueClaim);
-            _trustBuilder.AddTrust("B", "C", TrustTrueClaim);
-            _trustBuilder.AddTrust("C", "D", TrustTrueClaim);
-            _trustBuilder.AddTrust("B", "E", TrustTrueClaim);
-            _trustBuilder.AddTrust("E", "D", TrustTrueClaim);
-            _trustBuilder.AddTrust("B", "F", TrustTrueClaim);
-            _trustBuilder.AddTrust("F", "G", TrustTrueClaim);
-            _trustBuilder.AddTrust("G", "D", TrustTrueClaim); // Long way, no trust
-            _trustBuilder.AddTrust("G", "Unreach", TrustTrueClaim); // Long way, no trust
+            _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
+            _trustBuilder.AddTrust("B", "C", ClaimTrustTrue);
+            _trustBuilder.AddTrust("C", "D", ClaimTrustTrue);
+            _trustBuilder.AddTrust("B", "E", ClaimTrustTrue);
+            _trustBuilder.AddTrust("E", "D", ClaimTrustTrue);
+            _trustBuilder.AddTrust("B", "F", ClaimTrustTrue);
+            _trustBuilder.AddTrust("F", "G", ClaimTrustTrue);
+            _trustBuilder.AddTrust("G", "D", ClaimTrustTrue); // Long way, no trust
+            _trustBuilder.AddTrust("G", "Unreach", ClaimTrustTrue); // Long way, no trust
+
+            _trustBuilder.AddTrust("A", "B", ClaimConfirmTrue);
+            _trustBuilder.AddTrust("C", "D", ClaimConfirmTrue);
+            _trustBuilder.AddTrust("G", "D", ClaimConfirmTrue);
+
+            _trustBuilder.AddTrust("A", "B", ClaimRating);
+            _trustBuilder.AddTrust("C", "D", ClaimRating);
+            _trustBuilder.AddTrust("G", "D", ClaimRating);
+
             _graphTrustService.Add(_trustBuilder.Package);
         }
     }

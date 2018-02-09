@@ -5,6 +5,8 @@ using TrustchainCore.Builders;
 using TrustgraphCore.Model;
 using TrustgraphCore.Interfaces;
 using TrustchainCore.Controllers;
+using TrustgraphCore.Builders;
+using TrustchainCore.Model;
 
 namespace TrustgraphCore.Controllers
 {
@@ -27,19 +29,17 @@ namespace TrustgraphCore.Controllers
         [HttpGet]
         public ActionResult Get(string issuer, string subject, bool trust = true)
         {
-            var query = new QueryRequest();
-            query.Issuers = new List<Byte[]>();
-            query.Issuers.Add(Convert.FromBase64String(issuer));
+            var builder = new QueryRequestBuilder("", TrustBuilder.BINARYTRUST_TC1);
+            var sub = new Subject
+            {
+                Address = Convert.FromBase64String(subject),
+                Type = ""
+            };
+            builder.Add(Convert.FromBase64String(issuer), sub);
 
-            query.Subjects = new List<SubjectQuery>();
-            query.Subjects.Add(new SubjectQuery { Id = Convert.FromBase64String(subject), Type = "" });
+            _queryRequestService.Verify(builder.Query);
 
-            query.Claim = TrustBuilder.CreateTrust().ToString();
-            query.Scope = string.Empty; // Global
-
-            _queryRequestService.Verify(query);
-
-            return ResolvePost(query);
+            return ResolvePost(builder.Query);
         }
 
         // Post api/

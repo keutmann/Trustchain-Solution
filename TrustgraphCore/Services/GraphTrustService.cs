@@ -4,6 +4,7 @@ using TrustgraphCore.Model;
 using TrustgraphCore.Interfaces;
 using TrustchainCore.Builders;
 using TrustgraphCore.Extensions;
+using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Services
 {
@@ -11,7 +12,7 @@ namespace TrustgraphCore.Services
     {
         public GraphModel Graph { get; set;}
 
-        public GraphClaim FollowClaim { get; set; }
+        //public GraphClaim FollowClaim { get; set; }
         public int GlobalScopeIndex { get; set; }
         public int FollowTypeIndex { get; set; }
 
@@ -22,13 +23,13 @@ namespace TrustgraphCore.Services
         public GraphTrustService(GraphModel graph)
         {
             Graph = graph;
-            EnsureSetup();
+            //EnsureSetup();
         }
 
-        private void EnsureSetup()
-        {
-            FollowClaim = EnsureGraphClaim(TrustBuilder.CreateFollowClaim());
-        }
+        //private void EnsureSetup()
+        //{
+        //    FollowClaim = EnsureGraphClaim(TrustBuilder.CreateFollowClaim());
+        //}
 
         public GraphIssuer EnsureGraphIssuer(byte[] address)
         {
@@ -77,6 +78,10 @@ namespace TrustgraphCore.Services
             if (!Graph.ClaimIndex.TryGetValue(id, out int index))
             {
                 graphClaim.Index = Graph.Claims.Count;
+
+                if (TrustBuilder.IsTrustTrueClaim(trustClaim.Type, trustClaim.Data))
+                    graphClaim.Flags |= ClaimFlags.Trust;
+
                 Graph.Claims.Add(graphClaim);
                 Graph.ClaimIndex.Add(id, graphClaim.Index);
 
@@ -95,7 +100,8 @@ namespace TrustgraphCore.Services
                 Scope = Graph.Scopes.Ensure(trustClaim.Scope),
                 Cost = trustClaim.Cost,
                 Data = Graph.ClaimData.Ensure(trustClaim.Data),
-                Note = Graph.Notes.Ensure(trustClaim.Note)
+                Note = Graph.Notes.Ensure(trustClaim.Note),
+                Flags = 0
             };
             return gclaim;
         }
@@ -134,21 +140,10 @@ namespace TrustgraphCore.Services
                 {
                     var trustClaim = trust.Claims[index];
 
-                    EnsureSubjectClaim(graphSubject, trustClaim);
+                    var graphClaim = EnsureGraphClaim(trustClaim);
+                    graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Type, graphClaim.Index);
                 }
             }
-        }
-
-        public GraphClaim EnsureSubjectClaim(GraphSubject graphSubject, Claim trustClaim)
-        {
-            var graphClaim = EnsureGraphClaim(trustClaim);
-            graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Type, graphClaim.Index);
-
-            // If the claim is Trust = true
-            if (TrustBuilder.IsTrustTrueClaim(trustClaim.Type, trustClaim.Data))
-                graphSubject.Claims.Ensure(graphClaim.Scope, FollowClaim.Type, FollowClaim.Index);
-
-            return graphClaim;
         }
     }
 }

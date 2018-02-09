@@ -3,10 +3,10 @@
 namespace TrustgraphCore.Model
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class SubjectQuery
+    public class ClaimQuery
     {
-        [JsonProperty(PropertyName = "id")]
-        public byte[] Id;
+        [JsonProperty(PropertyName = "scope")]
+        public string Scope;
         [JsonProperty(PropertyName = "type")]
         public string Type;
     }

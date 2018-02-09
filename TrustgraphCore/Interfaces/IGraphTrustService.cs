@@ -8,9 +8,8 @@ namespace TrustgraphCore.Interfaces
     {
         GraphModel Graph { get; set; }
 
-        GraphClaim FollowClaim { get; set; }
         int GlobalScopeIndex { get; set; }
-        int FollowTypeIndex { get; set; }
+        int BinaryTrustTypeIndex { get; set; }
 
         void Add(Package package);
         void Add(IEnumerable<Trust> trusts);

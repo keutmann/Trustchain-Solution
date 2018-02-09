@@ -25,17 +25,8 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class GraphQueryConfirmTest : GraphQueryMock
     {
-        private Claim ClaimTrustTrue = null;
-        private Claim ClaimConfirmTrue = null;
         private const string ConfirmClaimType = TrustBuilder.CONFIRMTRUST_TC1;
 
-        [TestInitialize]
-        public override void Init()
-        {
-            base.Init();
-            ClaimTrustTrue = TrustBuilder.CreateTrustTrueClaim();
-            ClaimConfirmTrue = TrustBuilder.CreateConfirmClaim();
-        }
 
         /// <summary>
         /// 1 Source, 1 targets
@@ -156,6 +147,10 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("A", "B", ClaimConfirmTrue);
             _trustBuilder.AddTrust("C", "D", ClaimConfirmTrue);
             _trustBuilder.AddTrust("G", "D", ClaimConfirmTrue);
+
+            _trustBuilder.AddTrust("A", "B", ClaimRating);
+            _trustBuilder.AddTrust("C", "D", ClaimRating);
+            _trustBuilder.AddTrust("G", "D", ClaimRating);
 
             _graphTrustService.Add(_trustBuilder.Package);
         }

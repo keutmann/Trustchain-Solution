@@ -14,6 +14,14 @@ namespace TrustgraphCore.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool GetIndex(this Dictionary<long, int> claims, int scope, int type, out int index)
+        {
+            var subjectClaimIndex = new SubjectClaimIndex { Scope = scope, Type = type };
+            return claims.TryGetValue(subjectClaimIndex.Value, out index);
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Ensure(this Dictionary<long, int> claims, int scope, int type, int claimIndex)
         {
             var subjectClaimIndex = new SubjectClaimIndex { Scope = scope, Type = type };

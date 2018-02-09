@@ -25,19 +25,7 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class GraphQueryRatingTest : GraphQueryMock
     {
-        private Claim ClaimTrustTrue = null;
-        private Claim ClaimRating = null;
         private string ClaimType = TrustBuilder.RATING_TC1;
-
-        [TestInitialize]
-        public override void Init()
-        {
-            base.Init();
-            ClaimTrustTrue = TrustBuilder.CreateTrustTrueClaim();
-            ClaimRating = TrustBuilder.CreateRatingClaim(100,"");
-
-        }
-
 
         /// <summary>
         /// 1 Source, 1 targets
