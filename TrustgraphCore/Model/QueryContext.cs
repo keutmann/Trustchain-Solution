@@ -19,13 +19,16 @@ namespace TrustgraphCore.Model
         public IGraphTrustService GraphTrustService { get; set; }
 
         [JsonIgnore]
-        public List<GraphIssuer> Issuers { get; set; }
+        public GraphIssuer Issuer { get; set; }
 
         [JsonIgnore]
         public Dictionary<int, GraphIssuer> Targets { get; set; }
 
         [JsonIgnore]
         public List<int> ClaimTypes;
+
+        [JsonIgnore]
+        public bool AddClaimTrust = false;
 
         [JsonIgnore]
         public int ClaimScope;
@@ -67,7 +70,7 @@ namespace TrustgraphCore.Model
 
         public QueryContext()
         {
-            Issuers = new List<GraphIssuer>();
+            Issuer = new GraphIssuer();
             Targets = new Dictionary<int, GraphIssuer>(); 
             ClaimTypes = new List<int>();
             Results = new Dictionary<int, GraphTracker>();
@@ -94,16 +97,15 @@ namespace TrustgraphCore.Model
 
         internal void SetupIssuers(QueryRequest query)
         {
-            foreach (var issuerId in query.Issuers)
+
+            if (!GraphTrustService.Graph.IssuerIndex.ContainsKey(query.Issuer))
             {
-                if (GraphTrustService.Graph.IssuerIndex.ContainsKey(issuerId))
-                {
-                    var index = GraphTrustService.Graph.IssuerIndex[issuerId];
-                    Issuers.Add(GraphTrustService.Graph.Issuers[index]);
-                }
-                else
-                    Errors.Add($"Unknown Issuer {issuerId.ConvertToBase64()}");
+                Errors.Add($"Unknown Issuer {query.Issuer.ConvertToBase64()}");
+                return;
             }
+
+            var index = GraphTrustService.Graph.IssuerIndex[query.Issuer];
+            Issuer =  GraphTrustService.Graph.Issuers[index];
         }
 
         internal void SetupSubjects(QueryRequest query)
@@ -142,12 +144,14 @@ namespace TrustgraphCore.Model
             {
                 foreach (var type in query.ClaimTypes)
                 {
-
                     if (!GraphTrustService.Graph.ClaimType.ContainsKey(type))
                         Errors.Add($"Unknown claim type {type}");
                     else
                         ClaimTypes.Add(GraphTrustService.Graph.ClaimType.GetIndex(type));
                 }
+
+                if (!ClaimTypes.Contains(GraphTrustService.BinaryTrustTypeIndex))
+                    AddClaimTrust = true;
             }
 
 

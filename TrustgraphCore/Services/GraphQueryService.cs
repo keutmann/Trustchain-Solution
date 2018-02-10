@@ -25,7 +25,7 @@ namespace TrustgraphCore.Services
         {
             var context = new QueryContext(TrustService, query);
 
-            if (context.Issuers.Count > 0 && context.Targets.Count > 0)
+            if (context.Issuer != null && context.Targets.Count > 0)
                 ExecuteQueryContext(context);
 
             return context;
@@ -37,12 +37,9 @@ namespace TrustgraphCore.Services
             // Keep search until the maxlevel is hit or matchlevel is hit
             while (context.Level < context.MaxLevel && context.Targets.Count > 0)
             {
-                context.Level++; 
+                context.Level++;
 
-                foreach (var issuer in context.Issuers)
-                {
-                    SearchIssuer(context, issuer);
-                }
+                SearchIssuer(context, context.Issuer);
 
                 ClearTargets(context);
             }
@@ -133,11 +130,12 @@ namespace TrustgraphCore.Services
             if (claims.Count == 0)
                 return;
 
-            if (issuer.Subjects[key].Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out index)) // Check local scope for claims
-                claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex).Value, index));
-            else
-                if (issuer.Subjects[key].Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index)) // Check global scope for claims
-                    claims.Add(new Tuple<long, int>(new SubjectClaimIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex).Value, index));
+            if(context.AddClaimTrust)
+                if (issuer.Subjects[key].Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out index)) // Check local scope for claims
+                    claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex).Value, index));
+                else
+                    if (issuer.Subjects[key].Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index)) // Check global scope for claims
+                        claims.Add(new Tuple<long, int>(new SubjectClaimIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex).Value, index));
             
             BuildResult(context, tracker, claims); // Target found!
 
@@ -171,7 +169,7 @@ namespace TrustgraphCore.Services
                 {
                     foreach (var item in claimsFound)
                     {
-                        resultTracker.Subjects[tracker.SubjectKey].Claims.Add(item.Item1, item.Item2);
+                        resultTracker.Subjects[tracker.SubjectKey].Claims[item.Item1] = item.Item2;
                     }
                 }
             }

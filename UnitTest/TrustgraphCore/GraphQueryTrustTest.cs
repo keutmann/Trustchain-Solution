@@ -91,28 +91,28 @@ namespace UnitTest.TrustgraphCore
         }
 
 
-        /// <summary>
-        /// 1 Source, 1 targets, 2 claims
-        /// </summary>
-        [TestMethod]
-        public void Source1Target1Claim2()
-        {
-            // Build up
-            ClaimTrustTrueGraph();
+        ///// <summary>
+        ///// 1 Source, 1 targets, 2 claims
+        ///// </summary>
+        //[TestMethod]
+        //public void Source1Target1Claim2()
+        //{
+        //    // Build up
+        //    ClaimTrustTrueGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimType);
-            BuildQuery(queryBuilder, "A", "D");
-            queryBuilder.Query.ClaimTypes.Add(TrustBuilder.CONFIRMTRUST_TC1);
+        //    var queryBuilder = new QueryRequestBuilder(ClaimType);
+        //    BuildQuery(queryBuilder, "A", "D");
+        //    queryBuilder.Query.ClaimTypes.Add(TrustBuilder.CONFIRMTRUST_TC1);
 
-            // Execute
-            var context = _graphQueryService.Execute(queryBuilder.Query);
+        //    // Execute
+        //    var context = _graphQueryService.Execute(queryBuilder.Query);
 
-            // Verify
-            Assert.AreEqual(context.Results.Count, 2, $"Should be {2} results!");
+        //    // Verify
+        //    Assert.AreEqual(context.Results.Count, 2, $"Should be {2} results!");
 
-            VerfifyResult(context, "A", "B");
-            VerfifyResult(context, "B", "C");
-        }
+        //    VerfifyResult(context, "A", "B");
+        //    VerfifyResult(context, "B", "C");
+        //}
 
 
 
@@ -143,34 +143,34 @@ namespace UnitTest.TrustgraphCore
             VerfifyResult(context, "E", "D");
         }
 
-        /// <summary>
-        /// 2 Source, 1 targets
-        /// </summary>
-        [TestMethod]
-        public void Source2Target1()
-        {
-            ClaimTrustTrueGraph();
+        ///// <summary>
+        ///// 2 Source, 1 targets
+        ///// </summary>
+        //[TestMethod]
+        //public void Source2Target1()
+        //{
+        //    ClaimTrustTrueGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimType);
+        //    var queryBuilder = new QueryRequestBuilder(ClaimType);
 
-            BuildQuery(queryBuilder, "A", "D");
-            BuildQuery(queryBuilder, "F", "D");
+        //    BuildQuery(queryBuilder, "A", "D");
+        //    BuildQuery(queryBuilder, "F", "D");
 
-            // Execute
-            var context = _graphQueryService.Execute(queryBuilder.Query);
+        //    // Execute
+        //    var context = _graphQueryService.Execute(queryBuilder.Query);
 
-            // Verify
-            Assert.AreEqual(context.Results.Count, 6, $"Should be {6} results!");
+        //    // Verify
+        //    Assert.AreEqual(context.Results.Count, 6, $"Should be {6} results!");
 
-            VerfifyResult(context, "A", "B");
-            VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D");
-            VerfifyResult(context, "B", "E");
-            VerfifyResult(context, "E", "D");
+        //    VerfifyResult(context, "A", "B");
+        //    VerfifyResult(context, "B", "C");
+        //    VerfifyResult(context, "C", "D");
+        //    VerfifyResult(context, "B", "E");
+        //    VerfifyResult(context, "E", "D");
 
-            VerfifyResult(context, "F", "G");
-            VerfifyResult(context, "G", "D");
-        }
+        //    VerfifyResult(context, "F", "G");
+        //    VerfifyResult(context, "G", "D");
+        //}
 
 
         /// <summary>

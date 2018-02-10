@@ -17,15 +17,11 @@ namespace TrustgraphCore.Services
 
         public void Verify(QueryRequest query)
         {
-            if (query.Issuers == null || query.Issuers.Count == 0)
+            if (query.Issuer == null)
                 throw new ApplicationException("Missing issuers");
 
-            foreach (var issuer in query.Issuers)
-            {
-                if (issuer.Length != _derivationStrategy.Length)
-                    throw new ApplicationException("Invalid byte length on Issuer : " +issuer.ConvertToHex());
-
-            }
+            if (query.Issuer.Length != _derivationStrategy.Length)
+                throw new ApplicationException("Invalid byte length on Issuer : " + query.Issuer.ConvertToHex());
 
             foreach (var subject in query.Subjects)
             {

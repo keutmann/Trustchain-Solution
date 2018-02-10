@@ -7,7 +7,7 @@ namespace TrustgraphCore.Model
     public class QueryRequest
     {
         [JsonProperty(PropertyName = "issuers")]
-        public List<byte[]> Issuers;
+        public byte[] Issuer;
 
         [JsonProperty(PropertyName = "subjects")]
         public List<SubjectQuery> Subjects;

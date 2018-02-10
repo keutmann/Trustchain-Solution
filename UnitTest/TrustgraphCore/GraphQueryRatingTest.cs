@@ -79,32 +79,32 @@ namespace UnitTest.TrustgraphCore
             VerfifyResult(context, "C", "D", ClaimRating);
         }
 
-        /// <summary>
-        /// 2 Source, 1 targets
-        /// </summary>
-        [TestMethod]
-        public void Source2Target1()
-        {
-            BuildGraph();
+        ///// <summary>
+        ///// 2 Source, 1 targets
+        ///// </summary>
+        //[TestMethod]
+        //public void Source2Target1()
+        //{
+        //    BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimType);
+        //    var queryBuilder = new QueryRequestBuilder(ClaimType);
 
-            BuildQuery(queryBuilder, "A", "D");
-            BuildQuery(queryBuilder, "F", "D");
+        //    BuildQuery(queryBuilder, "A", "D");
+        //    BuildQuery(queryBuilder, "F", "D");
 
-            // Execute
-            var context = _graphQueryService.Execute(queryBuilder.Query);
+        //    // Execute
+        //    var context = _graphQueryService.Execute(queryBuilder.Query);
 
-            // Verify
-            Assert.AreEqual(5, context.Results.Count, $"Should be {5} results!");
+        //    // Verify
+        //    Assert.AreEqual(5, context.Results.Count, $"Should be {5} results!");
 
-            VerfifyResult(context, "A", "B");
-            VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", ClaimRating);
+        //    VerfifyResult(context, "A", "B");
+        //    VerfifyResult(context, "B", "C");
+        //    VerfifyResult(context, "C", "D", ClaimRating);
 
-            VerfifyResult(context, "F", "G");
-            VerfifyResult(context, "G", "D", ClaimRating);
-        }
+        //    VerfifyResult(context, "F", "G");
+        //    VerfifyResult(context, "G", "D", ClaimRating);
+        //}
 
 
         /// <summary>
