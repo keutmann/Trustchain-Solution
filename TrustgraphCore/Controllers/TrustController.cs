@@ -60,30 +60,25 @@ namespace TrustgraphCore.Controllers
             if (validationResult.ErrorsFound > 0)
                 return BadRequest(validationResult);
 
-            if (_trustDBService.DBContext.Packages.Any(f => f.Id == package.Id))
-                return ApiOk(null, null, "Package already exist");
-
+            // Timestamp validation service disabled for the moment
             // Check timestamp
-            if(package.Timestamps != null && package.Timestamps.Count > 0)
-            {
-                var timestamp = package.Timestamps[0]; // Only support one timestamp for now
-                var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
-                if(blockchainService == null)
-                    return BadRequest("Invalid Blockchain definition in package timestamp");
+            //if(package.Timestamps != null && package.Timestamps.Count > 0)
+            //{
+            //    var timestamp = package.Timestamps[0]; // Only support one timestamp for now
+            //    var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
+            //    if(blockchainService == null)
+            //        return BadRequest("Invalid Blockchain definition in package timestamp");
 
-                //var 
-                //var addressTimestamp = blockchainService.GetTimestamp()
-            }
+            //    //var 
+            //    //var addressTimestamp = blockchainService.GetTimestamp()
+            //}
             
-
 
             if (!_trustDBService.Add(package))   // Add to database
                 return ApiOk(null, null, "Package already exist");
 
             _graphTrustService.Add(package);    // Add to Graph
             _proofService.AddProof(package.Id); // Add to timestamp service
-
-
 
             return ApiOk(null, null, "Package added");
         }

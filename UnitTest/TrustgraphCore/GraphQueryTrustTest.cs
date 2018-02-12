@@ -19,6 +19,7 @@ using UnitTest.TrustchainCore.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using TrustchainCore.Model;
+using System.Diagnostics;
 
 namespace UnitTest.TrustgraphCore
 {
@@ -75,19 +76,29 @@ namespace UnitTest.TrustgraphCore
             // Build up
             _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
             _trustBuilder.AddTrust("B", "C", ClaimTrustTrue);
+            _trustBuilder.AddTrust("C", "D", ClaimTrustTrue);
             _graphTrustService.Add(_trustBuilder.Package);
 
             var queryBuilder = new QueryRequestBuilder(ClaimType);
-            BuildQuery(queryBuilder, "A", "C");
+            BuildQuery(queryBuilder, "A", "D");
 
             // Execute
-            var context = _graphQueryService.Execute(queryBuilder.Query);
+            QueryContext context = null;
+            var watch = new Stopwatch();
+            watch.Start();
+            for (int i = 0; i < 10; i++)
+            {
+                context = _graphQueryService.Execute(queryBuilder.Query);
+            }
+            watch.Stop();
+            Console.WriteLine("Query: "+watch.ElapsedMilliseconds);
 
             // Verify
-            Assert.AreEqual(2, context.Results.Count, $"Should be {2} results!");
+            Assert.AreEqual(3, context.Results.Count, $"Should be {3} results!");
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
+            VerfifyResult(context, "C", "D");
         }
 
 

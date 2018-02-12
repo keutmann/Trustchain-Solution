@@ -112,7 +112,7 @@ namespace TrustchainCore.Migrations
 
                     b.Property<byte[]>("ClaimIndexs");
 
-                    b.Property<string>("Kind");
+                    b.Property<string>("Type");
 
                     b.Property<int>("TrustID");
 

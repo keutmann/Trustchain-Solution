@@ -41,23 +41,6 @@ namespace TrustchainCore.Model
 
     }
 
-    //[JsonObject(MemberSerialization.OptIn)]
-    //public class ServerIdentity
-    //{
-    //    [JsonProperty(PropertyName = "script")]
-    //    public string Script { get; set; }
-
-    //    [JsonProperty(PropertyName = "id")]
-    //    public byte[] Id { get; set; }
-
-    //    [JsonProperty(PropertyName = "signature")]
-    //    public string Signature { get; set; }
-
-    //    public ServerIdentity()
-    //    {
-    //        Script = "btc-pkh";
-    //    }
-    //}
 
     [Table("Trust")]
     [JsonObject(MemberSerialization.OptIn)]
@@ -229,15 +212,6 @@ namespace TrustchainCore.Model
         }
 
     }
-
-    //[JsonObject(MemberSerialization.OptIn)]
-    //public class Datum
-    //{
-    //    public string kind { get; set; }
-    //    public bool trust { get; set; }
-    //    public bool confirm { get; set; }
-    //    public string reason { get; set; }
-    //}
 
     [Table("Timestamp")]
     [JsonObject(MemberSerialization.OptIn)]

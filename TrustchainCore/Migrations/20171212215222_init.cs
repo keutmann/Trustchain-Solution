@@ -156,7 +156,7 @@ namespace TrustchainCore.Migrations
                     Address = table.Column<byte[]>(nullable: true),
                     Alias = table.Column<string>(nullable: true),
                     ClaimIndexs = table.Column<byte[]>(nullable: true),
-                    Kind = table.Column<string>(nullable: true),
+                    Type = table.Column<string>(nullable: true),
                     TrustID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
