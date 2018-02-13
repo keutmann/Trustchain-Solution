@@ -3,6 +3,8 @@ using TrustchainCore.Model;
 using TrustchainCore.Repository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System;
+using System.Collections;
 
 namespace TrustchainCore.Services
 {
@@ -69,7 +71,29 @@ namespace TrustchainCore.Services
         public bool Add(Package package)
         {
             if (DBContext.Packages.Any(f => f.Id == package.Id))
-                return false;
+                throw new ApplicationException("Package already exist");
+
+            foreach (var trust in package.Trusts.ToArray())
+            {
+                var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, trust.Id));
+                if (dbTrust == null)
+                    continue;
+
+
+                if (package.Timestamps == null && trust.Timestamp == null)
+                {
+                    package.Trusts.Remove(trust);
+                    continue;
+                }
+
+                if (dbTrust.Timestamp == null)
+                {
+                    DBContext.Trusts.Remove(dbTrust);
+                    continue;
+                }
+
+                // Check timestamp
+            }
 
             DBContext.Packages.Add(package);
             DBContext.SaveChanges();

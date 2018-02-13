@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -210,6 +211,12 @@ namespace TrustchainCore.Model
         {
             return Expire > 0;
         }
+
+        public bool ShouldSerializeNote()
+        {
+            return Note != null;
+        }
+
 
     }
 

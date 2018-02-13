@@ -7,6 +7,6 @@ namespace TrustchainCore.Enumerations
     public enum HttpResultStatusType: int
     {
         Success,
-        Fail
+        Error
     }
 }

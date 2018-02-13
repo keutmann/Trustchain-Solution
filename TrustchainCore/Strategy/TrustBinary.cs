@@ -17,7 +17,7 @@ namespace TrustchainCore.Strategy
             {
                 ms.WriteString(trust.Issuer.Script.ToLower());
                 ms.WriteBytes(trust.Issuer.Address);
-                //ms.WriteString(trust.Name); // UTF8 - Not sure that name should be included in trust ID.
+
                 foreach (var subject in trust.Subjects)
                 {
                     ms.WriteBytes(subject.Address);
@@ -37,6 +37,7 @@ namespace TrustchainCore.Strategy
                     ms.WriteInteger(claim.Activate);
                     ms.WriteInteger(claim.Expire);
                     ms.WriteString(claim.Scope);
+                    ms.WriteString(claim.Note);
                 }
 
                 return ms.ToArray();

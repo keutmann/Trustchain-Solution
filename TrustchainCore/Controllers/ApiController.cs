@@ -19,5 +19,11 @@ namespace TrustchainCore.Controllers
         {
             return Ok(HttpResultBuilder.Success(data, status, message));
         }
+
+        [NonAction]
+        public OkObjectResult ApiError(object data, string status = null, string message = null)
+        {
+            return Ok(HttpResultBuilder.Error(data, status, message));
+        }
     }
 }

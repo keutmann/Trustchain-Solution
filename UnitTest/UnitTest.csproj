@@ -23,4 +23,8 @@
     <ProjectReference Include="..\TruststampCore\TruststampCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TrustchainCore\DBContext\" />
+  </ItemGroup>
+
 </Project>

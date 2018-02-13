@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 using TrustchainCore.Interfaces;
 using TrustgraphCore.Interfaces;
 
@@ -18,17 +19,21 @@ namespace TrustgraphCore.Services
             _logger = loggerFactory.CreateLogger<TrustLoadService>();
         }
 
-        public void LoadDatabase()
+        public Task LoadDatabase()
         {
-            _logger.LogInformation("Loading trust into Graph");
-            var count = 0;
-            // No need to load packages, just load trusts directly.
-            foreach (var trust in _trustDBService.Trusts)
+            return Task.Run(() =>
             {
-                count++;
-                _graphTrustService.Add(trust);
-            }
-            _logger.LogInformation($"Trust loaded: {count}");
+                _logger.LogInformation("Loading trust into Graph");
+                var count = 0;
+                // No need to load packages, just load trusts directly.
+                foreach (var trust in _trustDBService.Trusts)
+                {
+                    count++;
+                    _graphTrustService.Add(trust);
+                }
+                _logger.LogInformation($"Trust loaded: {count}");
+
+            });
         }
 
 

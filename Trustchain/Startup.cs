@@ -65,8 +65,6 @@ namespace Trustchain
         }
 
 
-
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
@@ -82,7 +80,7 @@ namespace Trustchain
                 app.UseExceptionHandler("/Error");
             }
 
-            //app.LoadGraph(); // Load the Trust Graph from Database
+            app.LoadGraph(); // Load the Trust Graph from Database
             app.Truststamp();
             ConfigureTimers(app);
             app.UseStaticFiles();

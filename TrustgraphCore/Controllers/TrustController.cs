@@ -5,6 +5,7 @@ using TrustgraphCore.Interfaces;
 using TrustchainCore.Controllers;
 using TrustchainCore.Interfaces;
 using TruststampCore.Interfaces;
+using System;
 
 namespace TrustgraphCore.Controllers
 {
@@ -56,29 +57,35 @@ namespace TrustgraphCore.Controllers
         [HttpPost]
         public ActionResult Add([FromBody]Package package)
         {
-            var validationResult = _trustSchemaService.Validate(package);
-            if (validationResult.ErrorsFound > 0)
-                return BadRequest(validationResult);
+            try
+            {
 
-            // Timestamp validation service disabled for the moment
-            // Check timestamp
-            //if(package.Timestamps != null && package.Timestamps.Count > 0)
-            //{
-            //    var timestamp = package.Timestamps[0]; // Only support one timestamp for now
-            //    var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
-            //    if(blockchainService == null)
-            //        return BadRequest("Invalid Blockchain definition in package timestamp");
+                var validationResult = _trustSchemaService.Validate(package);
+                if (validationResult.ErrorsFound > 0)
+                    return ApiError(validationResult, null, "Validation failed");
 
-            //    //var 
-            //    //var addressTimestamp = blockchainService.GetTimestamp()
-            //}
-            
+                // Timestamp validation service disabled for the moment
+                // Check timestamp
+                //if(package.Timestamps != null && package.Timestamps.Count > 0)
+                //{
+                //    var timestamp = package.Timestamps[0]; // Only support one timestamp for now
+                //    var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
+                //    if(blockchainService == null)
+                //        return BadRequest("Invalid Blockchain definition in package timestamp");
 
-            if (!_trustDBService.Add(package))   // Add to database
-                return ApiOk(null, null, "Package already exist");
+                //    //var 
+                //    //var addressTimestamp = blockchainService.GetTimestamp()
+                //}
 
-            _graphTrustService.Add(package);    // Add to Graph
-            _proofService.AddProof(package.Id); // Add to timestamp service
+
+                _trustDBService.Add(package);   // Add to database
+                _graphTrustService.Add(package);    // Add to Graph
+                _proofService.AddProof(package.Id); // Add to timestamp service
+            }
+            catch (Exception ex)
+            {
+                return ApiError(null, null, ex.Message);
+            }
 
             return ApiOk(null, null, "Package added");
         }

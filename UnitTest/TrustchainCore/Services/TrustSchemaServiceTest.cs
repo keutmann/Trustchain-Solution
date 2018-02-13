@@ -13,37 +13,13 @@ using UnitTest.TrustchainCore.Extensions;
 using TrustchainCore.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace UnitTest.TrustchainCore.Builders
+namespace UnitTest.TrustchainCore.Services
 {
     [TestClass]
-    public class ReadWriteTest : StartupMock
+    public class TrustSchemaServiceTest : StartupMock
     {
         [TestMethod]
-        public void ReadWritePackageIssuer()
-        {
-            var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
-            var derivationStrategy = new DerivationBTCPKH();
-            var serverKey = derivationStrategy.GetKey(Encoding.UTF8.GetBytes("testserver"));
-
-            var builder = new TrustBuilder(ServiceProvider);
-            builder.SetServer(serverKey);
-            builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateFollowClaim())
-                .Build()
-                .Sign();
-
-            trustDBService.Add(builder.Package);
-            trustDBService.DBContext.SaveChanges();
-
-            var dbPackage = trustDBService.Packages.FirstOrDefaultAsync().Result;
-
-            var compareResult = builder.Package.JsonCompare(dbPackage);
-            Assert.IsTrue(compareResult, "Package from database is not the same as Builder");
-
-        }
-
-        [TestMethod]
-        public void ReadWritePackage()
+        public void Validate()
         {
             var derivationStrategy = new DerivationBTCPKH();
             var serverKey = derivationStrategy.GetKey(Encoding.UTF8.GetBytes("testserver"));
@@ -67,5 +43,6 @@ namespace UnitTest.TrustchainCore.Builders
             Assert.AreEqual(0, result.Errors.Count);
             Assert.AreEqual(0, result.Warnings.Count);
         }
+
     }
 }

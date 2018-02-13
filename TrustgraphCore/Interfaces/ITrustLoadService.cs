@@ -1,8 +1,10 @@
-﻿namespace TrustgraphCore.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace TrustgraphCore.Interfaces
 {
     public interface ITrustLoadService
     {
         void LoadFile(string filename);
-        void LoadDatabase();
+        Task LoadDatabase();
     }
 }

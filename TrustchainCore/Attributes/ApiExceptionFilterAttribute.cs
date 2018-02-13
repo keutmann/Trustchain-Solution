@@ -13,7 +13,7 @@ namespace TrustchainCore.Attributes
             var exception = context.Exception;
             context.Result = new JsonResult(new HttpResult
             {
-                Status = HttpResultStatusType.Fail.ToString(),
+                Status = HttpResultStatusType.Error.ToString(),
                 StatusCode = (int?)HttpStatusCode.InternalServerError,
                 Message = context.Exception.Message
             });

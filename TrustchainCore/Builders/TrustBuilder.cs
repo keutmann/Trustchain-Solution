@@ -343,17 +343,17 @@ namespace TrustchainCore.Builders
 
         public static Claim CreateTrustTrueClaim(string scope = "")
         {
-            return CreateClaim(BINARYTRUST_TC1, scope, CreateTrust(true).ToString());
+            return CreateClaim(BINARYTRUST_TC1, scope, CreateTrust(true).ToString(Formatting.None));
         }
 
         public static Claim CreateConfirmClaim(string scope = "")
         {
-            return CreateClaim(CONFIRMTRUST_TC1, scope, CreateConfirm().ToString());
+            return CreateClaim(CONFIRMTRUST_TC1, scope, CreateConfirm().ToString(Formatting.None));
         }
 
         public static Claim CreateRatingClaim(byte rating = 100, string scope = "")
         {
-            return CreateClaim(RATING_TC1, scope, CreateRating(rating).ToString());
+            return CreateClaim(RATING_TC1, scope, CreateRating(rating).ToString(Formatting.None));
         }
 
         public static Claim CreateClaim(string type, string scope, string data)

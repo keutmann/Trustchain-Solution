@@ -17,5 +17,18 @@ namespace TrustchainCore.Builders
             };
             return result;
         }
+
+        public static HttpResult Error(object data, string status = null, string message = null)
+        {
+
+            var result = new HttpResult
+            {
+                Status = string.IsNullOrWhiteSpace(status) ? HttpResultStatusType.Error.ToString() : status,
+                Message = message,
+                Data = data
+            };
+            return result;
+        }
+
     }
 }
