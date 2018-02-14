@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Model
 {
@@ -24,5 +25,7 @@ namespace TrustgraphCore.Model
         [JsonProperty(PropertyName = "level")]
         public int Level;
 
+        [JsonProperty(PropertyName = "flag")]
+        public QueryFlags Flags;
     }
 }

@@ -8,6 +8,7 @@ using TrustchainCore.Collections.Generic;
 using System.Security.Claims;
 using TrustchainCore.Builders;
 using TrustchainCore.Collections;
+using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Model
 {
@@ -26,9 +27,6 @@ namespace TrustgraphCore.Model
 
         [JsonIgnore]
         public List<int> ClaimTypes;
-
-        [JsonIgnore]
-        public bool AddClaimTrust = false;
 
         [JsonIgnore]
         public int ClaimScope = 0;
@@ -50,6 +48,10 @@ namespace TrustgraphCore.Model
 
         [JsonIgnore]
         public BitArrayFast Visited;
+
+        [JsonIgnore]
+        public QueryFlags Flags;
+
 
         [JsonIgnore]
         internal Dictionary<int, GraphIssuer> TargetsFound = new Dictionary<int, GraphIssuer>();
@@ -95,6 +97,8 @@ namespace TrustgraphCore.Model
 
             if (query.Level > 0 && query.Level < MaxLevel)
                 MaxLevel = query.Level;
+
+            Flags = query.Flags;
 
             Visited = new BitArrayFast(GraphTrustService.Graph.Issuers.Count + 1024, false); // 1024 is buffer for new Issuers when searching
         }
@@ -155,7 +159,7 @@ namespace TrustgraphCore.Model
                 }
 
                 if (!ClaimTypes.Contains(GraphTrustService.BinaryTrustTypeIndex))
-                    AddClaimTrust = true;
+                    Flags |= QueryFlags.IncludeClaimTrust;
             }
 
 

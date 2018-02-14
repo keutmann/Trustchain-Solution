@@ -134,7 +134,7 @@ namespace TrustgraphCore.Services
             if (claims.Count == 0)
                 return;
 
-            if(context.AddClaimTrust)
+            if(context.Flags == QueryFlags.IncludeClaimTrust)
                 if (subject.Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out index)) // Check local scope for claims
                     claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex).Value, index));
                 else
@@ -151,33 +151,46 @@ namespace TrustgraphCore.Services
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void BuildResult(QueryContext context, GraphTracker currentTracker, List<Tuple<long, int>> claimsFound)
         {
-            foreach (var tracker in context.Tracker)
+            if(context.Flags == QueryFlags.LeafsOnly)
             {
-                if (!context.Results.ContainsKey(tracker.Issuer.Index))
+                AddResult(context, currentTracker.Issuer.Index, claimsFound, currentTracker);
+            }
+            else
+            {
+                // Full tree, or first path
+                foreach (var tracker in context.Tracker)
                 {
-                    tracker.Subjects = new Dictionary<int, GraphSubject>();
-                    context.Results.Add(tracker.Issuer.Index, tracker);
-                }
-                
-                var resultTracker = context.Results[tracker.Issuer.Index];
-
-                if (!resultTracker.Subjects.ContainsKey(tracker.SubjectKey))
-                {   // Only subjects with unique keys
-                    var graphSubject = tracker.Issuer.Subjects[tracker.SubjectKey]; // GraphSubject is a value type and therefore its copied
-                    graphSubject.Claims = new Dictionary<long, int>();
-                    resultTracker.Subjects.Add(tracker.SubjectKey, graphSubject);
-                    // Register the target found 
-                }
-
-                if(resultTracker.Issuer.Index == currentTracker.Issuer.Index)
-                {
-                    foreach (var item in claimsFound)
-                    {
-                        resultTracker.Subjects[tracker.SubjectKey].Claims[item.Item1] = item.Item2;
-                    }
+                    AddResult(context, currentTracker.Issuer.Index, claimsFound, tracker);
                 }
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AddResult(QueryContext context, int issuerIndex, List<Tuple<long, int>> claimsFound, GraphTracker tracker)
+        {
+            if (!context.Results.ContainsKey(tracker.Issuer.Index))
+            {
+                tracker.Subjects = new Dictionary<int, GraphSubject>();
+                context.Results.Add(tracker.Issuer.Index, tracker);
+            }
+
+            var result = context.Results[tracker.Issuer.Index];
+
+            if (!result.Subjects.ContainsKey(tracker.SubjectKey))
+            {   // Only subjects with unique keys
+                var graphSubject = tracker.Issuer.Subjects[tracker.SubjectKey]; // GraphSubject is a value type and therefore its copied
+                graphSubject.Claims = new Dictionary<long, int>();
+                result.Subjects.Add(tracker.SubjectKey, graphSubject);
+                // Register the target found 
+            }
+
+            if (result.Issuer.Index == issuerIndex)
+            {
+                foreach (var item in claimsFound)
+                {
+                    result.Subjects[tracker.SubjectKey].Claims[item.Item1] = item.Item2;
+                }
+            }
+        }
     }
 }

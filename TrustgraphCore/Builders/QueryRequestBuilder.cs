@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using TrustchainCore.Model;
+using TrustgraphCore.Enumerations;
 using TrustgraphCore.Model;
 
 namespace TrustgraphCore.Builders
@@ -24,7 +25,8 @@ namespace TrustgraphCore.Builders
                 Issuer = null,
                 Subjects = new List<SubjectQuery>(),
                 ClaimScope = scope,
-                ClaimTypes = new List<string>() { claim }
+                ClaimTypes = new List<string>() { claim },
+                Flags = QueryFlags.FullTree
             };
         }
 
