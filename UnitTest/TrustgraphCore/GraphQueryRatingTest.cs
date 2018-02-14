@@ -25,7 +25,7 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class GraphQueryRatingTest : GraphQueryMock
     {
-        private string ClaimType = TrustBuilder.RATING_TC1;
+        private string ClaimRatingType = TrustBuilder.RATING_TC1;
 
         /// <summary>
         /// 1 Source, 1 targets
@@ -38,7 +38,7 @@ namespace UnitTest.TrustgraphCore
 
             _graphTrustService.Add(_trustBuilder.Package);
 
-            var queryBuilder = new QueryRequestBuilder(ClaimType);
+            var queryBuilder = new QueryRequestBuilder(ClaimRatingType);
             BuildQuery(queryBuilder, "A", "D"); // Query if "person" have a confimation within A's trust sphere.
 
             // Execute
@@ -49,7 +49,7 @@ namespace UnitTest.TrustgraphCore
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", ClaimRating);
+            VerfifyResult(context, "C", "D", base.ClaimRating);
         }
 
 
@@ -62,7 +62,7 @@ namespace UnitTest.TrustgraphCore
         {
             BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimType);
+            var queryBuilder = new QueryRequestBuilder(ClaimRatingType);
 
             BuildQuery(queryBuilder, "A", "D");
             BuildQuery(queryBuilder, "A", "B");
@@ -74,9 +74,9 @@ namespace UnitTest.TrustgraphCore
             Assert.AreEqual(3, context.Results.Count, $"Should be {3} results!");
 
             VerfifyResult(context, "A", "B");
-            VerfifyResult(context, "A", "B", ClaimRating);
+            VerfifyResult(context, "A", "B", base.ClaimRating);
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", ClaimRating);
+            VerfifyResult(context, "C", "D", base.ClaimRating);
         }
 
         ///// <summary>
@@ -115,7 +115,7 @@ namespace UnitTest.TrustgraphCore
         {
             BuildGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimType);
+            var queryBuilder = new QueryRequestBuilder(ClaimRatingType);
 
             BuildQuery(queryBuilder, "A", "Unreach");
 
@@ -139,9 +139,9 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("G", "D", ClaimTrustTrue); // Long way, no trust
             _trustBuilder.AddTrust("G", "Unreach", ClaimTrustTrue); // Long way, no trust
 
-            _trustBuilder.AddTrust("A", "B", ClaimRating);
-            _trustBuilder.AddTrust("C", "D", ClaimRating);
-            _trustBuilder.AddTrust("G", "D", ClaimRating);
+            _trustBuilder.AddTrust("A", "B", base.ClaimRating);
+            _trustBuilder.AddTrust("C", "D", base.ClaimRating);
+            _trustBuilder.AddTrust("G", "D", base.ClaimRating);
 
             _graphTrustService.Add(_trustBuilder.Package);
         }

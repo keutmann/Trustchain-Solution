@@ -16,13 +16,13 @@ namespace TrustgraphCore.Model
     public class QueryContext
     {
         [JsonIgnore]
-        public IGraphTrustService GraphTrustService { get; set; }
+        public IGraphTrustService GraphTrustService = null;
 
         [JsonIgnore]
-        public GraphIssuer Issuer { get; set; }
+        public GraphIssuer Issuer = null;
 
         [JsonIgnore]
-        public Dictionary<int, GraphIssuer> Targets { get; set; }
+        public Dictionary<int, GraphIssuer> Targets = null;
 
         [JsonIgnore]
         public List<int> ClaimTypes;
@@ -31,26 +31,30 @@ namespace TrustgraphCore.Model
         public bool AddClaimTrust = false;
 
         [JsonIgnore]
-        public int ClaimScope;
+        public int ClaimScope = 0;
 
         [JsonIgnore]
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
 
         [JsonIgnore]
-        public int MaxCost { get; set; }
+        public int MaxCost = 0;
+
+        /// <summary>
+        /// Use field and not get and set methods. This may be quicker.
+        /// </summary>
+        [JsonIgnore]
+        public int Level = 0;
 
         [JsonIgnore]
-        public int Level { get; set; }
-
-        [JsonIgnore]
-        public int MaxLevel { get; set; }
+        public int MaxLevel = 0;
 
         [JsonIgnore]
         public BitArrayFast Visited;
 
-
         [JsonIgnore]
         internal Dictionary<int, GraphIssuer> TargetsFound = new Dictionary<int, GraphIssuer>();
+
+        public bool ShallowResult = false;
 
         [JsonProperty(PropertyName = "results", NullValueHandling = NullValueHandling.Ignore, Order = 50)]
         public Dictionary<int, GraphTracker> Results { get; set; }

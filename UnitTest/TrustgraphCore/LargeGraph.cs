@@ -1,10 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using TrustchainCore.Builders;
+using TrustchainCore.Model;
 using TrustgraphCore.Builders;
 using UnitTest.TrustchainCore.Extensions;
 
@@ -13,64 +15,60 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class LargeGraph : GraphQueryMock
     {
-        private JObject ClaimTrustTrueTest = null;
-
-        [TestInitialize]
-        public override void Init()
+        [TestMethod]
+        public void Test1()
         {
-            base.Init();
-            ClaimTrustTrueTest = TrustBuilder.CreateTrust();
+            var watch = new Stopwatch();
+            watch.Start();
+            var target = "";
+            int factor = 20;
+
+            for (int x = 1; x <= factor; x++)
+            {
+                var Level1 = $"L1_{x}";
+                _trustBuilder.AddTrust($"L0", Level1, ClaimTrustTrue);
+                for (int y = 1; y <= factor; y++)
+                {
+                    var xfactor = x * factor;
+                    var Level2 = $"L2_{(xfactor) + y}";
+                    _trustBuilder.AddTrust(Level1, Level2, ClaimTrustTrue);
+                    for (int z = 1; z <= factor; z++)
+                    {
+                        var yfactor = (xfactor + y) * factor;
+                        var Level3 = $"L3_{yfactor + z}";
+                        target = Level3;
+                        _trustBuilder.AddTrust(Level2, Level3, ClaimTrustTrue);
+                    }
+                }
+
+                //_trustBuilder.AddTrust($"{y}", $"{x}", ClaimTrustTrueTest);
+            }
+
+
+            _graphTrustService.Add(_trustBuilder.Package);
+            //Console.WriteLine(JsonConvert.SerializeObject(_graphTrustService.Graph, Formatting.Indented));
+            watch.Stop();
+            Console.WriteLine($"Build: {watch.ElapsedMilliseconds}");
+
+            watch.Restart();
+            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrue.Type);
+            BuildQuery(queryBuilder, $"L0", target);
+
+            for (int i = 0; i < 100; i++)
+            {
+
+
+                // Execute
+                var context = _graphQueryService.Execute(queryBuilder.Query);
+
+                if(i % 99 == 0)
+                    Console.WriteLine($"Results: ${context.Results.Count}");
+            }
+
+            watch.Stop();
+            Console.WriteLine($"Search: {watch.ElapsedMilliseconds}");
+
         }
-
-
-        //[TestMethod]
-        //public void Test1()
-        //{
-        //    var watch = new Stopwatch();
-        //    watch.Start();
-
-
-        //    for (int x = 1; x <= 100; x++)
-        //    {
-        //        _trustBuilder.AddTrust($"{0}", $"{x}", ClaimTrustTrueTest);
-        //        for (int y = 101; y <= 200; y++)
-        //        {
-        //            _trustBuilder.AddTrust($"{x}", $"{y}", ClaimTrustTrueTest);
-        //            for (int z = 201; z <= 202; z++)
-        //            {
-        //                _trustBuilder.AddTrust($"{y}", $"{z}", ClaimTrustTrueTest);
-        //            }
-        //        }
-            
-        //        //_trustBuilder.AddTrust($"{y}", $"{x}", ClaimTrustTrueTest);
-        //    }
-
-        //    _graphTrustService.Add(_trustBuilder.Package);
-        //    watch.Stop();
-        //    Console.WriteLine($"Build: {watch.Elapsed}");
-
-
-        //    for (int i = 0; i < 3; i++)
-        //    {
-        //        watch = new Stopwatch();
-        //        watch.Start();
-
-        //        var queryBuilder = new QueryRequestBuilder(ClaimTrustTrueTest.ToString());
-        //        BuildQuery(queryBuilder, $"{0}", $"{202}");
-
-        //        // Execute
-        //        var context = _graphQueryService.Execute(queryBuilder.Query);
-
-        //        Console.WriteLine($"Results: ${context.Results.Count}");
-
-        //        watch.Stop();
-        //        Console.WriteLine($"Search: {watch.Elapsed}");
-
-
-        //    }
-
-
-        //}
 
     }
 }

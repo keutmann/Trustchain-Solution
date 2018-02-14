@@ -85,14 +85,17 @@ namespace TrustchainCore.Collections
             m_array = new int[GetArrayLength(length, BitsPerInt32)];
             m_length = length;
 
-            int fillValue = defaultValue ? unchecked(((int)0xffffffff)) : 0;
-            for (int i = 0; i < m_array.Length; i++)
-            {
-                m_array[i] = fillValue;
-            }
+            // We will manually set the default value later.
+            //int fillValue = defaultValue ? unchecked(((int)0xffffffff)) : 0;
+            //for (int i = 0; i < m_array.Length; i++)
+            //{
+            //    m_array[i] = fillValue;
+            //}
 
             _version = 0;
         }
+
+
 
         /*=========================================================================
         ** Allocates space to hold the bit values in bytes. bytes[0] represents

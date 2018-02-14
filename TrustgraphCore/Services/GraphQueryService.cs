@@ -38,6 +38,7 @@ namespace TrustgraphCore.Services
             while (context.Level < context.MaxLevel && context.Targets.Count > 0)
             {
                 context.Level++;
+                context.Visited.SetAll(false); // Reset visited
 
                 SearchIssuer(context, context.Issuer);
 
@@ -66,19 +67,23 @@ namespace TrustgraphCore.Services
             var tracker = new GraphTracker(issuer);
             context.Tracker.Push(tracker);
 
+            // Set the Issuer to visited bit, avoiding re-searching the issuer
+            context.Visited.SetFast(issuer.Index, true);
+
             // Process current level
             if (context.Tracker.Count == context.Level)
             {
-                // Set the Issuer to visited bit, avoiding re-searching the issuer
-                context.Visited.SetFast(issuer.Index, true);
                 context.IssuerCount++;
 
-                foreach (var key in issuer.Subjects.Keys)
+                foreach (var targetIndex in context.Targets.Keys)
                 {
-                    tracker.SubjectKey = key;
+                    if (!issuer.Subjects.TryGetValue(targetIndex, out GraphSubject graphSubject))
+                        continue;
+
+                    tracker.SubjectKey = targetIndex;
                     context.SubjectCount++;
-                        
-                    SearchSubject(context, tracker);
+
+                    SearchSubject(context, tracker, graphSubject);
                 }
             }
             else
@@ -87,15 +92,11 @@ namespace TrustgraphCore.Services
                 {
                     tracker.SubjectKey = key;
 
-                    var follow = false;
-                    if (issuer.Subjects[key].Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out int index))
-                        follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
+                    //if(context.Tracker.Count + 1 == context.Level)
+                    if (context.Visited.GetFast(issuer.Subjects[key].TargetIssuer.Index))
+                        continue;
 
-                    if (!follow) // Check global
-                        if (issuer.Subjects[key].Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index))
-                            follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
-
-                    if (follow)
+                    if (FollowIssuer(context, issuer, key))
                         SearchIssuer(context, issuer.Subjects[key].TargetIssuer);
                 }
             }
@@ -104,17 +105,21 @@ namespace TrustgraphCore.Services
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void SearchSubject(QueryContext context, GraphTracker tracker)
+        private bool FollowIssuer(QueryContext context, GraphIssuer issuer, int key)
         {
-            GraphSubject subject = tracker.Issuer.Subjects[tracker.SubjectKey];
+            var follow = false;
+            if (issuer.Subjects[key].Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out int index))
+                follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
 
-            if (context.Visited.GetFast(subject.TargetIssuer.Index))
-                return;
+            if (!follow) // Check global
+                if (issuer.Subjects[key].Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index))
+                    follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
+            return follow;
+        }
 
-            if (!context.Targets.ContainsKey(subject.TargetIssuer.Index))
-                return;
-
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void SearchSubject(QueryContext context, GraphTracker tracker, GraphSubject subject)
+        {
             var claims = new List<Tuple<long, int>>();
             int index = 0;
             foreach (var type in context.ClaimTypes)
