@@ -83,15 +83,7 @@ namespace UnitTest.TrustgraphCore
             BuildQuery(queryBuilder, "A", "D");
 
             // Execute
-            QueryContext context = null;
-            var watch = new Stopwatch();
-            watch.Start();
-            for (int i = 0; i < 10; i++)
-            {
-                context = _graphQueryService.Execute(queryBuilder.Query);
-            }
-            watch.Stop();
-            Console.WriteLine("Query: "+watch.ElapsedMilliseconds);
+            var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
             Assert.AreEqual(3, context.Results.Count, $"Should be {3} results!");
@@ -100,6 +92,38 @@ namespace UnitTest.TrustgraphCore
             VerfifyResult(context, "B", "C");
             VerfifyResult(context, "C", "D");
         }
+
+
+        /// <summary>
+        /// 1 Source, 1 targets
+        /// </summary>
+        [TestMethod]
+        public void Source1Target1LLeafOnly()
+        {
+            // Build up
+            _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
+            _trustBuilder.AddTrust("B", "C", ClaimTrustTrue);
+            _trustBuilder.AddTrust("C", "D", ClaimTrustTrue);
+            _graphTrustService.Add(_trustBuilder.Package);
+
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
+            queryBuilder.Query.Flags |= QueryFlags.LeafsOnly;
+            BuildQuery(queryBuilder, "A", "D");
+
+            // Make sure that QueryFlags are serializeable
+            var json = JsonConvert.SerializeObject(queryBuilder.Query, Formatting.Indented);
+            Console.WriteLine(json);
+            var query = JsonConvert.DeserializeObject<QueryRequest>(json);
+
+            // Execute
+            var context = _graphQueryService.Execute(query);
+
+            // Verify
+            Assert.AreEqual(1, context.Results.Count, $"Should be {1} results!");
+
+            VerfifyResult(context, "C", "D");
+        }
+
 
 
         ///// <summary>

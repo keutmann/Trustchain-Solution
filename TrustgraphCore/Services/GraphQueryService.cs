@@ -151,7 +151,7 @@ namespace TrustgraphCore.Services
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void BuildResult(QueryContext context, GraphTracker currentTracker, List<Tuple<long, int>> claimsFound)
         {
-            if(context.Flags == QueryFlags.LeafsOnly)
+            if((context.Flags & QueryFlags.LeafsOnly) == QueryFlags.LeafsOnly)
             {
                 AddResult(context, currentTracker.Issuer.Index, claimsFound, currentTracker);
             }
