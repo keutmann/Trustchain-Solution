@@ -74,6 +74,33 @@ namespace UnitTest.TrustchainCore.Builders
         }
 
         [TestMethod]
+        public void Add2Claims2()
+        {
+            var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
+            var derivationStrategy = new DerivationBTCPKH();
+            var serverKey = derivationStrategy.GetKey(Encoding.UTF8.GetBytes("testserver"));
+
+            var _trustBuilder = new TrustBuilder(ServiceProvider);
+            //_trustBuilder.SetServer("testserver");
+            _trustBuilder.SetServer(serverKey);
+            _trustBuilder.AddTrust("testissuer1", "testsubject1", TrustBuilder.CreateTrustTrueClaim())
+                .AddTrust("testissuer2", "testsubject2", TrustBuilder.CreateTrustTrueClaim())
+                .Build().Sign();
+
+            Console.WriteLine(JsonConvert.SerializeObject(_trustBuilder.Package, Formatting.Indented));
+
+            trustDBService.Add(_trustBuilder.Package);
+            //trustDBService.DBContext.SaveChanges();
+
+            var dbPackage = trustDBService.Packages.FirstOrDefaultAsync().Result;
+
+            var compareResult = _trustBuilder.Package.JsonCompare(dbPackage);
+            Assert.IsTrue(compareResult, "Package from database is not the same as Builder");
+
+            Assert.AreEqual(2, trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
+        }
+
+        [TestMethod]
         public void Add2Trusts()
         {
             var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();

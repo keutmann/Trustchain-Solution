@@ -37,8 +37,7 @@ namespace UnitTest.TrustchainCore.Extensions
 
         public static TrustBuilder AddTrust(this TrustBuilder builder, string issuerName, string subjectName, Claim trustClaim)
         {
-            builder.AddTrust(issuerName);
-            builder.AddSubject(subjectName, trustClaim);
+            builder.AddTrust(issuerName).AddSubject(subjectName, trustClaim);
             return builder;
         }
 

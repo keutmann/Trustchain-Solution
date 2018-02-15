@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using UnitTest.TrustchainCore.Workflows;
 using TruststampCore.Interfaces;
 using UnitTest.TruststampCore.Mocks;
+using TrustgraphCore.Controllers;
 
 namespace UnitTest
 {
@@ -32,9 +33,10 @@ namespace UnitTest
                 return config;
                 });
 
-
             services.AddTransient<IBlockingWorkflowStep, BlockingWorkflowStep>();
             services.AddTransient<IBlockchainRepository, BlockchainRepositoryMock>();
+
+            services.AddTransient<TrustController>();
 
             ServiceScope = services.BuildServiceProvider(false).CreateScope();
             ServiceProvider = ServiceScope.ServiceProvider;

@@ -27,32 +27,32 @@ namespace TrustchainCore.Repository
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Package>().HasKey("DatabaseID");
-            builder.Entity<Package>().HasIndex("Id");
+            builder.Entity<Package>().HasKey(p => p.DatabaseID);
+            builder.Entity<Package>().HasIndex(p => p.Id);
             builder.Entity<Package>()
                 .OwnsOne(c => c.Server);
 
-            builder.Entity<Trust>().HasKey("DatabaseID");
-            builder.Entity<Trust>().HasIndex("Id");
+            builder.Entity<Trust>().HasKey(p => p.DatabaseID);
+            builder.Entity<Trust>().HasIndex(p => p.Id);
             builder.Entity<Trust>()
                 .OwnsOne(c => c.Issuer);
 
             builder.Entity<Trust>()
                 .OwnsOne(c => c.Timestamp);
 
-            builder.Entity<Subject>().HasKey("DatabaseID");
-            builder.Entity<Subject>().HasIndex("Address");
+            builder.Entity<Subject>().HasKey(p => p.DatabaseID);
+            builder.Entity<Subject>().HasIndex(p => p.Address);
 
-            builder.Entity<Claim>().HasKey("DatabaseID");
-            builder.Entity<Claim>().HasIndex("Index");
+            builder.Entity<Claim>().HasKey(p => p.DatabaseID);
+            builder.Entity<Claim>().HasIndex(p => p.Index);
 
-            builder.Entity<Timestamp>().HasKey("DatabaseID");
+            builder.Entity<Timestamp>().HasKey(p => p.DatabaseID);
             //builder.Entity<Timestamp>().HasIndex("");
 
             // Proof
-            builder.Entity<ProofEntity>().HasKey("DatabaseID");
-            builder.Entity<ProofEntity>().HasIndex("Source");
-            builder.Entity<ProofEntity>().HasIndex("WorkflowID");
+            builder.Entity<ProofEntity>().HasKey(p => p.DatabaseID);
+            builder.Entity<ProofEntity>().HasIndex(p => p.Source);
+            builder.Entity<ProofEntity>().HasIndex(p => p.WorkflowID);
 
             // Workflow
             builder.Entity<WorkflowContainer>().HasKey(p => p.DatabaseID);

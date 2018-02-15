@@ -57,37 +57,30 @@ namespace TrustgraphCore.Controllers
         [HttpPost]
         public ActionResult Add([FromBody]Package package)
         {
-            try
-            {
 
-                var validationResult = _trustSchemaService.Validate(package);
-                if (validationResult.ErrorsFound > 0)
-                    return ApiError(validationResult, null, "Validation failed");
+            var validationResult = _trustSchemaService.Validate(package);
+            if (validationResult.ErrorsFound > 0)
+                return ApiError(validationResult, null, "Validation failed");
 
-                // Timestamp validation service disabled for the moment
-                // Check timestamp
-                //if(package.Timestamps != null && package.Timestamps.Count > 0)
-                //{
-                //    var timestamp = package.Timestamps[0]; // Only support one timestamp for now
-                //    var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
-                //    if(blockchainService == null)
-                //        return BadRequest("Invalid Blockchain definition in package timestamp");
+            // Timestamp validation service disabled for the moment
+            // Check timestamp
+            //if(package.Timestamps != null && package.Timestamps.Count > 0)
+            //{
+            //    var timestamp = package.Timestamps[0]; // Only support one timestamp for now
+            //    var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
+            //    if(blockchainService == null)
+            //        return BadRequest("Invalid Blockchain definition in package timestamp");
 
-                //    //var 
-                //    //var addressTimestamp = blockchainService.GetTimestamp()
-                //}
+            //    //var 
+            //    //var addressTimestamp = blockchainService.GetTimestamp()
+            //}
 
 
-                _trustDBService.Add(package);   // Add to database
-                _graphTrustService.Add(package);    // Add to Graph
-                _proofService.AddProof(package.Id); // Add to timestamp service
-            }
-            catch (Exception ex)
-            {
-                return ApiError(null, null, ex.Message);
-            }
+            _trustDBService.Add(package);   // Add to database
+            _graphTrustService.Add(package);    // Add to Graph
+            _proofService.AddProof(package.Id); // Add to timestamp service
 
-            return ApiOk(null, null, "Package added");
+            return ApiOk("Package added");
         }
     }
 }

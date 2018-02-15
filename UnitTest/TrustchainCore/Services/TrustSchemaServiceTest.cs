@@ -34,7 +34,9 @@ namespace UnitTest.TrustchainCore.Services
             builder.Build();
             builder.Sign();
 
-            var schemaService = new TrustSchemaService(ServiceProvider);
+
+            var schemaService = ServiceProvider.GetRequiredService<ITrustSchemaService>();
+            //var schemaService = new TrustSchemaService(ServiceProvider);
             var result = schemaService.Validate(builder.Package);
 
             Console.WriteLine(result.ToString());
