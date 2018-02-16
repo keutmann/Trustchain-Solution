@@ -65,6 +65,9 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]
         public TrustTimestamp Timestamp { get; set; }
 
+        [JsonIgnore]
+        public int? PackageDatabaseID { get; set; }
+
         public Trust()
         {
             Algorithm = "double256";

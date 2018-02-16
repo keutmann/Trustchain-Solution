@@ -30,7 +30,11 @@ namespace TrustchainCore.Services
             _trustBinary = trustBinary;
         }
 
-
+        public SchemaValidationResult Validate(Trust trust)
+        {
+            var engine = new ValidationEngine(_derivationServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
+            return engine.Validate(trust);
+        }
 
         public SchemaValidationResult Validate(Package package)
         {
@@ -56,6 +60,22 @@ namespace TrustchainCore.Services
                 _merkleStrategyFactory = merkleStrategyFactory;
                 _hashAlgorithmFactory = hashAlgorithmFactory;
                 _trustBinary = trustBinary;
+            }
+
+            public SchemaValidationResult Validate(Trust trust)
+            {
+                try
+                {
+                    var testBuilder = new TrustBuilder(_derivationStrategyFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
+                    var trustIndex = 0;
+                    testBuilder.AddTrust(trust);
+                    ValidateTrust(trustIndex++, trust, result);
+                }
+                catch (Exception ex)
+                {
+                    result.Errors.Add(ex.Message);
+                }
+                return result;
             }
 
             public SchemaValidationResult Validate(Package package)

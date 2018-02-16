@@ -28,52 +28,54 @@ namespace TrustgraphCore.Controllers
             _blockchainServiceFactory = blockchainServiceFactory;
         }
 
+#if DEBUG
+        /// <summary>
+        /// Test
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult Get()
         {
             return ApiOk("OK");
         }
 
-        [HttpGet]
-        [Route("api/graph/[controller]/{issuerId}/{subjectId}/{scope}")]
-        public ActionResult Get(byte[] issuerId, byte[] subjectId, string scope)
-        {
-            if (!_graphTrustService.Graph.IssuerIndex.ContainsKey(issuerId))
-                return NotFound();
+#endif
 
-            var index = _graphTrustService.Graph.IssuerIndex[issuerId];
-            var issuer = _graphTrustService.Graph.Issuers[index];
+        //[HttpGet]
+        //[Route("api/graph/[controller]/{issuerId}/{subjectId}/{scope}")]
+        //public ActionResult Get(byte[] issuerId, byte[] subjectId, string scope)
+        //{
+        //    if (!_graphTrustService.Graph.IssuerIndex.ContainsKey(issuerId))
+        //        return NotFound();
 
-            for (int i = 0; i < issuer.Subjects.Count; i++)
-            {
+        //    var index = _graphTrustService.Graph.IssuerIndex[issuerId];
+        //    var issuer = _graphTrustService.Graph.Issuers[index];
 
-            }
+        //    for (int i = 0; i < issuer.Subjects.Count; i++)
+        //    {
 
-            return ApiOk("OK");
-        }
+        //    }
+
+        //    return ApiOk("OK");
+        //}
 
 
+
+        /// <summary>
+        /// Add a package to the Graph and database.
+        /// If the package is not timestamped, then it will be at a time interval.
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns></returns>
         [Produces("application/json")]
         [HttpPost]
-        public ActionResult Add([FromBody]Package package)
+        public ActionResult AddPackage([FromBody]Package package)
         {
 
             var validationResult = _trustSchemaService.Validate(package);
             if (validationResult.ErrorsFound > 0)
                 return ApiError(validationResult, null, "Validation failed");
-
             // Timestamp validation service disabled for the moment
-            // Check timestamp
-            //if(package.Timestamps != null && package.Timestamps.Count > 0)
-            //{
-            //    var timestamp = package.Timestamps[0]; // Only support one timestamp for now
-            //    var blockchainService = _blockchainServiceFactory.GetService(timestamp.Blockchain);
-            //    if(blockchainService == null)
-            //        return BadRequest("Invalid Blockchain definition in package timestamp");
-
-            //    //var 
-            //    //var addressTimestamp = blockchainService.GetTimestamp()
-            //}
 
 
             _trustDBService.Add(package);   // Add to database
@@ -82,5 +84,29 @@ namespace TrustgraphCore.Controllers
 
             return ApiOk("Package added");
         }
+
+        /// <summary>
+        /// Add a trust to the Graph and database.
+        /// The trust will be packaged at a time interval and timestamped.
+        /// </summary>
+        /// <param name="trust"></param>
+        /// <returns></returns>
+        [Produces("application/json")]
+        [HttpPost]
+        public ActionResult AddTrust([FromBody]Trust trust)
+        {
+            trust.PackageDatabaseID = null; // NO package! 
+
+            var validationResult = _trustSchemaService.Validate(trust);
+            if (validationResult.ErrorsFound > 0)
+                return ApiError(validationResult, null, "Validation failed");
+            // Timestamp validation service disabled for the moment
+
+            _trustDBService.Add(trust);   // Add to database
+            _graphTrustService.Add(trust);    // Add to Graph
+
+            return ApiOk("Trust added");
+        }
+
     }
 }

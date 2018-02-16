@@ -20,13 +20,13 @@ namespace TrustgraphCore.Services
             if (query.Issuer == null)
                 throw new ApplicationException("Missing issuers");
 
-            if (query.Issuer.Length != _derivationStrategy.Length)
-                throw new ApplicationException("Invalid byte length on Issuer : " + query.Issuer.ConvertToHex());
+            if (query.Issuer.Length != _derivationStrategy.AddressLength)
+                throw new ApplicationException("Invalid byte length on Issuer : " + query.Issuer.ConvertToBase64());
 
             foreach (var subject in query.Subjects)
             {
-                if (subject.Id.Length != _derivationStrategy.Length)
-                    throw new ApplicationException("Invalid byte length on subject id: " +subject.Id.ConvertToHex());
+                if (subject.Id.Length != _derivationStrategy.AddressLength)
+                    throw new ApplicationException("Invalid byte length on subject id: " +subject.Id.ConvertToBase64());
             }
         }
     }

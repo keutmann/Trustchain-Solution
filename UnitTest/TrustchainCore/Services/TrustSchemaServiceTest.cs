@@ -1,14 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Text;
 using TrustchainCore.Builders;
-using TrustchainCore.Repository;
-using TrustchainCore.Services;
-using TrustchainCore.Strategy;
-using TrustchainCore.Extensions;
-using TrustchainCore.Factories;
 using UnitTest.TrustchainCore.Extensions;
 using TrustchainCore.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,24 +11,17 @@ namespace UnitTest.TrustchainCore.Services
     public class TrustSchemaServiceTest : StartupMock
     {
         [TestMethod]
-        public void Validate()
+        public void ValidatePackage()
         {
-            var derivationStrategy = new DerivationBTCPKH();
-            var serverKey = derivationStrategy.GetKey(Encoding.UTF8.GetBytes("testserver"));
-
-            //var key = new Key()
             var builder = new TrustBuilder(ServiceProvider);
-            builder.SetServer(serverKey);
-            builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateFollowClaim())
-                .AddSubject("testsubject2", TrustBuilder.CreateFollowClaim());
-            builder.AddTrust("testissuer2", "testsubject1", TrustBuilder.CreateFollowClaim());
-            builder.Build();
-            builder.Sign();
-
+            builder.SetServer("testserver")
+                .AddTrustTrue("testissuer1", "testsubject1")
+                .AddTrustTrue("testissuer2", "testsubject1")
+                .Build()
+                .Sign();
 
             var schemaService = ServiceProvider.GetRequiredService<ITrustSchemaService>();
-            //var schemaService = new TrustSchemaService(ServiceProvider);
+
             var result = schemaService.Validate(builder.Package);
 
             Console.WriteLine(result.ToString());
@@ -46,5 +31,22 @@ namespace UnitTest.TrustchainCore.Services
             Assert.AreEqual(0, result.Warnings.Count);
         }
 
+        [TestMethod]
+        public void ValidateTrust()
+        {
+            var builder = new TrustBuilder(ServiceProvider);
+            builder.SetServer("testserver")
+                .AddTrustTrue("testissuer1", "testsubject1")
+                .Build()
+                .Sign();
+            
+            var schemaService = ServiceProvider.GetRequiredService<ITrustSchemaService>();
+            var result = schemaService.Validate(builder.CurrentTrust);
+
+            Console.WriteLine(result.ToString());
+
+            Assert.AreEqual(0, result.Errors.Count);
+            Assert.AreEqual(0, result.Warnings.Count);
+        }
     }
 }

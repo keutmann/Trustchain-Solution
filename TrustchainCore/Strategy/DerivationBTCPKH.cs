@@ -11,6 +11,7 @@ namespace TrustchainCore.Strategy
     public class DerivationBTCPKH : IDerivationStrategy
     {
         public int Length { get; }
+        public int AddressLength { get; }
         public string ScriptName { get; }
 
         private Network network;
@@ -18,6 +19,7 @@ namespace TrustchainCore.Strategy
         public DerivationBTCPKH()
         {
             Length = 32; // SHA 256 = 32 bytes
+            AddressLength = 20;
             ScriptName = "btc-pkh";
             network = Network.TestNet;
         }

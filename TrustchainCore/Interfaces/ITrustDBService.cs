@@ -15,6 +15,7 @@ namespace TrustchainCore.Interfaces
 
         TrustDBContext DBContext { get; }
 
+        void Add(Trust trust);
         bool Add(Package package);
         Package GetPackage(byte[] packageId);
     }

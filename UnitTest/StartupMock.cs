@@ -37,6 +37,7 @@ namespace UnitTest
             services.AddTransient<IBlockchainRepository, BlockchainRepositoryMock>();
 
             services.AddTransient<TrustController>();
+            services.AddTransient<QueryController>();
 
             ServiceScope = services.BuildServiceProvider(false).CreateScope();
             ServiceProvider = ServiceScope.ServiceProvider;

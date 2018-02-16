@@ -31,7 +31,7 @@ namespace UnitTest.TrustchainCore.Builders
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer(serverKey);
             builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateFollowClaim())
+                .AddSubject("testsubject1", TrustBuilder.CreateTrustTrueClaim())
                 .Build()
                 .Sign();
 
@@ -43,6 +43,66 @@ namespace UnitTest.TrustchainCore.Builders
             var compareResult = builder.Package.JsonCompare(dbPackage);
             Assert.IsTrue(compareResult, "Package from database is not the same as Builder");
         }
+
+        [TestMethod]
+        public void Add1Trust()
+        {
+
+            var builder = new TrustBuilder(ServiceProvider);
+            builder.SetServer("testserver");
+            builder.AddTrust("testissuer1", "testsubject1", TrustBuilder.CreateTrustTrueClaim())
+                .Build()
+                .Sign();
+
+            Assert.IsNull(builder.CurrentTrust.PackageDatabaseID);
+
+            var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
+            trustDBService.Add(builder.CurrentTrust);
+
+            trustDBService.DBContext.SaveChanges();
+
+            var dbTrust = trustDBService.Trusts.FirstOrDefaultAsync().Result;
+            var compareResult = builder.CurrentTrust.JsonCompare(dbTrust);
+            Assert.IsTrue(compareResult, "Trust from database is not the same as Builder");
+        }
+
+        [TestMethod]
+        public void GetPackageLessTrust()
+        {
+
+            var builder = new TrustBuilder(ServiceProvider);
+            builder.SetServer("testserver");
+            builder.AddTrustTrue("testissuer1", "testsubject1")
+                .AddTrustTrue("testissuer2", "testsubject2")
+                .Build()
+                .Sign();
+
+            Assert.IsNull(builder.CurrentTrust.PackageDatabaseID);
+
+            var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
+            foreach (var trust in builder.Package.Trusts)
+                trustDBService.Add(trust);
+
+            var builder2 = new TrustBuilder(ServiceProvider);
+            builder2.SetServer("testserver");
+            builder2.AddTrustTrue("A", "D")
+                .AddTrustTrue("B", "C")
+                .Build()
+                .Sign();
+
+            trustDBService.Add(builder2.Package);
+            trustDBService.DBContext.SaveChanges();
+
+            var dbTrusts = trustDBService.Trusts.Where(p=>p.PackageDatabaseID == null);
+
+            Assert.AreEqual(2, dbTrusts.Count(), "There should be 2 trusts not in a package.");
+            foreach (var dbTrust in dbTrusts)
+            {
+                var compareResult = builder.Package.Trusts.First(p=>p.Id == dbTrust.Id).JsonCompare(dbTrust);
+                Assert.IsTrue(compareResult, "Trust from database is not the same as Builder");
+            }
+        }
+
 
         [TestMethod]
         public void Add2Claims()

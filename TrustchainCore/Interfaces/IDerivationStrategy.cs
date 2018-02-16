@@ -3,6 +3,7 @@
     public interface IDerivationStrategy
     {
         int Length { get; }
+        int AddressLength { get; }
         string ScriptName { get; }
 
         byte[] HashOf(byte[] data);

@@ -41,6 +41,12 @@ namespace UnitTest.TrustchainCore.Extensions
             return builder;
         }
 
+        public static TrustBuilder AddTrustTrue(this TrustBuilder builder, string issuerName, string subjectName)
+        {
+            builder.AddTrust(issuerName, subjectName, TrustBuilder.CreateTrustTrueClaim());
+            return builder;
+        }
+
         public static TrustBuilder AddSubject(this TrustBuilder builder, string subjectName, Claim trustClaim)
         {
             var key = ScriptService.GetKey(Encoding.UTF8.GetBytes(subjectName));

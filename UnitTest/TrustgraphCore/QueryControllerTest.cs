@@ -10,31 +10,32 @@ using TrustchainCore.Model;
 using TrustgraphCore.Builders;
 using TrustgraphCore.Controllers;
 using TrustgraphCore.Enumerations;
+using TrustgraphCore.Model;
 using UnitTest.TrustchainCore.Extensions;
 
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
-    public class TrustControllerTest : GraphQueryMock
+    public class QueryControllerTest : GraphQueryMock
     {
         [TestMethod]
-        public void Add1()
+        public void AddAndQuery1()
         {
             // Setup
-            var _trustController = ServiceProvider.GetRequiredService<TrustController>();
 
-            _trustBuilder.SetServer("testserver");
-
-            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrueClaim());
-            _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrueClaim());
-            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateTrustTrueClaim());
-            _trustBuilder.Build().Sign();
+            _trustBuilder.SetServer("testserver")
+                .AddTrustTrue("A", "B")
+                .AddTrustTrue("B", "C")
+                .AddTrustTrue("C", "D")
+                .Build().Sign();
 
             Console.WriteLine(JsonConvert.SerializeObject(_trustBuilder.Package, Formatting.Indented));
 
+            var _trustController = ServiceProvider.GetRequiredService<TrustController>();
             // Test Add and schema validation
             var result = (OkObjectResult)_trustController.AddPackage(_trustBuilder.Package);
             Assert.IsNotNull(result);
+
             var httpResult = (HttpResult)result.Value;
             Assert.AreEqual(HttpResultStatusType.Success.ToString(), httpResult.Status, httpResult.Message + " : "+ httpResult.Data);
 
@@ -44,12 +45,15 @@ namespace UnitTest.TrustgraphCore
             Assert.AreEqual(3, _trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
 
             // Test Graph
-            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrue.Type);
-            queryBuilder.Query.Flags |= QueryFlags.LeafsOnly;
-            BuildQuery(queryBuilder, "A", "D");
+            var _queryController = ServiceProvider.GetRequiredService<QueryController>();
+            result = (OkObjectResult)_queryController.Get(TrustBuilderExtensions.GetAddress("A"), TrustBuilderExtensions.GetAddress("D"), QueryFlags.LeafsOnly);
 
-            // Execute
-            var context = _graphQueryService.Execute(queryBuilder.Query);
+            Assert.IsNotNull(result);
+
+            httpResult = (HttpResult)result.Value;
+            Assert.AreEqual(HttpResultStatusType.Success.ToString(), httpResult.Status, httpResult.Message + " : " + httpResult.Data);
+
+            var context = (QueryContext)httpResult.Data;
 
             // Verify
             Assert.AreEqual(1, context.Results.Count, $"Should be {1} results!");
