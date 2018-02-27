@@ -31,7 +31,7 @@ namespace UnitTest.TrustchainCore.Builders
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer(serverKey);
             builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrustTrueClaim())
+                .AddSubject("testsubject1", TrustBuilder.CreateTrustClaim())
                 .Build()
                 .Sign();
 
@@ -50,7 +50,7 @@ namespace UnitTest.TrustchainCore.Builders
 
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer("testserver");
-            builder.AddTrust("testissuer1", "testsubject1", TrustBuilder.CreateTrustTrueClaim())
+            builder.AddTrust("testissuer1", "testsubject1", TrustBuilder.CreateTrustClaim())
                 .Build()
                 .Sign();
 
@@ -114,9 +114,9 @@ namespace UnitTest.TrustchainCore.Builders
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer(serverKey);
             builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrustTrueClaim())
+                .AddSubject("testsubject1", TrustBuilder.CreateTrustClaim())
                 .AddTrust("testissuer2")
-                .AddSubject("testsubject2", TrustBuilder.CreateTrustTrueClaim())
+                .AddSubject("testsubject2", TrustBuilder.CreateTrustClaim())
                 .Build()
                 .Sign();
 
@@ -143,8 +143,8 @@ namespace UnitTest.TrustchainCore.Builders
             var _trustBuilder = new TrustBuilder(ServiceProvider);
             //_trustBuilder.SetServer("testserver");
             _trustBuilder.SetServer(serverKey);
-            _trustBuilder.AddTrust("testissuer1", "testsubject1", TrustBuilder.CreateTrustTrueClaim())
-                .AddTrust("testissuer2", "testsubject2", TrustBuilder.CreateTrustTrueClaim())
+            _trustBuilder.AddTrust("testissuer1", "testsubject1", TrustBuilder.CreateTrustClaim())
+                .AddTrust("testissuer2", "testsubject2", TrustBuilder.CreateTrustClaim())
                 .Build().Sign();
 
             Console.WriteLine(JsonConvert.SerializeObject(_trustBuilder.Package, Formatting.Indented));
@@ -170,16 +170,16 @@ namespace UnitTest.TrustchainCore.Builders
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer(serverKey);
             builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrustTrueClaim())
+                .AddSubject("testsubject1", TrustBuilder.CreateTrustClaim())
                 .Build()
                 .Sign();
 
             var builder2 = new TrustBuilder(ServiceProvider);
             builder2.SetServer(serverKey);
             builder2.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrustTrueClaim())
+                .AddSubject("testsubject1", TrustBuilder.CreateTrustClaim())
                 .AddTrust("testissuer2")
-                .AddSubject("testsubject2", TrustBuilder.CreateTrustTrueClaim())
+                .AddSubject("testsubject2", TrustBuilder.CreateTrustClaim())
                 .Build()
                 .Sign();
 

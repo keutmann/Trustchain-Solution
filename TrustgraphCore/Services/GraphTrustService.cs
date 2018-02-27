@@ -62,7 +62,7 @@ namespace TrustgraphCore.Services
             var graphSubject = new GraphSubject
             {
                 TargetIssuer =  EnsureGraphIssuer(trustSubject.Address),
-                IssuerType = Graph.SubjectTypes.Ensure(trustSubject.Type),
+                //IssuerType = Graph.SubjectTypes.Ensure(trustSubject.Type),
                 AliasIndex = Graph.Alias.Ensure(trustSubject.Alias),
                 Claims = new Dictionary<long, int>()
             };

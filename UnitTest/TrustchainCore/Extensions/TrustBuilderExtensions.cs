@@ -43,7 +43,7 @@ namespace UnitTest.TrustchainCore.Extensions
 
         public static TrustBuilder AddTrustTrue(this TrustBuilder builder, string issuerName, string subjectName)
         {
-            builder.AddTrust(issuerName, subjectName, TrustBuilder.CreateTrustTrueClaim());
+            builder.AddTrust(issuerName, subjectName, TrustBuilder.CreateTrustClaim());
             return builder;
         }
 

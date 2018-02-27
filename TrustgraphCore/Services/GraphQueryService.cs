@@ -88,16 +88,15 @@ namespace TrustgraphCore.Services
             }
             else
             {   // Otherwise continue down!
-                foreach (var key in issuer.Subjects.Keys)
+                foreach (var subjectEntry in issuer.Subjects)
                 {
-                    tracker.SubjectKey = key;
+                    tracker.SubjectKey = subjectEntry.Key;
 
-                    //if(context.Tracker.Count + 1 == context.Level)
-                    if (context.Visited.GetFast(issuer.Subjects[key].TargetIssuer.Index))
+                    if (context.Visited.GetFast(subjectEntry.Value.TargetIssuer.Index))
                         continue;
 
-                    if (FollowIssuer(context, issuer, key))
-                        SearchIssuer(context, issuer.Subjects[key].TargetIssuer);
+                    if (FollowIssuer(context, subjectEntry.Value))
+                        SearchIssuer(context, subjectEntry.Value.TargetIssuer);
                 }
             }
 
@@ -105,14 +104,17 @@ namespace TrustgraphCore.Services
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool FollowIssuer(QueryContext context, GraphIssuer issuer, int key)
+        private bool FollowIssuer(QueryContext context, GraphSubject subject)
         {
+            if ((subject.Flags & SubjectFlags.ContainsTrustTrue) != SubjectFlags.ContainsTrustTrue)
+                return true;
+
             var follow = false;
-            if (issuer.Subjects[key].Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out int index))
+            if (subject.Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out int index))
                 follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
 
             if (!follow) // Check global
-                if (issuer.Subjects[key].Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index))
+                if (subject.Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index))
                     follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
             return follow;
         }

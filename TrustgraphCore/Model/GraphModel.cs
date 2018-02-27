@@ -15,19 +15,7 @@ namespace TrustgraphCore.Model
         public DictionaryTwoWay<string> ClaimType = new DictionaryTwoWay<string>(StringComparer.OrdinalIgnoreCase);
         public DictionaryTwoWay<string> ClaimData = new DictionaryTwoWay<string>(StringComparer.OrdinalIgnoreCase);
         public DictionaryTwoWay<string> Notes = new DictionaryTwoWay<string>(StringComparer.OrdinalIgnoreCase);
-        public DictionaryTwoWay<string> SubjectTypes = new DictionaryTwoWay<string>(StringComparer.OrdinalIgnoreCase);
         public DictionaryTwoWay<string> Scopes = new DictionaryTwoWay<string>(StringComparer.OrdinalIgnoreCase);
         public DictionaryTwoWay<string> Alias = new DictionaryTwoWay<string>(StringComparer.OrdinalIgnoreCase);
-
-        //public GraphModel()
-        //{
-        //    //AliasIndex.Add("", 0);
-        //    //AliasIndexReverse.Add(0, "");
-
-        //    //SubjectTypesIndex.Add("", 0);
-        //    //SubjectTypesIndexReverse.Add(0, "");
-
-        //    //Scopes.Ensure("");
-        //}
     }
 }

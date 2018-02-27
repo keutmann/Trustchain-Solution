@@ -157,7 +157,7 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void Source1Target2()
         {
-            ClaimTrustTrueGraph();
+            BuildTestGraph();
 
             var queryBuilder = new QueryRequestBuilder(ClaimType);
 
@@ -214,7 +214,7 @@ namespace UnitTest.TrustgraphCore
         [TestMethod]
         public void Source1Target1Unreachable()
         {
-            ClaimTrustTrueGraph();
+            BuildTestGraph();
 
             var queryBuilder = new QueryRequestBuilder(ClaimType);
 
@@ -228,7 +228,55 @@ namespace UnitTest.TrustgraphCore
         }
 
 
-        private void ClaimTrustTrueGraph()
+        /// <summary>
+        /// 1 Source, 1 targets unreachable
+        /// </summary>
+        [TestMethod]
+        public void Source1Target1NoTrust()
+        {
+            BuildTestGraph();
+
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
+
+            BuildQuery(queryBuilder, "A", "NoTrustD"); 
+
+            // Execute
+            var context = _graphQueryService.Execute(queryBuilder.Query);
+
+            // Verify
+            VerfifyResult(context, "A", "B");
+            VerfifyResult(context, "B", "C");
+            VerfifyResult(context, "C", "NoTrustD", ClaimTrustFalse);
+            VerfifyContext(context, 3);
+        }
+
+
+        /// <summary>
+        /// 1 Source, 1 targets unreachable
+        /// </summary>
+        [TestMethod]
+        public void Source1Target1MixTrust()
+        {
+            BuildTestGraph();
+
+            var queryBuilder = new QueryRequestBuilder(ClaimType);
+
+            BuildQuery(queryBuilder, "A", "MixD");
+
+            // Execute
+            var context = _graphQueryService.Execute(queryBuilder.Query);
+
+            // Verify
+            VerfifyResult(context, "A", "B");
+            VerfifyResult(context, "B", "C");
+            VerfifyResult(context, "C", "MixD", ClaimTrustTrue);
+            VerfifyResult(context, "B", "E");
+            VerfifyResult(context, "E", "MixD", ClaimTrustFalse);
+            VerfifyContext(context, 4);
+        }
+
+
+        private void BuildTestGraph()
         {
             _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
             _trustBuilder.AddTrust("B", "C", ClaimTrustTrue);
@@ -247,6 +295,13 @@ namespace UnitTest.TrustgraphCore
             _trustBuilder.AddTrust("A", "B", ClaimRating);
             _trustBuilder.AddTrust("C", "D", ClaimRating);
             _trustBuilder.AddTrust("G", "D", ClaimRating);
+
+            _trustBuilder.AddTrust("A", "NoTrustB", ClaimTrustFalse);
+            _trustBuilder.AddTrust("B", "NoTrustC", ClaimTrustFalse);
+            _trustBuilder.AddTrust("C", "NoTrustD", ClaimTrustFalse);
+
+            _trustBuilder.AddTrust("C", "MixD", ClaimTrustTrue);
+            _trustBuilder.AddTrust("E", "MixD", ClaimTrustFalse);
 
             _graphTrustService.Add(_trustBuilder.Package);
         }

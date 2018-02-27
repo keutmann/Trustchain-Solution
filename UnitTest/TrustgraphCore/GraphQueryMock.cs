@@ -24,6 +24,7 @@ namespace UnitTest.TrustgraphCore
         protected IGraphQueryService _graphQueryService = null;
 
         protected Claim ClaimTrustTrue = null;
+        protected Claim ClaimTrustFalse = null;
         protected Claim ClaimConfirmTrue = null;
         protected Claim ClaimRating = null;
 
@@ -38,7 +39,8 @@ namespace UnitTest.TrustgraphCore
             //_graphQueryService = new GraphQueryService(_graphTrustService);
             _graphQueryService = ServiceProvider.GetRequiredService<IGraphQueryService>();
 
-            ClaimTrustTrue = TrustBuilder.CreateTrustTrueClaim();
+            ClaimTrustTrue = TrustBuilder.CreateTrustClaim("", true);
+            ClaimTrustFalse = TrustBuilder.CreateTrustClaim("", false);
             ClaimConfirmTrue = TrustBuilder.CreateConfirmClaim();
             ClaimRating = TrustBuilder.CreateRatingClaim(100, "");
         }

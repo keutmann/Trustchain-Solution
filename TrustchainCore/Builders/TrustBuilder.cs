@@ -341,9 +341,9 @@ namespace TrustchainCore.Builders
             return CreateClaim(FOLLOWTRUST_TC1, "", "");
         }
 
-        public static Claim CreateTrustTrueClaim(string scope = "")
+        public static Claim CreateTrustClaim(string scope = "", bool trust = true)
         {
-            return CreateClaim(BINARYTRUST_TC1, scope, CreateTrust(true).ToString(Formatting.None));
+            return CreateClaim(BINARYTRUST_TC1, scope, CreateTrust(trust).ToString(Formatting.None));
         }
 
         public static Claim CreateConfirmClaim(string scope = "")

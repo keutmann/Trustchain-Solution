@@ -25,9 +25,9 @@ namespace UnitTest.TrustgraphCore
 
             _trustBuilder.SetServer("testserver");
 
-            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustTrueClaim());
-            _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustTrueClaim());
-            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateTrustTrueClaim());
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateTrustClaim());
             _trustBuilder.Build().Sign();
 
             Console.WriteLine(JsonConvert.SerializeObject(_trustBuilder.Package, Formatting.Indented));
