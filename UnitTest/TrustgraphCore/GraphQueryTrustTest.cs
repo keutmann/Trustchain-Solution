@@ -250,7 +250,6 @@ namespace UnitTest.TrustgraphCore
             VerfifyContext(context, 3);
         }
 
-
         /// <summary>
         /// 1 Source, 1 targets unreachable
         /// </summary>
