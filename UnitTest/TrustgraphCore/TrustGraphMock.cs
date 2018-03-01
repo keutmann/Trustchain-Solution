@@ -13,15 +13,18 @@ using TrustgraphCore.Model;
 using TrustchainCore.Model;
 using Newtonsoft.Json.Linq;
 using TrustgraphCore.Extensions;
+using TrustgraphCore.Controllers;
 
 namespace UnitTest.TrustgraphCore
 {
-    public class GraphQueryMock : StartupMock
+    public class TrustGraphMock : StartupMock
     {
         protected IGraphTrustService _graphTrustService = null;
         protected TrustBuilder _trustBuilder = null;
         protected ITrustDBService _trustDBService = null;
         protected IGraphQueryService _graphQueryService = null;
+        protected TrustController _trustController = null;
+        protected IGraphLoadSaveService _graphLoadSaveService = null;
 
         protected Claim ClaimTrustTrue = null;
         protected Claim ClaimTrustFalse = null;
@@ -38,6 +41,8 @@ namespace UnitTest.TrustgraphCore
             _trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
             //_graphQueryService = new GraphQueryService(_graphTrustService);
             _graphQueryService = ServiceProvider.GetRequiredService<IGraphQueryService>();
+            _trustController = ServiceProvider.GetRequiredService<TrustController>();
+            _graphLoadSaveService = ServiceProvider.GetRequiredService<IGraphLoadSaveService>();
 
             ClaimTrustTrue = TrustBuilder.CreateTrustClaim("", true);
             ClaimTrustFalse = TrustBuilder.CreateTrustClaim("", false);
@@ -57,8 +62,7 @@ namespace UnitTest.TrustgraphCore
             var sourceAddress = TrustBuilderExtensions.GetAddress(source);
             var subject = new Subject
             {
-                Address = TrustBuilderExtensions.GetAddress(target),
-                Type = "person"
+                Address = TrustBuilderExtensions.GetAddress(target)
             };
             queryBuilder.Add(sourceAddress, subject);
 
@@ -91,5 +95,45 @@ namespace UnitTest.TrustgraphCore
                 Assert.IsTrue(exist, "Subject missing the claim type: " + trustClaim.Type);
             }
         }
+
+        protected void BuildTestGraph()
+        {
+            _trustBuilder.SetServer("testserver");
+
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("B", "E", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("E", "D", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("B", "F", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("F", "G", TrustBuilder.CreateTrustClaim());
+            _trustBuilder.AddTrust("G", "D", TrustBuilder.CreateTrustClaim()); // Long way, no trust
+            _trustBuilder.AddTrust("G", "Unreach", TrustBuilder.CreateTrustClaim()); // Long way, no trust
+
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateConfirmClaim());
+            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateConfirmClaim());
+            _trustBuilder.AddTrust("G", "D", TrustBuilder.CreateConfirmClaim());
+
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateRatingClaim());
+            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateRatingClaim());
+            _trustBuilder.AddTrust("G", "D", TrustBuilder.CreateRatingClaim());
+
+            _trustBuilder.AddTrust("A", "NoTrustB", TrustBuilder.CreateTrustClaim("", false));
+            _trustBuilder.AddTrust("B", "NoTrustC", TrustBuilder.CreateTrustClaim("", false));
+            _trustBuilder.AddTrust("C", "NoTrustD", TrustBuilder.CreateTrustClaim("", false));
+
+            _trustBuilder.AddTrust("C", "MixD", TrustBuilder.CreateTrustClaim("", true));
+            _trustBuilder.AddTrust("E", "MixD", TrustBuilder.CreateTrustClaim("", false));
+
+            _trustBuilder.Build().Sign();
+        }
+
+        protected void EnsureTestGraph()
+        {
+            BuildTestGraph();
+            _graphTrustService.Add(_trustBuilder.Package);
+
+        }
+
     }
 }

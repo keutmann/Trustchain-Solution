@@ -10,8 +10,8 @@ using TrustchainCore.Repository;
 namespace TrustchainCore.Migrations
 {
     [DbContext(typeof(TrustDBContext))]
-    [Migration("20180212213359_SchemaUpdate")]
-    partial class SchemaUpdate
+    [Migration("20180301105109_UpdateRef")]
+    partial class UpdateRef
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -38,7 +38,7 @@ namespace TrustchainCore.Migrations
 
                     b.Property<string>("Scope");
 
-                    b.Property<int>("TrustID");
+                    b.Property<int>("TrustDatabaseID");
 
                     b.Property<string>("Type");
 
@@ -46,7 +46,7 @@ namespace TrustchainCore.Migrations
 
                     b.HasIndex("Index");
 
-                    b.HasIndex("TrustID");
+                    b.HasIndex("TrustDatabaseID");
 
                     b.ToTable("Claim");
                 });
@@ -116,15 +116,13 @@ namespace TrustchainCore.Migrations
 
                     b.Property<byte[]>("ClaimIndexs");
 
-                    b.Property<int>("TrustID");
-
-                    b.Property<string>("Type");
+                    b.Property<int>("TrustDatabaseID");
 
                     b.HasKey("DatabaseID");
 
                     b.HasIndex("Address");
 
-                    b.HasIndex("TrustID");
+                    b.HasIndex("TrustDatabaseID");
 
                     b.ToTable("Subject");
                 });
@@ -138,7 +136,7 @@ namespace TrustchainCore.Migrations
 
                     b.Property<string>("Blockchain");
 
-                    b.Property<int>("PackageID");
+                    b.Property<int>("PackageDatabaseID");
 
                     b.Property<string>("Recipt");
 
@@ -148,7 +146,7 @@ namespace TrustchainCore.Migrations
 
                     b.HasKey("DatabaseID");
 
-                    b.HasIndex("PackageID");
+                    b.HasIndex("PackageDatabaseID");
 
                     b.ToTable("Timestamp");
                 });
@@ -199,7 +197,7 @@ namespace TrustchainCore.Migrations
                 {
                     b.HasOne("TrustchainCore.Model.Trust")
                         .WithMany("Claims")
-                        .HasForeignKey("TrustID")
+                        .HasForeignKey("TrustDatabaseID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -228,7 +226,7 @@ namespace TrustchainCore.Migrations
                 {
                     b.HasOne("TrustchainCore.Model.Trust")
                         .WithMany("Subjects")
-                        .HasForeignKey("TrustID")
+                        .HasForeignKey("TrustDatabaseID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -236,7 +234,7 @@ namespace TrustchainCore.Migrations
                 {
                     b.HasOne("TrustchainCore.Model.Package")
                         .WithMany("Timestamps")
-                        .HasForeignKey("PackageID")
+                        .HasForeignKey("PackageDatabaseID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

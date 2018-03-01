@@ -13,7 +13,7 @@ using UnitTest.TrustchainCore.Extensions;
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
-    public class LargeGraph : GraphQueryMock
+    public class LargeGraph : TrustGraphMock
     {
         [TestMethod]
         public void Test1()

@@ -5,6 +5,7 @@ using TrustgraphCore.Interfaces;
 using TrustchainCore.Builders;
 using TrustgraphCore.Extensions;
 using TrustgraphCore.Enumerations;
+using Microsoft.Extensions.Logging;
 
 namespace TrustgraphCore.Services
 {
@@ -12,7 +13,6 @@ namespace TrustgraphCore.Services
     {
         public GraphModel Graph { get; set;}
 
-        //public GraphClaim FollowClaim { get; set; }
         public int GlobalScopeIndex { get; set; }
         public int BinaryTrustTypeIndex { get; set; }
 
@@ -23,13 +23,39 @@ namespace TrustgraphCore.Services
         public GraphTrustService(GraphModel graph)
         {
             Graph = graph;
-            //EnsureSetup();
         }
 
-        //private void EnsureSetup()
-        //{
-        //    FollowClaim = EnsureGraphClaim(TrustBuilder.CreateFollowClaim());
-        //}
+        public void Add(Package package)
+        {
+            Add(package.Trusts);
+        }
+
+        public void Add(IEnumerable<Trust> trusts)
+        {
+            foreach (var trust in trusts)
+            {
+                Add(trust);
+            }
+        }
+
+        public void Add(Trust trust)
+        {
+            var issuer = EnsureGraphIssuer(trust.Issuer.Address);
+
+            foreach (var trustSubject in trust.Subjects)
+            {
+
+                var graphSubject = EnsureGraphSubject(issuer, trustSubject);
+
+                foreach (var index in trustSubject.ClaimIndexs)
+                {
+                    var trustClaim = trust.Claims[index];
+
+                    var graphClaim = EnsureGraphClaim(trustClaim);
+                    graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Type, graphClaim.Index);
+                }
+            }
+        }
 
         public GraphIssuer EnsureGraphIssuer(byte[] address)
         {
@@ -114,36 +140,6 @@ namespace TrustgraphCore.Services
         }
 
 
-        public void Add(Package package)
-        {
-            Add(package.Trusts);
-        }
 
-        public void Add(IEnumerable<Trust> trusts)
-        {
-            foreach (var trust in trusts)
-            {
-                Add(trust);
-            }
-        }
-
-        public void Add(Trust trust)
-        {
-            var issuer = EnsureGraphIssuer(trust.Issuer.Address);
-
-            foreach (var trustSubject in trust.Subjects)
-            {
-
-                var graphSubject = EnsureGraphSubject(issuer, trustSubject);
-
-                foreach (var index in trustSubject.ClaimIndexs)
-                {
-                    var trustClaim = trust.Claims[index];
-
-                    var graphClaim = EnsureGraphClaim(trustClaim);
-                    graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Type, graphClaim.Index);
-                }
-            }
-        }
     }
 }

@@ -7,7 +7,5 @@ namespace TrustgraphCore.Model
     {
         [JsonProperty(PropertyName = "id")]
         public byte[] Id;
-        [JsonProperty(PropertyName = "type")]
-        public string Type;
     }
 }

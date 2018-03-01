@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace TrustchainCore.Migrations
 {
-    public partial class init : Migration
+    public partial class UpdateRef : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -79,7 +79,7 @@ namespace TrustchainCore.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Algorithm = table.Column<string>(nullable: true),
                     Blockchain = table.Column<string>(nullable: true),
-                    PackageID = table.Column<int>(nullable: false),
+                    PackageDatabaseID = table.Column<int>(nullable: false),
                     Recipt = table.Column<string>(nullable: true),
                     Service = table.Column<string>(nullable: true),
                     Time = table.Column<int>(nullable: false)
@@ -88,8 +88,8 @@ namespace TrustchainCore.Migrations
                 {
                     table.PrimaryKey("PK_Timestamp", x => x.DatabaseID);
                     table.ForeignKey(
-                        name: "FK_Timestamp_Package_PackageID",
-                        column: x => x.PackageID,
+                        name: "FK_Timestamp_Package_PackageDatabaseID",
+                        column: x => x.PackageDatabaseID,
                         principalTable: "Package",
                         principalColumn: "DatabaseID",
                         onDelete: ReferentialAction.Cascade);
@@ -133,15 +133,17 @@ namespace TrustchainCore.Migrations
                     Data = table.Column<string>(nullable: true),
                     Expire = table.Column<uint>(nullable: false),
                     Index = table.Column<int>(nullable: false),
+                    Note = table.Column<string>(nullable: true),
                     Scope = table.Column<string>(nullable: true),
-                    TrustID = table.Column<int>(nullable: false)
+                    TrustDatabaseID = table.Column<int>(nullable: false),
+                    Type = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Claim", x => x.DatabaseID);
                     table.ForeignKey(
-                        name: "FK_Claim_Trust_TrustID",
-                        column: x => x.TrustID,
+                        name: "FK_Claim_Trust_TrustDatabaseID",
+                        column: x => x.TrustDatabaseID,
                         principalTable: "Trust",
                         principalColumn: "DatabaseID",
                         onDelete: ReferentialAction.Cascade);
@@ -156,15 +158,14 @@ namespace TrustchainCore.Migrations
                     Address = table.Column<byte[]>(nullable: true),
                     Alias = table.Column<string>(nullable: true),
                     ClaimIndexs = table.Column<byte[]>(nullable: true),
-                    Type = table.Column<string>(nullable: true),
-                    TrustID = table.Column<int>(nullable: false)
+                    TrustDatabaseID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Subject", x => x.DatabaseID);
                     table.ForeignKey(
-                        name: "FK_Subject_Trust_TrustID",
-                        column: x => x.TrustID,
+                        name: "FK_Subject_Trust_TrustDatabaseID",
+                        column: x => x.TrustDatabaseID,
                         principalTable: "Trust",
                         principalColumn: "DatabaseID",
                         onDelete: ReferentialAction.Cascade);
@@ -176,9 +177,9 @@ namespace TrustchainCore.Migrations
                 column: "Index");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Claim_TrustID",
+                name: "IX_Claim_TrustDatabaseID",
                 table: "Claim",
-                column: "TrustID");
+                column: "TrustDatabaseID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_KeyValues_Key",
@@ -206,14 +207,14 @@ namespace TrustchainCore.Migrations
                 column: "Address");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subject_TrustID",
+                name: "IX_Subject_TrustDatabaseID",
                 table: "Subject",
-                column: "TrustID");
+                column: "TrustDatabaseID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Timestamp_PackageID",
+                name: "IX_Timestamp_PackageDatabaseID",
                 table: "Timestamp",
-                column: "PackageID");
+                column: "PackageDatabaseID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Trust_Id",

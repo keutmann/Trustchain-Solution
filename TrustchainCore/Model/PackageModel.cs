@@ -145,7 +145,7 @@ namespace TrustchainCore.Model
     public class Subject : DatabaseEntity
     {
         [JsonIgnore]
-        public int TrustID { get; set; }
+        public int TrustDatabaseID { get; set; }
 
         [JsonProperty(PropertyName = "alias")]
         public string Alias { get; set; }
@@ -156,8 +156,8 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "address")]
         public byte[] Address { get; set; }
 
-        [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        //[JsonProperty(PropertyName = "type")]
+        //public string Type { get; set; }
     }
 
     [Table("Claim")]
@@ -165,7 +165,7 @@ namespace TrustchainCore.Model
     public class Claim : DatabaseEntity
     {
         [JsonIgnore]
-        public int TrustID { get; set; }
+        public int TrustDatabaseID { get; set; }
 
         /// <summary>
         /// Optional, specify index, if the possibility of claim object gets reordered.
@@ -228,7 +228,7 @@ namespace TrustchainCore.Model
     public class Timestamp : DatabaseEntity
     {
         [JsonIgnore]
-        public int PackageID { get; set; }
+        public int PackageDatabaseID { get; set; }
 
         [JsonProperty(PropertyName = "blockchain")]
         public string Blockchain { get; set; }

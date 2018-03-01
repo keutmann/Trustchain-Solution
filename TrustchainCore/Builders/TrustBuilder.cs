@@ -232,7 +232,7 @@ namespace TrustchainCore.Builders
         }
 
 
-        public TrustBuilder AddSubject(byte[] address, string alias, string type, byte[] claimIndex)
+        public TrustBuilder AddSubject(byte[] address, string alias, byte[] claimIndex)
         {
             if(_currentTrust.Subjects == null)
                 _currentTrust.Subjects = new List<Subject>();
@@ -241,13 +241,8 @@ namespace TrustchainCore.Builders
             {
                 Alias = alias,
                 Address = address,
-                Type = type,
                 ClaimIndexs = claimIndex
             });
-
-    //        Claim = JsonConvert.SerializeObject((claim != null) ? claim : new JObject(
-    //new JProperty("trust", "true")
-    //), Formatting.None),
 
             return this;
         }

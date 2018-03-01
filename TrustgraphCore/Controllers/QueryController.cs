@@ -48,7 +48,7 @@ namespace TrustgraphCore.Controllers
         {
             var builder = new QueryRequestBuilder(TrustScope.Global, TrustBuilder.BINARYTRUST_TC1);
             builder.Query.Flags = flags;
-            builder.Add(issuer, subject, "");
+            builder.Add(issuer, subject);
 
             _queryRequestService.Verify(builder.Query);
 

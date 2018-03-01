@@ -75,6 +75,7 @@ namespace TrustchainCore.Services
                 DBContext.Trusts.Add(trust);
             else
                 throw new ApplicationException("Trust already exist");
+
         }
 
         public bool Add(Package package)

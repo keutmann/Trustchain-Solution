@@ -15,20 +15,13 @@ using UnitTest.TrustchainCore.Extensions;
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
-    public class TrustControllerTest : GraphQueryMock
+    public class TrustControllerTest : TrustGraphMock
     {
         [TestMethod]
-        public void Add1()
+        public void AddPackage()
         {
             // Setup
-            var _trustController = ServiceProvider.GetRequiredService<TrustController>();
-
-            _trustBuilder.SetServer("testserver");
-
-            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.Build().Sign();
+            EnsureTestGraph();
 
             Console.WriteLine(JsonConvert.SerializeObject(_trustBuilder.Package, Formatting.Indented));
 
@@ -43,20 +36,19 @@ namespace UnitTest.TrustgraphCore
             Assert.AreEqual(3, _trustDBService.Subjects.Count(), $"Should be {3} Trusts");
             Assert.AreEqual(3, _trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
 
-            // Test Graph
-            var queryBuilder = new QueryRequestBuilder(ClaimTrustTrue.Type);
-            queryBuilder.Query.Flags |= QueryFlags.LeafsOnly;
-            BuildQuery(queryBuilder, "A", "D");
 
-            // Execute
-            var context = _graphQueryService.Execute(queryBuilder.Query);
+            //// Test Graph
+            //var queryBuilder = new QueryRequestBuilder(ClaimTrustTrue.Type);
+            //queryBuilder.Query.Flags |= QueryFlags.LeafsOnly;
+            //BuildQuery(queryBuilder, "A", "D");
 
-            // Verify
-            Assert.AreEqual(1, context.Results.Count, $"Should be {1} results!");
+            //// Execute
+            //var context = _graphQueryService.Execute(queryBuilder.Query);
 
-            VerfifyResult(context, "C", "D");
+            //// Verify
+            //Assert.AreEqual(1, context.Results.Count, $"Should be {1} results!");
 
-
+            //VerfifyResult(context, "C", "D");
         }
     }
 }

@@ -13,7 +13,7 @@ namespace TrustgraphCore.Extensions
         {
             services.AddSingleton(new GraphModel());
             services.AddScoped<IDerivationStrategy, DerivationBTCPKH>();
-            services.AddScoped<ITrustLoadService, TrustLoadService>();
+            services.AddScoped<IGraphLoadSaveService, GraphLoadSaveService>();
             services.AddScoped<IGraphTrustService, GraphTrustService>();
 
             services.AddTransient<IGraphQueryService, GraphQueryService>();

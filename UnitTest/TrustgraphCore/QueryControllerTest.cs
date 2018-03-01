@@ -16,7 +16,7 @@ using UnitTest.TrustchainCore.Extensions;
 namespace UnitTest.TrustgraphCore
 {
     [TestClass]
-    public class QueryControllerTest : GraphQueryMock
+    public class QueryControllerTest : TrustGraphMock
     {
         [TestMethod]
         public void AddAndQuery1()

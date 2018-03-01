@@ -29,15 +29,15 @@ namespace TrustgraphCore.Builders
         public QueryRequestBuilder Add(byte[] issuerId, Subject subject)
         {
             Query.Issuer = issuerId;
-            Query.Subjects.Add(new SubjectQuery { Id = subject.Address, Type = subject.Type});
+            Query.Subjects.Add(new SubjectQuery { Id = subject.Address});
 
             return this;
         }
 
-        public QueryRequestBuilder Add(byte[] issuerId, byte[] subject, string type)
+        public QueryRequestBuilder Add(byte[] issuerId, byte[] subject)
         {
             Query.Issuer = issuerId;
-            Query.Subjects.Add(new SubjectQuery { Id = subject, Type = type });
+            Query.Subjects.Add(new SubjectQuery { Id = subject});
 
             return this;
         }
