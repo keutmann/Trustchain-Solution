@@ -61,6 +61,9 @@ namespace TrustchainCore.Collections.Generic
         {
             return _reverse[index];
         }
-
+        public bool TryGetValue(int index, out T2 value)
+        {
+            return _reverse.TryGetValue(index, out value);
+        }
     }
 }

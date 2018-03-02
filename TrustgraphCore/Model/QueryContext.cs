@@ -9,6 +9,7 @@ using System.Security.Claims;
 using TrustchainCore.Builders;
 using TrustchainCore.Collections;
 using TrustgraphCore.Enumerations;
+using TrustchainCore.Model;
 
 namespace TrustgraphCore.Model
 {
@@ -63,7 +64,7 @@ namespace TrustgraphCore.Model
         public bool ShallowResult = false;
 
         [JsonProperty(PropertyName = "results", NullValueHandling = NullValueHandling.Ignore, Order = 50)]
-        public List<GraphTracker> Results { get; set; }
+        public Package Results { get; set; }
 
         [JsonProperty(PropertyName = "IssuerCount")]
         public int IssuerCount = 0;

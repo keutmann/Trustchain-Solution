@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TrustchainCore.Builders;
 using TrustchainCore.Interfaces;
 using TrustgraphCore.Interfaces;
-using TrustgraphCore.Services;
 using UnitTest.TrustchainCore.Extensions;
 using Newtonsoft.Json;
 using System;
@@ -11,7 +10,6 @@ using TrustgraphCore.Builders;
 using System.Collections.Generic;
 using TrustgraphCore.Model;
 using TrustchainCore.Model;
-using Newtonsoft.Json.Linq;
 using TrustgraphCore.Extensions;
 using TrustgraphCore.Controllers;
 
@@ -73,7 +71,7 @@ namespace UnitTest.TrustgraphCore
         protected void VerfifyContext(QueryContext context, int exspectedResults)
         {
             Assert.AreEqual(0, context.Errors.Count, $"{string.Join("\r\n", context.Errors.ToArray())}");
-            Assert.AreEqual(exspectedResults, context.Results.Count, $"Should be {exspectedResults} results!");
+            Assert.AreEqual(exspectedResults, context.Results.Trusts.Count, $"Should be {exspectedResults} results!");
 
         }
 

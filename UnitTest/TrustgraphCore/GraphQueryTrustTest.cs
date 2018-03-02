@@ -46,19 +46,18 @@ namespace UnitTest.TrustgraphCore
             Console.WriteLine("Query object");
             Console.WriteLine(JsonConvert.SerializeObject(queryBuilder.Query, Formatting.Indented));
             var queryContext = _graphQueryService.Execute(queryBuilder.Query);
-            Assert.AreEqual(queryContext.Results.Count, 1, "Should be one result!");
+            Assert.AreEqual(queryContext.Results.Trusts.Count, 1, "Should be one result!");
 
-            var tracker = queryContext.Results.First();
-            Assert.AreEqual(tracker.Subjects.Count, 1, "Should be one subject!");
+            var resultTrust = queryContext.Results.Trusts.First();
+            Assert.AreEqual(resultTrust.Subjects.Count, 1, "Should be one subject!");
 
-            var subject = tracker.Subjects.First().Value;
+            var subject = resultTrust.Subjects.First();
             //Assert.IsNotNull(queryContext.Subjects);
-            var targetIssuer = subject.TargetIssuer;
             Console.WriteLine("Issuer ID: " + JsonConvert.SerializeObject(trusts[0].Issuer.Address));
-            Console.WriteLine("result ID: " + JsonConvert.SerializeObject(targetIssuer.Address) + " : Trust SubjectID: " + JsonConvert.SerializeObject(trusts[0].Subjects[0].Address));
+            Console.WriteLine("result ID: " + JsonConvert.SerializeObject(subject.Address) + " : Trust SubjectID: " + JsonConvert.SerializeObject(trusts[0].Subjects[0].Address));
 
             //Assert.AreEqual(issuer.Name, trust.Name);
-            Assert.IsTrue(targetIssuer.Address.Equals(trust.Subjects[0].Address));
+            Assert.IsTrue(subject.Address.Equals(trust.Subjects[0].Address));
             //Assert.AreEqual(subject.Claims.ClaimModel.Metadata, ClaimMetadata.Reason);
             //Assert.IsTrue(issuer.Subjects[0].Claim.ContainsIgnoreCase("Test"));
 
@@ -82,8 +81,9 @@ namespace UnitTest.TrustgraphCore
             // Execute
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
+            PrintJson(context.Results);
             // Verify
-            Assert.AreEqual(4, context.Results.Count, $"Should be {4} results!");
+            Assert.AreEqual(4, context.Results.Trusts.Count, $"Should be {4} results!");
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
@@ -116,7 +116,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(query);
 
             // Verify
-            Assert.AreEqual(2, context.Results.Count, $"Should be {2} results!");
+            Assert.AreEqual(2, context.Results.Trusts.Count, $"Should be {2} results!");
 
             VerfifyResult(context, "C", "D");
             VerfifyResult(context, "E", "D");
@@ -139,8 +139,10 @@ namespace UnitTest.TrustgraphCore
             // Execute
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
+            PrintJson(context.Results);
             // Verify
-            Assert.AreEqual(context.Results.Count, 4, $"Should be {4} results!");
+            Assert.AreEqual(context.Results.Trusts.Count, 4, $"Should be {4} results!");
+
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
@@ -196,7 +198,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(context.Results.Count, 0, $"Should be {0} results!");
+            Assert.AreEqual(context.Results.Trusts.Count, 0, $"Should be {0} results!");
         }
 
 

@@ -49,18 +49,22 @@ namespace TrustchainCore.Model
     {
         [JsonProperty(PropertyName = "algorithm")]
         public string Algorithm { get; set; }
+        public bool ShouldSerializeAlgorithm() { return !string.IsNullOrWhiteSpace(Algorithm); }
 
         [JsonProperty(PropertyName = "id")]
         public byte[] Id { get; set; }
+        public bool ShouldSerializeId() { return Id != null; }
 
         [JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]
         public Identity Issuer { get; set; }
 
         [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Subject> Subjects { get; set; }
+        public bool ShouldSerializeSubjects() { return Subjects != null && Subjects.Count > 0; }
 
         [JsonProperty(PropertyName = "claims", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Claim> Claims { get; set; }
+        public bool ShouldSerializeClaims() { return Claims != null && Claims.Count > 0; }
 
         [JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]
         public TrustTimestamp Timestamp { get; set; }
@@ -73,15 +77,7 @@ namespace TrustchainCore.Model
             Algorithm = "double256";
         }
 
-        public bool ShouldSerializeSubjects()
-        {
-            return Subjects != null && Subjects.Count > 0;
-        }
 
-        public bool ShouldSerializeClaims()
-        {
-            return Claims != null && Claims.Count > 0;
-        }
     }
 
     /// <summary>
@@ -172,6 +168,7 @@ namespace TrustchainCore.Model
         /// </summary>
         [JsonProperty(PropertyName = "index")]
         public int Index { get; set; }
+        public bool ShouldSerializeIndex() { return Index >= 0; }
 
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
@@ -182,45 +179,23 @@ namespace TrustchainCore.Model
 
         [JsonProperty(PropertyName = "cost")]
         public short Cost { get; set; }
+        public bool ShouldSerializeCost() { return Cost > 0; }
 
         [JsonProperty(PropertyName = "activate")]
         public uint Activate { get; set; }
+        public bool ShouldSerializeActivate() { return Activate > 0; }
 
         [JsonProperty(PropertyName = "expire")]
         public uint Expire { get; set; }
+        public bool ShouldSerializeExpire() { return Expire > 0; }
 
         [JsonProperty(PropertyName = "scope")]
         public string Scope { get; set; }
+        public bool ShouldSerializeScope()  { return !string.IsNullOrWhiteSpace(Scope); }
 
         [JsonProperty(PropertyName = "note")]
         public string Note { get; set; }
-
-        public bool ShouldSerializeIndex()
-        {
-            return Index >= 0;
-        }
-
-        public bool ShouldSerializeCost()
-        {
-            return Cost > 0;
-        }
-
-        public bool ShouldSerializeActivate()
-        {
-            return Activate > 0;
-        }
-
-        public bool ShouldSerializeExpire()
-        {
-            return Expire > 0;
-        }
-
-        public bool ShouldSerializeNote()
-        {
-            return Note != null;
-        }
-
-
+        public bool ShouldSerializeNote() { return Note != null; }
     }
 
     [Table("Timestamp")]

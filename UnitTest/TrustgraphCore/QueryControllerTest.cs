@@ -58,7 +58,7 @@ namespace UnitTest.TrustgraphCore
             var context = (QueryContext)httpResult.Data;
 
             // Verify
-            Assert.AreEqual(1, context.Results.Count, $"Should be {1} results!");
+            Assert.AreEqual(1, context.Results.Trusts.Count, $"Should be {1} results!");
 
             VerfifyResult(context, "C", "D");
         }

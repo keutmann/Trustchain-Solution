@@ -62,7 +62,7 @@ namespace UnitTest.TrustgraphCore
                 var context = _graphQueryService.Execute(queryBuilder.Query);
 
                 if(i % 99 == 0)
-                    Console.WriteLine($"Results: ${context.Results.Count}");
+                    Console.WriteLine($"Results: ${context.Results.Trusts.Count}");
             }
 
             watch.Stop();
