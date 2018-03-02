@@ -36,6 +36,7 @@ namespace UnitTest
             services.AddTransient<IBlockingWorkflowStep, BlockingWorkflowStep>();
             services.AddTransient<IBlockchainRepository, BlockchainRepositoryMock>();
 
+            services.AddTransient<PackageController>();
             services.AddTransient<TrustController>();
             services.AddTransient<QueryController>();
 

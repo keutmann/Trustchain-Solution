@@ -24,6 +24,7 @@ namespace UnitTest.TrustgraphCore
         protected ITrustDBService _trustDBService = null;
         protected IGraphQueryService _graphQueryService = null;
         protected TrustController _trustController = null;
+        protected PackageController _packageController = null;
         protected IGraphLoadSaveService _graphLoadSaveService = null;
 
         protected Claim ClaimTrustTrue = null;
@@ -42,6 +43,7 @@ namespace UnitTest.TrustgraphCore
             //_graphQueryService = new GraphQueryService(_graphTrustService);
             _graphQueryService = ServiceProvider.GetRequiredService<IGraphQueryService>();
             _trustController = ServiceProvider.GetRequiredService<TrustController>();
+            _packageController = ServiceProvider.GetRequiredService<PackageController>();
             _graphLoadSaveService = ServiceProvider.GetRequiredService<IGraphLoadSaveService>();
 
             ClaimTrustTrue = TrustBuilder.CreateTrustClaim("", true);
@@ -82,7 +84,7 @@ namespace UnitTest.TrustgraphCore
             var sourceIndex = _graphTrustService.Graph.IssuerIndex.GetValueOrDefault(sourceAddress);
             var targetIndex = _graphTrustService.Graph.IssuerIndex.GetValueOrDefault(targetAddress);
 
-            var tracker = context.Results.GetValueOrDefault(sourceIndex);
+            var tracker = context.TrackerResults.GetValueOrDefault(sourceIndex);
             Assert.IsNotNull(tracker, $"Result is missing source: {source}");
 
             var subject = tracker.Subjects.GetValueOrDefault(targetIndex);

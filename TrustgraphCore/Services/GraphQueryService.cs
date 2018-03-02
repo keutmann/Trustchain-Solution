@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
@@ -44,8 +45,20 @@ namespace TrustgraphCore.Services
 
                 ClearTargets(context);
             }
+
+            ClearupResults(context);
         }
-        
+
+        /// <summary>
+        /// Clear up the results
+        /// </summary>
+        /// <param name="context"></param>
+        protected void ClearupResults(QueryContext context)
+        {
+            // Clear up the result
+            context.Results = context.TrackerResults.Select(p => p.Value).ToList();
+        }
+
         /// <summary>
         /// Remove the targets that have been found in the last run.
         /// </summary>
@@ -170,13 +183,13 @@ namespace TrustgraphCore.Services
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void AddResult(QueryContext context, int issuerIndex, List<Tuple<long, int>> claimsFound, GraphTracker tracker)
         {
-            if (!context.Results.ContainsKey(tracker.Issuer.Index))
+            if (!context.TrackerResults.ContainsKey(tracker.Issuer.Index))
             {
                 tracker.Subjects = new Dictionary<int, GraphSubject>();
-                context.Results.Add(tracker.Issuer.Index, tracker);
+                context.TrackerResults.Add(tracker.Issuer.Index, tracker);
             }
 
-            var result = context.Results[tracker.Issuer.Index];
+            var result = context.TrackerResults[tracker.Issuer.Index];
 
             if (!result.Subjects.ContainsKey(tracker.SubjectKey))
             {   // Only subjects with unique keys

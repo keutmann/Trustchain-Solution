@@ -48,7 +48,7 @@ namespace UnitTest.TrustgraphCore
             var queryContext = _graphQueryService.Execute(queryBuilder.Query);
             Assert.AreEqual(queryContext.Results.Count, 1, "Should be one result!");
 
-            var tracker = queryContext.Results.First().Value;
+            var tracker = queryContext.Results.First();
             Assert.AreEqual(tracker.Subjects.Count, 1, "Should be one subject!");
 
             var subject = tracker.Subjects.First().Value;
@@ -74,10 +74,7 @@ namespace UnitTest.TrustgraphCore
         public void Source1Target1()
         {
             // Build up
-            _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
-            _trustBuilder.AddTrust("B", "C", ClaimTrustTrue);
-            _trustBuilder.AddTrust("C", "D", ClaimTrustTrue);
-            _graphTrustService.Add(_trustBuilder.Package);
+            EnsureTestGraph();
 
             var queryBuilder = new QueryRequestBuilder(ClaimType);
             BuildQuery(queryBuilder, "A", "D");
@@ -86,11 +83,13 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            Assert.AreEqual(3, context.Results.Count, $"Should be {3} results!");
+            Assert.AreEqual(4, context.Results.Count, $"Should be {4} results!");
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
+            VerfifyResult(context, "B", "E");
             VerfifyResult(context, "C", "D");
+            VerfifyResult(context, "E", "D");
         }
 
 
@@ -101,13 +100,11 @@ namespace UnitTest.TrustgraphCore
         public void Source1Target1LLeafOnly()
         {
             // Build up
-            _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
-            _trustBuilder.AddTrust("B", "C", ClaimTrustTrue);
-            _trustBuilder.AddTrust("C", "D", ClaimTrustTrue);
-            _graphTrustService.Add(_trustBuilder.Package);
+            EnsureTestGraph();
 
             var queryBuilder = new QueryRequestBuilder(ClaimType);
             queryBuilder.Query.Flags |= QueryFlags.LeafsOnly;
+            queryBuilder.Query.Flags &= ~QueryFlags.FullTree;
             BuildQuery(queryBuilder, "A", "D");
 
             // Make sure that QueryFlags are serializeable
@@ -119,36 +116,11 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(query);
 
             // Verify
-            Assert.AreEqual(1, context.Results.Count, $"Should be {1} results!");
+            Assert.AreEqual(2, context.Results.Count, $"Should be {2} results!");
 
             VerfifyResult(context, "C", "D");
+            VerfifyResult(context, "E", "D");
         }
-
-
-
-        ///// <summary>
-        ///// 1 Source, 1 targets, 2 claims
-        ///// </summary>
-        //[TestMethod]
-        //public void Source1Target1Claim2()
-        //{
-        //    // Build up
-        //    ClaimTrustTrueGraph();
-
-        //    var queryBuilder = new QueryRequestBuilder(ClaimType);
-        //    BuildQuery(queryBuilder, "A", "D");
-        //    queryBuilder.Query.ClaimTypes.Add(TrustBuilder.CONFIRMTRUST_TC1);
-
-        //    // Execute
-        //    var context = _graphQueryService.Execute(queryBuilder.Query);
-
-        //    // Verify
-        //    Assert.AreEqual(context.Results.Count, 2, $"Should be {2} results!");
-
-        //    VerfifyResult(context, "A", "B");
-        //    VerfifyResult(context, "B", "C");
-        //}
-
 
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using TrustchainCore.Attributes;
 
 namespace TrustgraphCore.Model
 {
@@ -13,9 +14,11 @@ namespace TrustgraphCore.Model
         /// <summary>
         /// Dictionary Id of subject in Issuer Subjects
         /// </summary>
+        [JsonIgnore]
         public int SubjectKey;
 
         [JsonProperty(PropertyName = "subjects", NullValueHandling = NullValueHandling.Ignore, Order = 100)]
+        [JsonConverter(typeof(JsonDictionaryToListConverter<int,GraphSubject>))]
         public Dictionary<int, GraphSubject> Subjects { get; set; }
 
         public GraphTracker(GraphIssuer issuer)

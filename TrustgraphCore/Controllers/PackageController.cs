@@ -10,7 +10,7 @@ using System;
 namespace TrustgraphCore.Controllers
 {
     [Route("api/graph/[controller]")]
-    public class TrustController : ApiController
+    public class PackageController : ApiController
     {
         private IGraphTrustService _graphTrustService;
         private ITrustSchemaService _trustSchemaService;
@@ -19,7 +19,7 @@ namespace TrustgraphCore.Controllers
         private IBlockchainServiceFactory _blockchainServiceFactory;
 
 
-        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService, IBlockchainServiceFactory blockchainServiceFactory)
+        public PackageController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService, IBlockchainServiceFactory blockchainServiceFactory)
         {
             _graphTrustService = graphTrustService;
             _trustSchemaService = trustSchemaService;
@@ -42,27 +42,28 @@ namespace TrustgraphCore.Controllers
 #endif
 
         /// <summary>
-        /// Add a trust to the Graph and database.
-        /// The trust will be packaged at a time interval and timestamped.
+        /// Add a package to the Graph and database.
+        /// If the package is not timestamped, then it will be at a time interval.
         /// </summary>
-        /// <param name="trust"></param>
+        /// <param name="package"></param>
         /// <returns></returns>
         [Produces("application/json")]
         [HttpPost]
-        public ActionResult AddTrust([FromBody]Trust trust)
+        public ActionResult AddPackage([FromBody]Package package)
         {
-            trust.PackageDatabaseID = null; // NO package! 
 
-            var validationResult = _trustSchemaService.Validate(trust);
+            var validationResult = _trustSchemaService.Validate(package);
             if (validationResult.ErrorsFound > 0)
                 return ApiError(validationResult, null, "Validation failed");
             // Timestamp validation service disabled for the moment
 
-            _trustDBService.Add(trust);   // Add to database
-            _graphTrustService.Add(trust);    // Add to Graph
 
-            return ApiOk("Trust added");
+            _trustDBService.Add(package);   // Add to database
+            _graphTrustService.Add(package);    // Add to Graph
+            _proofService.AddProof(package.Id); // Add to timestamp service
+
+            return ApiOk("Package added");
         }
-
+ 
     }
 }

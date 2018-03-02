@@ -31,9 +31,9 @@ namespace UnitTest.TrustgraphCore
 
             Console.WriteLine(JsonConvert.SerializeObject(_trustBuilder.Package, Formatting.Indented));
 
-            var _trustController = ServiceProvider.GetRequiredService<TrustController>();
+            var _packageController = ServiceProvider.GetRequiredService<PackageController>();
             // Test Add and schema validation
-            var result = (OkObjectResult)_trustController.AddPackage(_trustBuilder.Package);
+            var result = (OkObjectResult)_packageController.AddPackage(_trustBuilder.Package);
             Assert.IsNotNull(result);
 
             var httpResult = (HttpResult)result.Value;
@@ -52,6 +52,8 @@ namespace UnitTest.TrustgraphCore
 
             httpResult = (HttpResult)result.Value;
             Assert.AreEqual(HttpResultStatusType.Success.ToString(), httpResult.Status, httpResult.Message + " : " + httpResult.Data);
+            Console.WriteLine("Result:-------------------------");
+            PrintJson(httpResult);
 
             var context = (QueryContext)httpResult.Data;
 
@@ -59,8 +61,6 @@ namespace UnitTest.TrustgraphCore
             Assert.AreEqual(1, context.Results.Count, $"Should be {1} results!");
 
             VerfifyResult(context, "C", "D");
-
-
         }
     }
 }

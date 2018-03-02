@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using TrustgraphCore.Enumerations;
 
@@ -12,6 +13,8 @@ namespace TrustgraphCore.Model
         public SubjectFlags Flags; // Containes metadata about the GraphSubject object
         public int AliasIndex; // The name of the issuer for this subject
         public Dictionary<long, int> Claims;  // Int is scope index
+
+        [JsonIgnore]
         public object ClaimsData;
     }
 }

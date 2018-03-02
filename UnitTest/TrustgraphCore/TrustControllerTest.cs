@@ -26,7 +26,7 @@ namespace UnitTest.TrustgraphCore
             Console.WriteLine(JsonConvert.SerializeObject(_trustBuilder.Package, Formatting.Indented));
 
             // Test Add and schema validation
-            var result = (OkObjectResult)_trustController.AddPackage(_trustBuilder.Package);
+            var result = (OkObjectResult)_packageController.AddPackage(_trustBuilder.Package);
             Assert.IsNotNull(result);
             var httpResult = (HttpResult)result.Value;
             Assert.AreEqual(HttpResultStatusType.Success.ToString(), httpResult.Status, httpResult.Message + " : "+ httpResult.Data);

@@ -35,6 +35,10 @@ namespace TrustgraphCore.Model
         public Stack<GraphTracker> Tracker = new Stack<GraphTracker>();
 
         [JsonIgnore]
+        public Dictionary<int, GraphTracker> TrackerResults = new Dictionary<int, GraphTracker>();
+
+
+        [JsonIgnore]
         public int MaxCost = 0;
 
         /// <summary>
@@ -59,7 +63,7 @@ namespace TrustgraphCore.Model
         public bool ShallowResult = false;
 
         [JsonProperty(PropertyName = "results", NullValueHandling = NullValueHandling.Ignore, Order = 50)]
-        public Dictionary<int, GraphTracker> Results { get; set; }
+        public List<GraphTracker> Results { get; set; }
 
         [JsonProperty(PropertyName = "IssuerCount")]
         public int IssuerCount = 0;
@@ -79,7 +83,6 @@ namespace TrustgraphCore.Model
             Issuer = new GraphIssuer();
             Targets = new Dictionary<int, GraphIssuer>(); 
             ClaimTypes = new List<int>();
-            Results = new Dictionary<int, GraphTracker>();
             Errors = new List<string>();
 
             MaxCost = 500; 
@@ -127,21 +130,17 @@ namespace TrustgraphCore.Model
                 }
                 else
                     Errors.Add($"Unknown subject {subject.Id.ConvertToBase64()}");
-
-                //var type = GraphTrustService.Graph.SubjectTypes.ContainsKey(subject.Type) ? GraphTrustService.Graph.SubjectTypes.GetIndex(subject.Type) : -1;
-                //if (type == -1)
-                //UnknownSubjectTypes.Add(subject.Type);
-                //throw new ApplicationException("Unknown subject type: " + subject.Type);
             }
 
         }
 
         internal void SetupQueryClaim(QueryRequest query)
         {
-            if (!GraphTrustService.Graph.Scopes.ContainsKey(query.ClaimScope))
-                Errors.Add($"Unknown claim scope {query.ClaimScope}");
+            var scope = query.ClaimScope ?? string.Empty;
+            if (!GraphTrustService.Graph.Scopes.ContainsKey(scope))
+                Errors.Add($"Unknown claim scope {scope}");
             else
-                ClaimScope = GraphTrustService.Graph.Scopes.GetIndex(query.ClaimScope);
+                ClaimScope = GraphTrustService.Graph.Scopes.GetIndex(scope);
 
             if (query.ClaimTypes == null || query.ClaimTypes.Count == 0)
             {
@@ -161,8 +160,6 @@ namespace TrustgraphCore.Model
                 if (!ClaimTypes.Contains(GraphTrustService.BinaryTrustTypeIndex))
                     Flags |= QueryFlags.IncludeClaimTrust;
             }
-
-
         }
     }
 }
