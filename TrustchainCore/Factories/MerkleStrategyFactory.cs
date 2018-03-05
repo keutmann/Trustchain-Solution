@@ -15,10 +15,10 @@ namespace TrustchainCore.Factories
             _hashAlgorithmFactory = hashAlgorithmFactory;
         }
 
-        public IMerkleTree GetStrategy(string name)
+        public IMerkleTree GetStrategy(string name = MERKLE_TC1_DOUBLE256)
         {
             if(string.IsNullOrWhiteSpace(name))
-                return null;
+                name = MERKLE_TC1_DOUBLE256;
 
             var parts = name.ToLower().Split("-");
             if (parts.Length != 2)

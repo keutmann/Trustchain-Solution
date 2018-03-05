@@ -12,34 +12,22 @@ namespace TrustchainCore.Model
     {
         [JsonProperty(PropertyName = "algorithm")]
         public string Algorithm { get; set; }
+        public bool ShouldSerializeAlgorithm() { return !string.IsNullOrWhiteSpace(Algorithm); }
 
         [JsonProperty(PropertyName = "id")]
         public byte[] Id { get; set; }
+        public bool ShouldSerializeId() { return Id != null && Id.Length > 0; }
 
         [JsonProperty(PropertyName = "trusts", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Trust> Trusts { get; set; }
+        public bool ShouldSerializeTrusts() { return Trusts != null && Trusts.Count > 0; }
 
         [JsonProperty(PropertyName = "server", NullValueHandling = NullValueHandling.Ignore)]
         public Identity Server { get; set; }
 
         [JsonProperty(PropertyName = "timestamps", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Timestamp> Timestamps { get; set; }
-
-        public bool ShouldSerializeTrusts()
-        {
-            return Trusts != null && Trusts.Count > 0;
-        }
-
-        public bool ShouldSerializeTimestamps()
-        {
-            return Timestamps != null && Timestamps.Count > 0;
-        }
-
-        public Package()
-        {
-            Algorithm = "merkle.tc1-double256";
-        }
-
+        public bool ShouldSerializeTimestamps() {  return Timestamps != null && Timestamps.Count > 0; }
     }
 
 
@@ -93,6 +81,7 @@ namespace TrustchainCore.Model
     {
         [JsonProperty(PropertyName = "script")]
         public string Script { get; set; }
+        public bool ShouldSerializeScript() { return !string.IsNullOrWhiteSpace(Script); }
 
         [JsonProperty(PropertyName = "address")]
         public byte[] Address { get; set; }
@@ -106,10 +95,9 @@ namespace TrustchainCore.Model
 
         [JsonProperty(PropertyName = "signature")]
         public byte[] Signature { get; set; }
-
-        public Identity()
+        public bool ShouldSerializeSignature()
         {
-            Script = "btc-pkh";
+            return Signature != null && Signature.Length > 0;
         }
 
     }
@@ -146,8 +134,29 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "alias")]
         public string Alias { get; set; }
 
+        [JsonIgnore]
+        [Column(name:"ClaimIndexs")]
+        public byte[] DBCI {
+            get
+            {
+                byte[] result = new byte[ClaimIndexs.Length * sizeof(int)];
+                Buffer.BlockCopy(ClaimIndexs, 0, result, 0, result.Length);
+                return result;
+            }
+            set
+            {
+                var bytes = value;
+                var size = bytes.Length / sizeof(int);
+                var ints = new int[size];
+                for (var index = 0; index < size; index++)
+                    ints[index] = BitConverter.ToInt32(bytes, index * sizeof(int));
+                ClaimIndexs = ints;            
+            }
+        }
+
         [JsonProperty(PropertyName = "claimIndexs", NullValueHandling = NullValueHandling.Ignore)]
-        public byte[] ClaimIndexs { get; set; }
+        [NotMapped]
+        public int[] ClaimIndexs { get; set; }
 
         [JsonProperty(PropertyName = "address")]
         public byte[] Address { get; set; }

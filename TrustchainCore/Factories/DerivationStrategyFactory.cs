@@ -16,8 +16,11 @@ namespace TrustchainCore.Factories
             _serviceProvider = serviceProvider;
         }
 
-        public IDerivationStrategy GetService(string name = "btcpkh")
+        public IDerivationStrategy GetService(string name = BTC_PKH)
         {
+            if (String.IsNullOrWhiteSpace(name))
+                name = BTC_PKH;
+
             Type type = null;
             switch(name.ToLower())
             {

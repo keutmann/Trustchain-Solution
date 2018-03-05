@@ -84,7 +84,7 @@ namespace TrustgraphCore.Services
                         Address = ts.TargetIssuer.Address,
                         Alias = TrustService.Graph.Alias.GetValue(ts.AliasIndex)
                     };
-                    var claimIndexs = new List<byte>();
+                    var claimIndexs = new List<int>();
 
                     foreach (var claimEntry in ts.Claims)
                     {
