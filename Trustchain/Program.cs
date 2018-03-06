@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Trustchain
 {
@@ -23,6 +24,14 @@ namespace Trustchain
                 .UseDefaultServiceProvider((context, options) =>
                 {
                     options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
+                })
+                .UseKestrel(options =>
+                {
+                    options.Listen(IPAddress.Any, 80);
+                    options.Listen(IPAddress.Any, 443, listenOptions =>
+                    {
+                        listenOptions.UseHttps("xxxx", "xxxx");
+                    });
                 })
                 .Build();
     }
