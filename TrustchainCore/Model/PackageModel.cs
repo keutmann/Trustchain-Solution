@@ -183,8 +183,8 @@ namespace TrustchainCore.Model
         public string Type { get; set; }
 
         [UIHint("JSON")]
-        [JsonProperty(PropertyName = "data")]
-        public string Data { get; set; }
+        [JsonProperty(PropertyName = "attributes")]
+        public string Attributes { get; set; }
 
         [JsonProperty(PropertyName = "cost")]
         public short Cost { get; set; }

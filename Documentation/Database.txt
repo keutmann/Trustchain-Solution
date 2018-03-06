@@ -1,3 +1,10 @@
+Running on port 80
+
+Sometimes the Microsoft "Web Deployment Agent Service" can block access to http port 80.
+Uninstall or disable the service.
+https://www.file.net/process/msdepsvc.exe.html
+
+
 Database managning
 
 

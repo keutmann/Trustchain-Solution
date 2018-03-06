@@ -31,7 +31,7 @@ namespace TrustchainCore.Strategy
 
                 foreach (var claim in trust.Claims)
                 {
-                    ms.WriteString(claim.Data); // UTF8
+                    ms.WriteString(claim.Attributes); // UTF8
                     ms.WriteInteger(claim.Cost);
                     ms.WriteInteger(claim.Activate);
                     ms.WriteInteger(claim.Expire);

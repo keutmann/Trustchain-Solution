@@ -11,7 +11,7 @@ namespace TrustchainCore.Factories
         public IHashAlgorithm GetAlgorithm(string name)
         {
             if (String.IsNullOrWhiteSpace(name))
-                return new Double256();
+                name = DefaultAlgorithmName();
 
             switch(name.ToLower())
             {
@@ -20,6 +20,11 @@ namespace TrustchainCore.Factories
             }
 
             return null;
+        }
+
+        public string DefaultAlgorithmName()
+        {
+            return DOUBLE256;
         }
     }
 }

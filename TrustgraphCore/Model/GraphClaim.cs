@@ -14,7 +14,7 @@ namespace TrustgraphCore.Model
         public short Cost;  // cost of following the trust, lower the better
         public int Scope; // scope of the trust
         public int Type; // Type of the trust
-        public int Data; // Claims 
+        public int Attributes; // Claims 
         public int Note;
         public ClaimFlags Flags;
 
@@ -23,7 +23,7 @@ namespace TrustgraphCore.Model
 
         public string ID()
         {
-            return $"T:{Type}:{Scope}:{Data}:{Note}";
+            return $"T:{Type}:{Scope}:{Attributes}:{Note}";
         }
 
         //public static byte[] ByteID(string id)

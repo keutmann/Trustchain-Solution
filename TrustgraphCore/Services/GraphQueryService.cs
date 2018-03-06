@@ -105,8 +105,8 @@ namespace TrustgraphCore.Services
                             if (TrustService.Graph.ClaimType.TryGetValue(trackerClaim.Type, out string type))
                                 claim.Type = type;
 
-                            if (TrustService.Graph.ClaimData.TryGetValue(trackerClaim.Data, out string data))
-                                claim.Data = data;
+                            if (TrustService.Graph.ClaimAttributes.TryGetValue(trackerClaim.Attributes, out string attributes))
+                                claim.Attributes = attributes;
 
                             if (TrustService.Graph.Scopes.TryGetValue(trackerClaim.Scope, out string scope))
                                 claim.Scope = scope;

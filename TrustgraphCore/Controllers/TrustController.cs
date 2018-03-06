@@ -6,6 +6,7 @@ using TrustchainCore.Controllers;
 using TrustchainCore.Interfaces;
 using TruststampCore.Interfaces;
 using System;
+using TrustchainCore.Builders;
 
 namespace TrustgraphCore.Controllers
 {
@@ -17,29 +18,49 @@ namespace TrustgraphCore.Controllers
         private ITrustDBService _trustDBService;
         private IProofService _proofService;
         private IBlockchainServiceFactory _blockchainServiceFactory;
+        private IServiceProvider _serviceProvider { get; set; }
 
 
-        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService, IBlockchainServiceFactory blockchainServiceFactory)
+
+        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService, IBlockchainServiceFactory blockchainServiceFactory, IServiceProvider serviceProvider)
         {
             _graphTrustService = graphTrustService;
             _trustSchemaService = trustSchemaService;
             _trustDBService = trustDBService;
             _proofService = proofService;
             _blockchainServiceFactory = blockchainServiceFactory;
+            _serviceProvider = serviceProvider;
         }
 
-#if DEBUG
         /// <summary>
-        /// Test
+        /// Create a trust, that is not added but returned for signing.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult Get()
+        public ActionResult Get(byte[] issuer, byte[] subject, string issuerScript = "", string claimType = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
         {
-            return ApiOk("OK");
+            if (issuer == null || issuer.Length < 1)
+                throw new ApplicationException("Missing issuer");
+
+            if (subject == null || subject.Length < 1)
+                throw new ApplicationException("Missing subject");
+
+            if (string.IsNullOrEmpty(attributes))
+                if (claimType == TrustBuilder.BINARYTRUST_TC1)
+                    attributes = TrustBuilder.CreateTrustClaim().Attributes;
+
+            var claim = TrustBuilder.CreateClaim(claimType, scope, attributes);
+
+            var trustBuilder = new TrustBuilder(_serviceProvider);
+            trustBuilder.AddTrust()
+                .SetIssuer(issuer, issuerScript)
+                .AddClaim(claim)
+                .AddSubject(subject, alias, new int[] { claim.Index })
+                .BuildTrustID();
+
+            return ApiOk(trustBuilder.CurrentTrust);
         }
 
-#endif
 
         /// <summary>
         /// Add a trust to the Graph and database.

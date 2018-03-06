@@ -152,16 +152,22 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public TrustBuilder SetIssuer(byte[] address, string script = DerivationStrategyFactory.BTC_PKH, SignDelegate sign = null)
+        public TrustBuilder SetIssuer(byte[] address, string script = "", SignDelegate sign = null)
         {
+            if (string.IsNullOrEmpty(script))
+                script = DerivationStrategyFactory.BTC_PKH;
+
             var identity = CurrentTrust.Issuer = new Identity();
             SetIdentity(identity, address, script, sign);
 
             return this;
         }
 
-        public TrustBuilder SetServer(byte[] address, string script = DerivationStrategyFactory.BTC_PKH, SignDelegate sign = null)
+        public TrustBuilder SetServer(byte[] address, string script = "", SignDelegate sign = null)
         {
+            if (string.IsNullOrEmpty(script))
+                script = DerivationStrategyFactory.BTC_PKH;
+
             var identity = Package.Server = new Identity();
             SetIdentity(identity, address, script, sign);
 
@@ -214,6 +220,9 @@ namespace TrustchainCore.Builders
                 trust = _currentTrust;
 
             var _hashAlgorithm = _hashAlgorithmFactory.GetAlgorithm(trust.Algorithm);
+
+            if (String.IsNullOrEmpty(trust.Algorithm))
+                trust.Algorithm = _hashAlgorithm.AlgorithmName;
 
             trust.Id = _hashAlgorithm.HashOf(_trustBinary.GetIssuerBinary(trust));
 
@@ -317,7 +326,7 @@ namespace TrustchainCore.Builders
             for(int i = 0; i < CurrentTrust.Claims.Count; i++)
             {
                 var item = CurrentTrust.Claims[i];
-                var currentId = item.Data.GetHashCode();
+                var currentId = item.Attributes.GetHashCode();
                 if (currentId == claimID)
                 {
                     claim.Index = i;
@@ -351,13 +360,13 @@ namespace TrustchainCore.Builders
             return CreateClaim(RATING_TC1, scope, CreateRating(rating).ToString(Formatting.None));
         }
 
-        public static Claim CreateClaim(string type, string scope, string data)
+        public static Claim CreateClaim(string type, string scope, string attributes)
         {
             var claim = new Claim
             {
                 Type = type,
                 Cost = 100,
-                Data = data,
+                Attributes = attributes,
                 Scope = scope // Global scope
             };
 

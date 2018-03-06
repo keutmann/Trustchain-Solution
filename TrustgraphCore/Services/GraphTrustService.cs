@@ -105,7 +105,7 @@ namespace TrustgraphCore.Services
             {
                 graphClaim.Index = Graph.Claims.Count;
 
-                if (TrustBuilder.IsTrustTrueClaim(trustClaim.Type, trustClaim.Data))
+                if (TrustBuilder.IsTrustTrueClaim(trustClaim.Type, trustClaim.Attributes))
                     graphClaim.Flags |= ClaimFlags.Trust;
 
                 Graph.Claims.Add(graphClaim);
@@ -125,7 +125,7 @@ namespace TrustgraphCore.Services
                 Type = Graph.ClaimType.Ensure(trustClaim.Type),
                 Scope = Graph.Scopes.Ensure(trustClaim.Scope),
                 Cost = trustClaim.Cost,
-                Data = Graph.ClaimData.Ensure(trustClaim.Data),
+                Attributes = Graph.ClaimAttributes.Ensure(trustClaim.Attributes),
                 Note = Graph.Notes.Ensure(trustClaim.Note),
                 Flags = 0
             };
