@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Text;
 using TrustchainCore.Builders;
+using TrustchainCore.Enumerations;
 using TrustchainCore.Factories;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Services;

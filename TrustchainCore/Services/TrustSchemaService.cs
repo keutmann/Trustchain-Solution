@@ -5,9 +5,11 @@ using TrustchainCore.Extensions;
 using TrustchainCore.Strategy;
 using System;
 using TrustchainCore.Factories;
+using TrustchainCore.Enumerations;
 
 namespace TrustchainCore.Services
 {
+
 
     public class TrustSchemaService : ITrustSchemaService
     {
@@ -30,15 +32,15 @@ namespace TrustchainCore.Services
             _trustBinary = trustBinary;
         }
 
-        public SchemaValidationResult Validate(Trust trust)
+        public SchemaValidationResult Validate(Trust trust, TrustSchemaValidationOptions options = TrustSchemaValidationOptions.Full)
         {
-            var engine = new ValidationEngine(_derivationServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
+            var engine = new ValidationEngine(_derivationServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary, options);
             return engine.Validate(trust);
         }
 
-        public SchemaValidationResult Validate(Package package)
+        public SchemaValidationResult Validate(Package package, TrustSchemaValidationOptions options = TrustSchemaValidationOptions.Full)
         {
-            var engine = new ValidationEngine(_derivationServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary);
+            var engine = new ValidationEngine(_derivationServiceFactory, _merkleStrategyFactory, _hashAlgorithmFactory, _trustBinary, options);
             return engine.Validate(package);
         }
 
@@ -52,14 +54,16 @@ namespace TrustchainCore.Services
             private IMerkleStrategyFactory _merkleStrategyFactory;
             private IHashAlgorithmFactory _hashAlgorithmFactory;
 
+            private TrustSchemaValidationOptions _options; 
 
 
-            public ValidationEngine(IDerivationStrategyFactory derivationStrategyFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary)
+            public ValidationEngine(IDerivationStrategyFactory derivationStrategyFactory, IMerkleStrategyFactory merkleStrategyFactory, IHashAlgorithmFactory hashAlgorithmFactory, ITrustBinary trustBinary, TrustSchemaValidationOptions options)
             {
                 _derivationStrategyFactory = derivationStrategyFactory;
                 _merkleStrategyFactory = merkleStrategyFactory;
                 _hashAlgorithmFactory = hashAlgorithmFactory;
                 _trustBinary = trustBinary;
+                _options = options;
             }
 
             public SchemaValidationResult Validate(Trust trust)
@@ -80,8 +84,9 @@ namespace TrustchainCore.Services
 
             public SchemaValidationResult Validate(Package package)
             {
-                if (package.Id == null)
-                    result.Errors.Add("Package.PackageID is missing");
+                if(_options == TrustSchemaValidationOptions.Full)
+                    if (package.Id == null)
+                        result.Errors.Add("Package.PackageID is missing");
 
                 try
                 {
@@ -127,8 +132,9 @@ namespace TrustchainCore.Services
             {
                 var location = $"Trust Index: {trustIndex} - ";
 
-                if (trust.Id == null)
-                    result.Errors.Add(location+"Missing trust id");
+                if (_options == TrustSchemaValidationOptions.Full)
+                    if (trust.Id == null)
+                        result.Errors.Add(location+"Missing trust id");
 
                 if(trust.Issuer == null)
                     result.Errors.Add(location + "Missing issuer");
@@ -144,11 +150,13 @@ namespace TrustchainCore.Services
                     ValidateSubject(trustIndex, subjectIndex++, trust, subject, result);
                 }
 
-                var hashService = _hashAlgorithmFactory.GetAlgorithm(trust.Algorithm);
-
-                var trustID = hashService.HashOf(_trustBinary.GetIssuerBinary(trust));
-                if(trustID.Compare(trust.Id) != 0)
-                    result.Errors.Add(location + "Invalid trust id");
+                if (_options == TrustSchemaValidationOptions.Full)
+                {
+                    var hashService = _hashAlgorithmFactory.GetAlgorithm(trust.Algorithm);
+                    var trustID = hashService.HashOf(_trustBinary.GetIssuerBinary(trust));
+                    if (trustID.Compare(trust.Id) != 0)
+                        result.Errors.Add(location + "Invalid trust id");
+                }
             }
 
             private void ValidateIdentity(byte[] data, Identity identity, string location, SchemaValidationResult result)
@@ -156,18 +164,20 @@ namespace TrustchainCore.Services
                 if (identity.Address == null || identity.Address.Length == 0)
                     result.Errors.Add(location + "Missing identity address");
 
-                if (identity.Signature == null || identity.Signature.Length == 0)
-                    result.Errors.Add(location + "Missing identity signature");
-                else
+                if (_options == TrustSchemaValidationOptions.Full)
                 {
-                    var scriptService = _derivationStrategyFactory.GetService(identity.Script);
-
-                    if (!scriptService.VerifySignature(data, identity.Signature, identity.Address))
+                    if (identity.Signature == null || identity.Signature.Length == 0)
+                        result.Errors.Add(location + "Missing identity signature");
+                    else
                     {
-                        result.Errors.Add(location + "Invalid identity signature");
+                        var scriptService = _derivationStrategyFactory.GetService(identity.Script);
+
+                        if (!scriptService.VerifySignatureMessage(data, identity.Signature, identity.Address))
+                        {
+                            result.Errors.Add(location + "Invalid identity signature");
+                        }
                     }
                 }
-
             }
 
             private void ValidateSubject(int trustIndex, int subjectIndex, Trust trust, Subject subject, SchemaValidationResult result)

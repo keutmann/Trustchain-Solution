@@ -124,13 +124,13 @@ namespace TrustgraphCore.Model
         {
             foreach (var subject in query.Subjects)
             {
-                if (GraphTrustService.Graph.IssuerIndex.ContainsKey(subject.Id))
+                if (GraphTrustService.Graph.IssuerIndex.ContainsKey(subject.Address))
                 {
-                    var index = GraphTrustService.Graph.IssuerIndex[subject.Id];
+                    var index = GraphTrustService.Graph.IssuerIndex[subject.Address];
                     Targets[index] = GraphTrustService.Graph.Issuers[index];
                 }
                 else
-                    Errors.Add($"Unknown subject {subject.Id.ConvertToBase64()}");
+                    Errors.Add($"Unknown subject {subject.Address.ConvertToBase64()}");
             }
 
         }

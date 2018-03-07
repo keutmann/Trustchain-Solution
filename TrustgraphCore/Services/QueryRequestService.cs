@@ -25,8 +25,8 @@ namespace TrustgraphCore.Services
 
             foreach (var subject in query.Subjects)
             {
-                if (subject.Id.Length != _derivationStrategy.AddressLength)
-                    throw new ApplicationException("Invalid byte length on subject id: " +subject.Id.ConvertToBase64());
+                if (subject.Address.Length != _derivationStrategy.AddressLength)
+                    throw new ApplicationException("Invalid byte length on subject id: " +subject.Address.ConvertToBase64());
             }
         }
     }

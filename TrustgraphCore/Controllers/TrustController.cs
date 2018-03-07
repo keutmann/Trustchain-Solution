@@ -7,6 +7,7 @@ using TrustchainCore.Interfaces;
 using TruststampCore.Interfaces;
 using System;
 using TrustchainCore.Builders;
+using TrustchainCore.Enumerations;
 
 namespace TrustgraphCore.Controllers
 {
@@ -32,34 +33,34 @@ namespace TrustgraphCore.Controllers
             _serviceProvider = serviceProvider;
         }
 
-        /// <summary>
-        /// Create a trust, that is not added but returned for signing.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public ActionResult Get(byte[] issuer, byte[] subject, string issuerScript = "", string claimType = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
-        {
-            if (issuer == null || issuer.Length < 1)
-                throw new ApplicationException("Missing issuer");
+        ///// <summary>
+        ///// Create a trust, that is not added but returned for signing.
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet]
+        //public ActionResult Get(byte[] issuer, byte[] subject, string issuerScript = "", string claimType = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
+        //{
+        //    if (issuer == null || issuer.Length < 1)
+        //        throw new ApplicationException("Missing issuer");
 
-            if (subject == null || subject.Length < 1)
-                throw new ApplicationException("Missing subject");
+        //    if (subject == null || subject.Length < 1)
+        //        throw new ApplicationException("Missing subject");
 
-            if (string.IsNullOrEmpty(attributes))
-                if (claimType == TrustBuilder.BINARYTRUST_TC1)
-                    attributes = TrustBuilder.CreateTrustClaim().Attributes;
+        //    if (string.IsNullOrEmpty(attributes))
+        //        if (claimType == TrustBuilder.BINARYTRUST_TC1)
+        //            attributes = TrustBuilder.CreateTrustClaim().Attributes;
 
-            var claim = TrustBuilder.CreateClaim(claimType, scope, attributes);
+        //    var claim = TrustBuilder.CreateClaim(claimType, scope, attributes);
 
-            var trustBuilder = new TrustBuilder(_serviceProvider);
-            trustBuilder.AddTrust()
-                .SetIssuer(issuer, issuerScript)
-                .AddClaim(claim)
-                .AddSubject(subject, alias, new int[] { claim.Index })
-                .BuildTrustID();
+        //    var trustBuilder = new TrustBuilder(_serviceProvider);
+        //    trustBuilder.AddTrust()
+        //        .SetIssuer(issuer, issuerScript)
+        //        .AddClaim(claim)
+        //        .AddSubject(subject, alias, new int[] { claim.Index })
+        //        .BuildTrustID();
 
-            return ApiOk(trustBuilder.CurrentTrust);
-        }
+        //    return ApiOk(trustBuilder.CurrentTrust);
+        //}
 
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace TrustgraphCore.Controllers
         {
             trust.PackageDatabaseID = null; // NO package! 
 
-            var validationResult = _trustSchemaService.Validate(trust);
+            var validationResult = _trustSchemaService.Validate(trust, TrustSchemaValidationOptions.Full);
             if (validationResult.ErrorsFound > 0)
                 return ApiError(validationResult, null, "Validation failed");
             // Timestamp validation service disabled for the moment
