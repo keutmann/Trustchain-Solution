@@ -7,8 +7,8 @@ namespace TrustchainCore.Repository
     {
         public DbSet<Package> Packages { get; set; }
         public DbSet<Trust> Trusts { get; set; }
-        public DbSet<Subject> Subjects { get; set; }
-        public DbSet<Claim> Claims { get; set; }
+        //public DbSet<Subject> Subjects { get; set; }
+        //public DbSet<Claim> Claims { get; set; }
         public DbSet<Timestamp> Timestamps { get; set; }
 
         public DbSet<ProofEntity> Proofs { get; set; }
@@ -28,26 +28,18 @@ namespace TrustchainCore.Repository
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Package>().HasKey(p => p.DatabaseID);
-            builder.Entity<Package>().HasIndex(p => p.Id);
+            builder.Entity<Package>().HasAlternateKey(p => p.Id);
             builder.Entity<Package>()
                 .OwnsOne(c => c.Server);
 
             builder.Entity<Trust>().HasKey(p => p.DatabaseID);
-            builder.Entity<Trust>().HasIndex(p => p.Id);
-            builder.Entity<Trust>()
-                .OwnsOne(c => c.Issuer);
-
+            
+            builder.Entity<Trust>().HasIndex(p => p.Id).IsUnique(true);
+            builder.Entity<Trust>().HasIndex(p => new { p.IssuerAddress, p.SubjectAddress, p.Type, p.Scope }).IsUnique(true);
             builder.Entity<Trust>()
                 .OwnsOne(c => c.Timestamp);
 
-            builder.Entity<Subject>().HasKey(p => p.DatabaseID);
-            builder.Entity<Subject>().HasIndex(p => p.Address);
-
-            builder.Entity<Claim>().HasKey(p => p.DatabaseID);
-            builder.Entity<Claim>().HasIndex(p => p.Index);
-
             builder.Entity<Timestamp>().HasKey(p => p.DatabaseID);
-            //builder.Entity<Timestamp>().HasIndex("");
 
             // Proof
             builder.Entity<ProofEntity>().HasKey(p => p.DatabaseID);

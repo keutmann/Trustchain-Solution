@@ -157,8 +157,9 @@ namespace TrustchainCore.Builders
             if (string.IsNullOrEmpty(script))
                 script = DerivationStrategyFactory.BTC_PKH;
 
-            var identity = CurrentTrust.Issuer = new Identity();
-            SetIdentity(identity, address, script, sign);
+            CurrentTrust.IssuerScript = script;
+            CurrentTrust.IssuerAddress = address;
+            CurrentTrust.IssuerSign = sign;
 
             return this;
         }
@@ -168,7 +169,7 @@ namespace TrustchainCore.Builders
             if (string.IsNullOrEmpty(script))
                 script = DerivationStrategyFactory.BTC_PKH;
 
-            var identity = Package.Server = new Identity();
+            var identity = Package.Server = new ServerIdentity();
             SetIdentity(identity, address, script, sign);
 
             return this;
@@ -187,11 +188,13 @@ namespace TrustchainCore.Builders
                 trust = CurrentTrust;
 
             if (sign != null)
-                return Sign(trust.Issuer, trust.Id, sign);
+            {
+                trust.IssuerSignature = sign(trust.Id);
+            }
             else
             {
-                if(trust.Issuer.Sign != null)
-                    return Sign(trust.Issuer, trust.Id, trust.Issuer.Sign);
+                if (trust.IssuerSign != null)
+                    trust.IssuerSignature = trust.IssuerSign(trust.Id);
             }
             return this;
         }
@@ -210,7 +213,7 @@ namespace TrustchainCore.Builders
         public TrustBuilder Sign(Identity identity, byte[] data, SignDelegate sign)
         {
             if(sign != null)
-                identity.Signature = sign(identity, data);
+                identity.Signature = sign(data);
             return this;
         }
 
@@ -241,17 +244,17 @@ namespace TrustchainCore.Builders
         }
 
 
-        public TrustBuilder AddSubject(byte[] address, string alias, int[] claimIndex)
+        public TrustBuilder AddSubject(byte[] address)
         {
-            if(_currentTrust.Subjects == null)
-                _currentTrust.Subjects = new List<Subject>();
+            _currentTrust.SubjectAddress = address;
 
-            _currentTrust.Subjects.Add(new Subject
-            {
-                Alias = alias,
-                Address = address,
-                ClaimIndexs = claimIndex
-            });
+            return this;
+        }
+
+        public TrustBuilder AddType(string type, string attributes)
+        {
+            _currentTrust.Type = type;
+            _currentTrust.Attributes = attributes;
 
             return this;
         }
@@ -314,66 +317,81 @@ namespace TrustchainCore.Builders
         //    return this;
         //}
 
-        public TrustBuilder AddClaim(Claim claim, Trust trust = null)
+        //public TrustBuilder AddClaim(Claim claim, Trust trust = null)
+        //{
+        //    if (trust == null)
+        //        trust = CurrentTrust;
+
+        //    var claimID = claim.GetHashCode();
+        //    if (trust.Claims == null)
+        //        trust.Claims = new List<Claim>();
+
+        //    for(int i = 0; i < CurrentTrust.Claims.Count; i++)
+        //    {
+        //        var item = CurrentTrust.Claims[i];
+        //        var currentId = item.Attributes.GetHashCode();
+        //        if (currentId == claimID)
+        //        {
+        //            claim.Index = i;
+        //            return this;
+        //        }
+        //    }
+
+        //    claim.Index = CurrentTrust.Claims.Count;
+        //    CurrentTrust.Claims.Add(claim);
+
+        //    return this;
+        //}
+
+        //public static Claim CreateFollowClaim()
+        //{
+        //    return CreateClaim(FOLLOWTRUST_TC1, "", "");
+        //}
+
+        public static string CreateBinaryTrustAttributes(bool trust = true)
         {
-            if (trust == null)
-                trust = CurrentTrust;
-
-            var claimID = claim.GetHashCode();
-            if (trust.Claims == null)
-                trust.Claims = new List<Claim>();
-
-            for(int i = 0; i < CurrentTrust.Claims.Count; i++)
-            {
-                var item = CurrentTrust.Claims[i];
-                var currentId = item.Attributes.GetHashCode();
-                if (currentId == claimID)
-                {
-                    claim.Index = i;
-                    return this;
-                }
-            }
-
-            claim.Index = CurrentTrust.Claims.Count;
-            CurrentTrust.Claims.Add(claim);
-
-            return this;
+            return CreateTrust(trust).ToString(Formatting.None);
         }
 
-        public static Claim CreateFollowClaim()
+        public static string CreateConfirmAttributes(bool confirm = true)
         {
-            return CreateClaim(FOLLOWTRUST_TC1, "", "");
+            return CreateConfirm(confirm).ToString(Formatting.None);
         }
 
-        public static Claim CreateTrustClaim(string scope = "", bool trust = true)
+        public static string CreateRatingAttributes(byte rating)
         {
-            return CreateClaim(BINARYTRUST_TC1, scope, CreateTrust(trust).ToString(Formatting.None));
+            return CreateRating(rating).ToString(Formatting.None);
         }
 
-        public static Claim CreateConfirmClaim(string scope = "")
-        {
-            return CreateClaim(CONFIRMTRUST_TC1, scope, CreateConfirm().ToString(Formatting.None));
-        }
+        //public static Claim CreateTrustClaim(string scope = "", bool trust = true)
+        //{
+        //    return CreateClaim(BINARYTRUST_TC1, scope, CreateTrust(trust).ToString(Formatting.None));
+        //}
 
-        public static Claim CreateRatingClaim(byte rating = 100, string scope = "")
-        {
-            return CreateClaim(RATING_TC1, scope, CreateRating(rating).ToString(Formatting.None));
-        }
+        //public static Claim CreateConfirmClaim(string scope = "")
+        //{
+        //    return CreateClaim(CONFIRMTRUST_TC1, scope, CreateConfirm().ToString(Formatting.None));
+        //}
 
-        public static Claim CreateClaim(string type, string scope, string attributes)
-        {
-            var claim = new Claim
-            {
-                Type = type,
-                Cost = 100,
-                Attributes = attributes,
-                Scope = scope // Global scope
-            };
+        //public static Claim CreateRatingClaim(byte rating = 100, string scope = "")
+        //{
+        //    return CreateClaim(RATING_TC1, scope, CreateRating(rating).ToString(Formatting.None));
+        //}
 
-            return claim;
-        }
+        //public static Claim CreateClaim(string type, string scope, string attributes)
+        //{
+        //    var claim = new Claim
+        //    {
+        //        Type = type,
+        //        Cost = 100,
+        //        Attributes = attributes,
+        //        Scope = scope // Global scope
+        //    };
 
-        public static bool IsTrustTrueClaim(string type, string data)
+        //    return claim;
+        //}
+
+        public static bool IsTrustTrue(string type, string data)
         {
             if (!BINARYTRUST_TC1.EqualsIgnoreCase(type))
                 return false;

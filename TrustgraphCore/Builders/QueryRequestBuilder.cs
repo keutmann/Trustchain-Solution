@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using TrustchainCore.Model;
+﻿using System.Collections.Generic;
 using TrustgraphCore.Enumerations;
 using TrustgraphCore.Model;
 
@@ -26,21 +24,12 @@ namespace TrustgraphCore.Builders
             };
         }
 
-        public QueryRequestBuilder Add(byte[] issuerId, Subject subject)
+        public QueryRequestBuilder Add(byte[] issuerId, byte[] subjectAddress)
         {
             Query.Issuer = issuerId;
-            Query.Subjects.Add(new SubjectQuery { Address = subject.Address});
+            Query.Subjects.Add(new SubjectQuery { Address = subjectAddress });
 
             return this;
         }
-
-        public QueryRequestBuilder Add(byte[] issuerId, byte[] subject)
-        {
-            Query.Issuer = issuerId;
-            Query.Subjects.Add(new SubjectQuery { Address = subject});
-
-            return this;
-        }
-
     }
 }

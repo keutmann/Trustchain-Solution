@@ -36,10 +36,10 @@ namespace UnitTest.TrustgraphCore
         {
             // Build up
             //BuildGraph();
-            _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
-            _trustBuilder.AddTrust("B", "C", ClaimTrustTrue);
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true));
+            _trustBuilder.AddTrust("B", "C", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true));
 
-            _trustBuilder.AddTrust("B", "C", ClaimConfirmTrue);
+            _trustBuilder.AddTrust("B", "C", TrustBuilder.CONFIRMTRUST_TC1, TrustBuilder.CreateConfirmAttributes(true));
 
 
             _graphTrustService.Add(_trustBuilder.Package);
@@ -54,7 +54,7 @@ namespace UnitTest.TrustgraphCore
             VerfifyContext(context, 2);
 
             VerfifyResult(context, "A", "B");
-            VerfifyResult(context, "B", "C", ClaimConfirmTrue);
+            VerfifyResult(context, "B", "C", ConfirmAttributes);
         }
 
 
@@ -79,9 +79,9 @@ namespace UnitTest.TrustgraphCore
             VerfifyContext(context, 3);
 
             VerfifyResult(context, "A", "B");
-            VerfifyResult(context, "A", "B", ClaimConfirmTrue);
+            VerfifyResult(context, "A", "B", ConfirmAttributes);
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", ClaimConfirmTrue);
+            VerfifyResult(context, "C", "D", ConfirmAttributes);
         }
 
         ///// <summary>

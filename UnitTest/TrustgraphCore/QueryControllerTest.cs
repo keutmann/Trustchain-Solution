@@ -41,8 +41,6 @@ namespace UnitTest.TrustgraphCore
 
             // Check db
             Assert.AreEqual(3, _trustDBService.Trusts.Count(), $"Should be {3} Trusts");
-            Assert.AreEqual(3, _trustDBService.Subjects.Count(), $"Should be {3} Trusts");
-            Assert.AreEqual(3, _trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
 
             // Test Graph
             var _queryController = ServiceProvider.GetRequiredService<QueryController>();

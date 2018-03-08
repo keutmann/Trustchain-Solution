@@ -65,71 +65,38 @@ namespace TrustgraphCore.Services
 
             foreach (var tracker in context.TrackerResults.Values)
             {
-                var trust = new Trust
-                {
-                    Issuer = new Identity
-                    {
-                        Address = tracker.Issuer.Address
-                    }
-                };
-
-                var trustClaims = new Dictionary<int, Claim>();
-                var trustClaimIndex = new Dictionary<int, byte>();
-
-                trust.Subjects = new List<Subject>(tracker.Subjects.Count);
                 foreach (var ts in tracker.Subjects.Values)
                 {
-                    var subject = new Subject
-                    {
-                        Address = ts.TargetIssuer.Address,
-                        Alias = TrustService.Graph.Alias.GetValue(ts.AliasIndex)
-                    };
-                    var claimIndexs = new List<int>();
-
                     foreach (var claimEntry in ts.Claims)
                     {
+                        var trust = new Trust
+                        {
+                            IssuerAddress = tracker.Issuer.Address,
+                            SubjectAddress = ts.TargetIssuer.Address
+                        };
+
                         var claimIndex = claimEntry.Value;
                         var trackerClaim = TrustService.Graph.Claims[claimIndex];
-                        byte localIndex = 0;
-                        
-                        if(!trustClaims.ContainsKey(claimIndex))
-                        {
-                            localIndex = (byte)trustClaims.Count;
-                            trustClaimIndex[claimIndex] = localIndex;
-                            var claim = new Claim
-                            {
-                                Cost = trackerClaim.Cost,
-                                Expire = 0,
-                                Activate = 0
-                            };
-                            if (TrustService.Graph.ClaimType.TryGetValue(trackerClaim.Type, out string type))
-                                claim.Type = type;
 
-                            if (TrustService.Graph.ClaimAttributes.TryGetValue(trackerClaim.Attributes, out string attributes))
-                                claim.Attributes = attributes;
+                        if (TrustService.Graph.ClaimType.TryGetValue(trackerClaim.Type, out string type))
+                            trust.Type = type;
 
-                            if (TrustService.Graph.Scopes.TryGetValue(trackerClaim.Scope, out string scope))
-                                claim.Scope = scope;
+                        if (TrustService.Graph.ClaimAttributes.TryGetValue(trackerClaim.Attributes, out string attributes))
+                            trust.Attributes = attributes;
 
-                            if (TrustService.Graph.Notes.TryGetValue(trackerClaim.Note, out string note))
-                                claim.Note = note;
+                        if (TrustService.Graph.Scopes.TryGetValue(trackerClaim.Scope, out string scope))
+                            trust.Scope = scope;
 
-                            trustClaims.Add(localIndex, claim);
-                        }
-                        else
-                        {
-                            localIndex = trustClaimIndex[claimIndex];
-                        }
+                        if (TrustService.Graph.Notes.TryGetValue(trackerClaim.Note, out string note))
+                            trust.Note = note;
 
-                        claimIndexs.Add(localIndex);
+                        trust.Cost = trackerClaim.Cost;
+                        trust.Expire = 0;
+                        trust.Activate = 0;
+
+                        context.Results.Trusts.Add(trust);
                     }
-                    subject.ClaimIndexs = claimIndexs.ToArray();
-                    trust.Subjects.Add(subject);
                 }
-
-                trust.Claims = trustClaims.Values.ToList();
-
-                context.Results.Trusts.Add(trust);
             }
         }
 

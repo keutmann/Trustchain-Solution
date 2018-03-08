@@ -35,7 +35,7 @@ namespace TrustchainCore.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult Get(byte[] issuer, byte[] subject, string issuerScript = "", string claimType = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
+        public ActionResult Get(byte[] issuer, byte[] subject, string issuerScript = "", string type = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
         {
             if (issuer == null || issuer.Length < 1)
                 throw new ApplicationException("Missing issuer");
@@ -44,16 +44,14 @@ namespace TrustchainCore.Controllers
                 throw new ApplicationException("Missing subject");
 
             if (string.IsNullOrEmpty(attributes))
-                if (claimType == TrustBuilder.BINARYTRUST_TC1)
-                    attributes = TrustBuilder.CreateTrustClaim().Attributes;
-
-            var claim = TrustBuilder.CreateClaim(claimType, scope, attributes);
+                if (type == TrustBuilder.BINARYTRUST_TC1)
+                    attributes = TrustBuilder.CreateBinaryTrustAttributes();
 
             var trustBuilder = new TrustBuilder(_serviceProvider);
             trustBuilder.AddTrust()
                 .SetIssuer(issuer, issuerScript)
-                .AddClaim(claim)
-                .AddSubject(subject, alias, new int[] { claim.Index })
+                .AddType(type, attributes)
+                .AddSubject(subject)
                 .BuildTrustID();
 
             return ApiOk(trustBuilder.CurrentTrust);

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace TrustchainCore.Migrations
 {
-    public partial class UpdateRef : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -29,7 +29,7 @@ namespace TrustchainCore.Migrations
                     DatabaseID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Algorithm = table.Column<string>(nullable: true),
-                    Id = table.Column<byte[]>(nullable: true),
+                    Id = table.Column<byte[]>(nullable: false),
                     Server_Address = table.Column<byte[]>(nullable: true),
                     Server_Script = table.Column<string>(nullable: true),
                     Server_Signature = table.Column<byte[]>(nullable: true)
@@ -37,6 +37,7 @@ namespace TrustchainCore.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Package", x => x.DatabaseID);
+                    table.UniqueConstraint("AK_Package_Id", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -101,12 +102,22 @@ namespace TrustchainCore.Migrations
                 {
                     DatabaseID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Activate = table.Column<uint>(nullable: false),
                     Algorithm = table.Column<string>(nullable: true),
+                    Attributes = table.Column<string>(nullable: true),
+                    Cost = table.Column<short>(nullable: false),
+                    Expire = table.Column<uint>(nullable: false),
                     Id = table.Column<byte[]>(nullable: true),
+                    IssuerAddress = table.Column<byte[]>(nullable: true),
+                    IssuerScript = table.Column<string>(nullable: true),
+                    IssuerSignature = table.Column<byte[]>(nullable: true),
+                    Note = table.Column<string>(nullable: true),
                     PackageDatabaseID = table.Column<int>(nullable: true),
-                    Issuer_Address = table.Column<byte[]>(nullable: true),
-                    Issuer_Script = table.Column<string>(nullable: true),
-                    Issuer_Signature = table.Column<byte[]>(nullable: true),
+                    Scope = table.Column<string>(nullable: true),
+                    SubjectAddress = table.Column<byte[]>(nullable: true),
+                    SubjectScript = table.Column<string>(nullable: true),
+                    SubjectSignature = table.Column<byte[]>(nullable: true),
+                    Type = table.Column<string>(nullable: true),
                     Timestamp_Algorithm = table.Column<string>(nullable: true),
                     Timestamp_Recipt = table.Column<byte[]>(nullable: true),
                     Timestamp_Timestamps = table.Column<string>(nullable: true)
@@ -122,74 +133,10 @@ namespace TrustchainCore.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Claim",
-                columns: table => new
-                {
-                    DatabaseID = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Activate = table.Column<uint>(nullable: false),
-                    Cost = table.Column<short>(nullable: false),
-                    Data = table.Column<string>(nullable: true),
-                    Expire = table.Column<uint>(nullable: false),
-                    Index = table.Column<int>(nullable: false),
-                    Note = table.Column<string>(nullable: true),
-                    Scope = table.Column<string>(nullable: true),
-                    TrustDatabaseID = table.Column<int>(nullable: false),
-                    Type = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Claim", x => x.DatabaseID);
-                    table.ForeignKey(
-                        name: "FK_Claim_Trust_TrustDatabaseID",
-                        column: x => x.TrustDatabaseID,
-                        principalTable: "Trust",
-                        principalColumn: "DatabaseID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Subject",
-                columns: table => new
-                {
-                    DatabaseID = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Address = table.Column<byte[]>(nullable: true),
-                    Alias = table.Column<string>(nullable: true),
-                    ClaimIndexs = table.Column<byte[]>(nullable: true),
-                    TrustDatabaseID = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Subject", x => x.DatabaseID);
-                    table.ForeignKey(
-                        name: "FK_Subject_Trust_TrustDatabaseID",
-                        column: x => x.TrustDatabaseID,
-                        principalTable: "Trust",
-                        principalColumn: "DatabaseID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Claim_Index",
-                table: "Claim",
-                column: "Index");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Claim_TrustDatabaseID",
-                table: "Claim",
-                column: "TrustDatabaseID");
-
             migrationBuilder.CreateIndex(
                 name: "IX_KeyValues_Key",
                 table: "KeyValues",
                 column: "Key");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Package_Id",
-                table: "Package",
-                column: "Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Proof_Source",
@@ -202,16 +149,6 @@ namespace TrustchainCore.Migrations
                 column: "WorkflowID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subject_Address",
-                table: "Subject",
-                column: "Address");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Subject_TrustDatabaseID",
-                table: "Subject",
-                column: "TrustDatabaseID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Timestamp_PackageDatabaseID",
                 table: "Timestamp",
                 column: "PackageDatabaseID");
@@ -219,12 +156,19 @@ namespace TrustchainCore.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Trust_Id",
                 table: "Trust",
-                column: "Id");
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Trust_PackageDatabaseID",
                 table: "Trust",
                 column: "PackageDatabaseID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Trust_IssuerAddress_SubjectAddress_Type_Scope",
+                table: "Trust",
+                columns: new[] { "IssuerAddress", "SubjectAddress", "Type", "Scope" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Workflow_State",
@@ -240,25 +184,19 @@ namespace TrustchainCore.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Claim");
-
-            migrationBuilder.DropTable(
                 name: "KeyValues");
 
             migrationBuilder.DropTable(
                 name: "Proof");
 
             migrationBuilder.DropTable(
-                name: "Subject");
-
-            migrationBuilder.DropTable(
                 name: "Timestamp");
 
             migrationBuilder.DropTable(
-                name: "Workflow");
+                name: "Trust");
 
             migrationBuilder.DropTable(
-                name: "Trust");
+                name: "Workflow");
 
             migrationBuilder.DropTable(
                 name: "Package");

@@ -28,43 +28,43 @@ namespace UnitTest.TrustgraphCore
     {
         private const string ClaimType = TrustBuilder.BINARYTRUST_TC1;
 
-        [TestMethod]
-        public void Search1()
-        {
-            _trustBuilder.AddTrust("A", "B", ClaimTrustTrue);
+        //[TestMethod]
+        //public void Search1()
+        //{
+        //    _trustBuilder.AddTrust("A", "B", BinaryTrustTrueAttributes);
 
-            _graphTrustService.Add(_trustBuilder.Package);  // Build graph!
+        //    _graphTrustService.Add(_trustBuilder.Package);  // Build graph!
 
-            var trusts = _trustBuilder.Package.Trusts;
-            var trust = trusts[0];
-            Console.WriteLine("Trust object");
-            Console.WriteLine(JsonConvert.SerializeObject(trusts[0], Formatting.Indented));
+        //    var trusts = _trustBuilder.Package.Trusts;
+        //    var trust = trusts[0];
+        //    Console.WriteLine("Trust object");
+        //    Console.WriteLine(JsonConvert.SerializeObject(trusts[0], Formatting.Indented));
 
-            var queryBuilder = new QueryRequestBuilder(ClaimType);
-            queryBuilder.Add(trusts[0].Issuer.Address, trusts[0].Subjects[0]);
+        //    var queryBuilder = new QueryRequestBuilder(ClaimType);
+        //    queryBuilder.Add(trusts[0].Issuer.Address, trusts[0].Subjects[0]);
 
-            Console.WriteLine("Query object");
-            Console.WriteLine(JsonConvert.SerializeObject(queryBuilder.Query, Formatting.Indented));
-            var queryContext = _graphQueryService.Execute(queryBuilder.Query);
-            Assert.AreEqual(queryContext.Results.Trusts.Count, 1, "Should be one result!");
+        //    Console.WriteLine("Query object");
+        //    Console.WriteLine(JsonConvert.SerializeObject(queryBuilder.Query, Formatting.Indented));
+        //    var queryContext = _graphQueryService.Execute(queryBuilder.Query);
+        //    Assert.AreEqual(queryContext.Results.Trusts.Count, 1, "Should be one result!");
 
-            var resultTrust = queryContext.Results.Trusts.First();
-            Assert.AreEqual(resultTrust.Subjects.Count, 1, "Should be one subject!");
+        //    var resultTrust = queryContext.Results.Trusts.First();
+        //    Assert.AreEqual(resultTrust.Subjects.Count, 1, "Should be one subject!");
 
-            var subject = resultTrust.Subjects.First();
-            //Assert.IsNotNull(queryContext.Subjects);
-            Console.WriteLine("Issuer ID: " + JsonConvert.SerializeObject(trusts[0].Issuer.Address));
-            Console.WriteLine("result ID: " + JsonConvert.SerializeObject(subject.Address) + " : Trust SubjectID: " + JsonConvert.SerializeObject(trusts[0].Subjects[0].Address));
+        //    var subject = resultTrust.Subjects.First();
+        //    //Assert.IsNotNull(queryContext.Subjects);
+        //    Console.WriteLine("Issuer ID: " + JsonConvert.SerializeObject(trusts[0].Issuer.Address));
+        //    Console.WriteLine("result ID: " + JsonConvert.SerializeObject(subject.Address) + " : Trust SubjectID: " + JsonConvert.SerializeObject(trusts[0].Subjects[0].Address));
 
-            //Assert.AreEqual(issuer.Name, trust.Name);
-            Assert.IsTrue(subject.Address.Equals(trust.Subjects[0].Address));
-            //Assert.AreEqual(subject.Claims.ClaimModel.Metadata, ClaimMetadata.Reason);
-            //Assert.IsTrue(issuer.Subjects[0].Claim.ContainsIgnoreCase("Test"));
+        //    //Assert.AreEqual(issuer.Name, trust.Name);
+        //    Assert.IsTrue(subject.Address.Equals(trust.Subjects[0].Address));
+        //    //Assert.AreEqual(subject.Claims.ClaimModel.Metadata, ClaimMetadata.Reason);
+        //    //Assert.IsTrue(issuer.Subjects[0].Claim.ContainsIgnoreCase("Test"));
 
-            Console.WriteLine("Query Result");
-            Console.WriteLine(JsonConvert.SerializeObject(queryContext.Results, Formatting.Indented));
-            //PrintResult(result.Nodes, search.GraphService, 1);
-        }
+        //    Console.WriteLine("Query Result");
+        //    Console.WriteLine(JsonConvert.SerializeObject(queryContext.Results, Formatting.Indented));
+        //    //PrintResult(result.Nodes, search.GraphService, 1);
+        //}
 
         /// <summary>
         /// 1 Source, 1 targets
@@ -220,7 +220,7 @@ namespace UnitTest.TrustgraphCore
             // Verify
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "NoTrustD", ClaimTrustFalse);
+            VerfifyResult(context, "C", "NoTrustD", BinaryTrustFalseAttributes);
             VerfifyContext(context, 3);
         }
 
@@ -242,9 +242,9 @@ namespace UnitTest.TrustgraphCore
             // Verify
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "MixD", ClaimTrustTrue);
+            VerfifyResult(context, "C", "MixD", BinaryTrustTrueAttributes);
             VerfifyResult(context, "B", "E");
-            VerfifyResult(context, "E", "MixD", ClaimTrustFalse);
+            VerfifyResult(context, "E", "MixD", BinaryTrustFalseAttributes);
             VerfifyContext(context, 4);
         }
 

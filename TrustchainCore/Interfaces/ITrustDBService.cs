@@ -9,7 +9,6 @@ namespace TrustchainCore.Interfaces
         
         IQueryable<Package> Packages { get; }
         IQueryable<Trust> Trusts { get; }
-        IQueryable<Subject> Subjects { get; }
         IQueryable<ProofEntity> Proofs { get; }
         IQueryable<WorkflowContainer> Workflows { get; }
 

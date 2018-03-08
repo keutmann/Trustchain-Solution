@@ -145,7 +145,7 @@ namespace TrustgraphCore.Model
 
             if (query.ClaimTypes == null || query.ClaimTypes.Count == 0)
             {
-                var graphClaim = GraphTrustService.CreateGraphClaim(TrustBuilder.CreateTrustClaim());
+                var graphClaim = GraphTrustService.CreateGraphClaim(TrustBuilder.BINARYTRUST_TC1, "", TrustBuilder.CreateBinaryTrustAttributes(true));
                 ClaimTypes.Add(graphClaim.Index);
             }
             else

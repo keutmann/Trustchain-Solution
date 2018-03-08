@@ -25,10 +25,10 @@ namespace UnitTest.TrustgraphCore
         protected PackageController _packageController = null;
         protected IGraphLoadSaveService _graphLoadSaveService = null;
 
-        protected Claim ClaimTrustTrue = null;
-        protected Claim ClaimTrustFalse = null;
-        protected Claim ClaimConfirmTrue = null;
-        protected Claim ClaimRating = null;
+        protected string BinaryTrustTrueAttributes = null;
+        protected string BinaryTrustFalseAttributes = null;
+        protected string ConfirmAttributes = null;
+        protected string RatingAtrributes = null;
 
 
         [TestInitialize]
@@ -44,10 +44,10 @@ namespace UnitTest.TrustgraphCore
             _packageController = ServiceProvider.GetRequiredService<PackageController>();
             _graphLoadSaveService = ServiceProvider.GetRequiredService<IGraphLoadSaveService>();
 
-            ClaimTrustTrue = TrustBuilder.CreateTrustClaim("", true);
-            ClaimTrustFalse = TrustBuilder.CreateTrustClaim("", false);
-            ClaimConfirmTrue = TrustBuilder.CreateConfirmClaim();
-            ClaimRating = TrustBuilder.CreateRatingClaim(100, "");
+            BinaryTrustTrueAttributes = TrustBuilder.CreateBinaryTrustAttributes(true);
+            BinaryTrustFalseAttributes = TrustBuilder.CreateBinaryTrustAttributes(false);
+            ConfirmAttributes = TrustBuilder.CreateConfirmAttributes();
+            RatingAtrributes = TrustBuilder.CreateRatingAttributes(100);
         }
 
 
@@ -60,11 +60,11 @@ namespace UnitTest.TrustgraphCore
         protected QueryRequest BuildQuery(QueryRequestBuilder queryBuilder, string source, string target)
         {
             var sourceAddress = TrustBuilderExtensions.GetAddress(source);
-            var subject = new Subject
+            var subject = new Identity
             {
                 Address = TrustBuilderExtensions.GetAddress(target)
             };
-            queryBuilder.Add(sourceAddress, subject);
+            queryBuilder.Add(sourceAddress, subject.Address);
 
             return queryBuilder.Query;
         }
@@ -75,7 +75,7 @@ namespace UnitTest.TrustgraphCore
 
         }
 
-        protected void VerfifyResult(QueryContext context, string source, string target, Claim trustClaim = null)
+        protected void VerfifyResult(QueryContext context, string source, string target, string type = "")
         {
             var sourceAddress = TrustBuilderExtensions.GetAddress(source);
             var targetAddress = TrustBuilderExtensions.GetAddress(target);
@@ -88,42 +88,42 @@ namespace UnitTest.TrustgraphCore
             var subject = tracker.Subjects.GetValueOrDefault(targetIndex);
             Assert.IsNotNull(subject, $"Result is missing for subject for: {source} - subject: {target}");
 
-            if (trustClaim != null)
-            {
-                var graphClaim = _graphTrustService.CreateGraphClaim(trustClaim);
-                var exist = subject.Claims.Exist(graphClaim.Scope, graphClaim.Type);
-                Assert.IsTrue(exist, "Subject missing the claim type: " + trustClaim.Type);
-            }
+            //if (trustClaim != null)
+            //{
+            //    var graphClaim = _graphTrustService.CreateGraphClaim(trustClaim);
+            //    var exist = subject.Claims.Exist(graphClaim.Scope, graphClaim.Type);
+            //    Assert.IsTrue(exist, "Subject missing the claim type: " + trustClaim.Type);
+            //}
         }
 
         protected void BuildTestGraph()
         {
             _trustBuilder.SetServer("testserver");
 
-            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("B", "C", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("B", "E", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("E", "D", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("B", "F", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("F", "G", TrustBuilder.CreateTrustClaim());
-            _trustBuilder.AddTrust("G", "D", TrustBuilder.CreateTrustClaim()); // Long way, no trust
-            _trustBuilder.AddTrust("G", "Unreach", TrustBuilder.CreateTrustClaim()); // Long way, no trust
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes);
+            _trustBuilder.AddTrust("B", "C", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes);
+            _trustBuilder.AddTrust("C", "D", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes);
+            _trustBuilder.AddTrust("B", "E", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes);
+            _trustBuilder.AddTrust("E", "D", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes);
+            _trustBuilder.AddTrust("B", "F", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes);
+            _trustBuilder.AddTrust("F", "G", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes);
+            _trustBuilder.AddTrust("G", "D", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes); // Long way, no trust
+            _trustBuilder.AddTrust("G", "Unreach", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes); // Long way, no trust
 
-            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateConfirmClaim());
-            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateConfirmClaim());
-            _trustBuilder.AddTrust("G", "D", TrustBuilder.CreateConfirmClaim());
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.CONFIRMTRUST_TC1, ConfirmAttributes);
+            _trustBuilder.AddTrust("C", "D", TrustBuilder.CONFIRMTRUST_TC1, ConfirmAttributes);
+            _trustBuilder.AddTrust("G", "D", TrustBuilder.CONFIRMTRUST_TC1, ConfirmAttributes);
 
-            _trustBuilder.AddTrust("A", "B", TrustBuilder.CreateRatingClaim());
-            _trustBuilder.AddTrust("C", "D", TrustBuilder.CreateRatingClaim());
-            _trustBuilder.AddTrust("G", "D", TrustBuilder.CreateRatingClaim());
+            _trustBuilder.AddTrust("A", "B", TrustBuilder.RATING_TC1, RatingAtrributes);
+            _trustBuilder.AddTrust("C", "D", TrustBuilder.RATING_TC1, RatingAtrributes);
+            _trustBuilder.AddTrust("G", "D", TrustBuilder.RATING_TC1, RatingAtrributes);
 
-            _trustBuilder.AddTrust("A", "NoTrustB", TrustBuilder.CreateTrustClaim("", false));
-            _trustBuilder.AddTrust("B", "NoTrustC", TrustBuilder.CreateTrustClaim("", false));
-            _trustBuilder.AddTrust("C", "NoTrustD", TrustBuilder.CreateTrustClaim("", false));
+            _trustBuilder.AddTrust("A", "NoTrustB", TrustBuilder.BINARYTRUST_TC1, BinaryTrustFalseAttributes);
+            _trustBuilder.AddTrust("B", "NoTrustC", TrustBuilder.BINARYTRUST_TC1, BinaryTrustFalseAttributes);
+            _trustBuilder.AddTrust("C", "NoTrustD", TrustBuilder.BINARYTRUST_TC1, BinaryTrustFalseAttributes);
 
-            _trustBuilder.AddTrust("C", "MixD", TrustBuilder.CreateTrustClaim("", true));
-            _trustBuilder.AddTrust("E", "MixD", TrustBuilder.CreateTrustClaim("", false));
+            _trustBuilder.AddTrust("C", "MixD", TrustBuilder.BINARYTRUST_TC1, BinaryTrustTrueAttributes);
+            _trustBuilder.AddTrust("E", "MixD", TrustBuilder.BINARYTRUST_TC1, BinaryTrustFalseAttributes);
 
             _trustBuilder.Build().Sign();
         }

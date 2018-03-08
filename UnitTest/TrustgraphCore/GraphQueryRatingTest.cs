@@ -49,7 +49,7 @@ namespace UnitTest.TrustgraphCore
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", base.ClaimRating);
+            VerfifyResult(context, "C", "D", TrustBuilder.RATING_TC1);
         }
 
 
@@ -74,9 +74,9 @@ namespace UnitTest.TrustgraphCore
             Assert.AreEqual(3, context.Results.Trusts.Count, $"Should be {3} results!");
 
             VerfifyResult(context, "A", "B");
-            VerfifyResult(context, "A", "B", base.ClaimRating);
+            VerfifyResult(context, "A", "B", TrustBuilder.RATING_TC1);
             VerfifyResult(context, "B", "C");
-            VerfifyResult(context, "C", "D", base.ClaimRating);
+            VerfifyResult(context, "C", "D", TrustBuilder.RATING_TC1);
         }
 
         ///// <summary>

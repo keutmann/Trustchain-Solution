@@ -136,19 +136,9 @@ namespace TrustchainCore.Services
                     if (trust.Id == null)
                         result.Errors.Add(location+"Missing trust id");
 
-                if(trust.Issuer == null)
-                    result.Errors.Add(location + "Missing issuer");
+                ValidateIssuer(trust, location, result);
+                ValidateSubject(trust, location, result);
 
-                ValidateIdentity(trust.Id, trust.Issuer, location, result);
-
-                if (trust.Subjects == null || trust.Subjects.Count == 0)
-                    result.Errors.Add(location+"Missing subject");
-
-                var subjectIndex = 0;
-                foreach (var subject in trust.Subjects)
-                {
-                    ValidateSubject(trustIndex, subjectIndex++, trust, subject, result);
-                }
 
                 if (_options == TrustSchemaValidationOptions.Full)
                 {
@@ -159,43 +149,46 @@ namespace TrustchainCore.Services
                 }
             }
 
-            private void ValidateIdentity(byte[] data, Identity identity, string location, SchemaValidationResult result)
+            private void ValidateIssuer(Trust trust, string location, SchemaValidationResult result)
             {
-                if (identity.Address == null || identity.Address.Length == 0)
-                    result.Errors.Add(location + "Missing identity address");
+                if (trust.IssuerAddress == null || trust.IssuerAddress.Length == 0)
+                    result.Errors.Add(location + "Missing issuer address");
 
                 if (_options == TrustSchemaValidationOptions.Full)
                 {
-                    if (identity.Signature == null || identity.Signature.Length == 0)
-                        result.Errors.Add(location + "Missing identity signature");
+                    if (trust.IssuerSignature == null || trust.IssuerSignature.Length == 0)
+                        result.Errors.Add(location + "Missing issuer signature");
                     else
                     {
-                        var scriptService = _derivationStrategyFactory.GetService(identity.Script);
+                        var scriptService = _derivationStrategyFactory.GetService(trust.IssuerScript);
 
-                        if (!scriptService.VerifySignatureMessage(data, identity.Signature, identity.Address))
+                        if (!scriptService.VerifySignatureMessage(trust.Id, trust.IssuerSignature, trust.IssuerAddress))
                         {
-                            result.Errors.Add(location + "Invalid identity signature");
+                            result.Errors.Add(location + "Invalid issuer signature");
                         }
                     }
                 }
             }
 
-            private void ValidateSubject(int trustIndex, int subjectIndex, Trust trust, Subject subject, SchemaValidationResult result)
+            private void ValidateSubject(Trust trust, string location, SchemaValidationResult result)
             {
-                var location = $"Trust Index: {trustIndex} -> Subject Index: {subjectIndex} - ";
-                if (subject.Address == null || subject.Address.Length == 0)
-                    result.Errors.Add(location+"Missing subject address");
+                if (trust.SubjectAddress == null || trust.SubjectAddress.Length == 0)
+                    result.Errors.Add(location + "Missing subject address");
 
-                //if (subject.Signature != null && subject.Signature.Length > 0)
-                //{
-                //    if (!_cryptoService.VerifySignatureMessage(trust.TrustId, subject.Signature, subject.SubjectId))
-                //    {
-                //        result.Errors.Add(location+"Invalid subject signature");
-                //    }
-                //}
+                if (_options == TrustSchemaValidationOptions.Full)
+                {
+                    if (trust.SubjectSignature == null || trust.SubjectSignature.Length == 0)
+                        result.Errors.Add(location + "Missing subject signature");
+                    else
+                    {
+                        var scriptService = _derivationStrategyFactory.GetService(trust.SubjectScript);
 
-                //if (string.IsNullOrWhiteSpace(subject.ClaimIndexs))
-                //    result.Errors.Add(location + "Missing Claim");
+                        if (!scriptService.VerifySignatureMessage(trust.Id, trust.SubjectSignature, trust.SubjectAddress))
+                        {
+                            result.Errors.Add(location + "Invalid subject signature");
+                        }
+                    }
+                }
             }
         }
     }

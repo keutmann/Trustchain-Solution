@@ -31,7 +31,7 @@ namespace UnitTest.TrustchainCore.Builders
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer(serverKey);
             builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrustClaim())
+                .AddSubject("testsubject1", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
                 .Build()
                 .Sign();
 
@@ -50,7 +50,7 @@ namespace UnitTest.TrustchainCore.Builders
 
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer("testserver");
-            builder.AddTrust("testissuer1", "testsubject1", TrustBuilder.CreateTrustClaim())
+            builder.AddTrust("testissuer1", "testsubject1", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
                 .Build()
                 .Sign();
 
@@ -114,9 +114,9 @@ namespace UnitTest.TrustchainCore.Builders
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer(serverKey);
             builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrustClaim())
+                .AddSubject("testsubject1", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
                 .AddTrust("testissuer2")
-                .AddSubject("testsubject2", TrustBuilder.CreateTrustClaim())
+                .AddSubject("testsubject2", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
                 .Build()
                 .Sign();
 
@@ -130,7 +130,7 @@ namespace UnitTest.TrustchainCore.Builders
             var compareResult = builder.Package.JsonCompare(dbPackage);
             Assert.IsTrue(compareResult, "Package from database is not the same as Builder");
 
-            Assert.AreEqual(2, trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
+            //Assert.AreEqual(2, trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
         }
 
         [TestMethod]
@@ -143,8 +143,8 @@ namespace UnitTest.TrustchainCore.Builders
             var _trustBuilder = new TrustBuilder(ServiceProvider);
             //_trustBuilder.SetServer("testserver");
             _trustBuilder.SetServer(serverKey);
-            _trustBuilder.AddTrust("testissuer1", "testsubject1", TrustBuilder.CreateTrustClaim())
-                .AddTrust("testissuer2", "testsubject2", TrustBuilder.CreateTrustClaim())
+            _trustBuilder.AddTrust("testissuer1", "testsubject1", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
+                .AddTrust("testissuer2", "testsubject2", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
                 .Build().Sign();
 
             Console.WriteLine(JsonConvert.SerializeObject(_trustBuilder.Package, Formatting.Indented));
@@ -157,7 +157,7 @@ namespace UnitTest.TrustchainCore.Builders
             var compareResult = _trustBuilder.Package.JsonCompare(dbPackage);
             Assert.IsTrue(compareResult, "Package from database is not the same as Builder");
 
-            Assert.AreEqual(2, trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
+            //Assert.AreEqual(2, trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
         }
 
         [TestMethod]
@@ -170,16 +170,16 @@ namespace UnitTest.TrustchainCore.Builders
             var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer(serverKey);
             builder.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrustClaim())
+                .AddSubject("testsubject1", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
                 .Build()
                 .Sign();
 
             var builder2 = new TrustBuilder(ServiceProvider);
             builder2.SetServer(serverKey);
             builder2.AddTrust("testissuer1")
-                .AddSubject("testsubject1", TrustBuilder.CreateTrustClaim())
+                .AddSubject("testsubject1", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
                 .AddTrust("testissuer2")
-                .AddSubject("testsubject2", TrustBuilder.CreateTrustClaim())
+                .AddSubject("testsubject2", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true))
                 .Build()
                 .Sign();
 
@@ -197,7 +197,6 @@ namespace UnitTest.TrustchainCore.Builders
             Assert.IsTrue(compareResult, "Package from database is not the same as Builder");
 
             Assert.AreEqual(2, trustDBService.DBContext.Trusts.Count(), "Wrong number of Trusts");
-            Assert.AreEqual(2, trustDBService.DBContext.Claims.Count(), "Wrong number of Claims");
         }
 
 

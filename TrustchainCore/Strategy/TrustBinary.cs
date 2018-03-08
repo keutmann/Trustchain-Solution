@@ -15,29 +15,17 @@ namespace TrustchainCore.Strategy
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                ms.WriteString(trust.Issuer.Script.ToLower());
-                ms.WriteBytes(trust.Issuer.Address);
-
-                foreach (var subject in trust.Subjects)
-                {
-                    ms.WriteBytes(subject.Address);
-                    ms.WriteString(subject.Alias);
-                    
-                    foreach (int index in subject.ClaimIndexs)
-                    {
-                        ms.WriteInteger(index);
-                    }
-                }
-
-                foreach (var claim in trust.Claims)
-                {
-                    ms.WriteString(claim.Attributes); // UTF8
-                    ms.WriteInteger(claim.Cost);
-                    ms.WriteInteger(claim.Activate);
-                    ms.WriteInteger(claim.Expire);
-                    ms.WriteString(claim.Scope);
-                    ms.WriteString(claim.Note);
-                }
+                ms.WriteString(trust.IssuerScript.ToLowerSafe());
+                ms.WriteBytes(trust.IssuerAddress);
+                ms.WriteString(trust.SubjectScript.ToLowerSafe());
+                ms.WriteBytes(trust.SubjectAddress);
+                ms.WriteString(trust.Type);
+                ms.WriteString(trust.Scope);
+                ms.WriteString(trust.Attributes);
+                ms.WriteInteger(trust.Cost);
+                ms.WriteInteger(trust.Activate);
+                ms.WriteInteger(trust.Expire);
+                //ms.WriteString(trust.Note);
 
                 return ms.ToArray();
             }

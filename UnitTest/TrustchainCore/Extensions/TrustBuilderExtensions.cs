@@ -27,7 +27,7 @@ namespace UnitTest.TrustchainCore.Extensions
             var issuerKey = ScriptService.GetKey(Encoding.UTF8.GetBytes(name));
             var address = ScriptService.GetAddress(issuerKey);
 
-            builder.AddTrust().SetIssuer(address, ScriptService.ScriptName, (Identity identity, byte[] data) =>
+            builder.AddTrust().SetIssuer(address, ScriptService.ScriptName, (byte[] data) =>
             {
                 return ScriptService.Sign(issuerKey, data);
             });
@@ -35,28 +35,27 @@ namespace UnitTest.TrustchainCore.Extensions
             return builder;
         }
 
-        public static TrustBuilder AddTrust(this TrustBuilder builder, string issuerName, string subjectName, Claim trustClaim)
+        public static TrustBuilder AddTrust(this TrustBuilder builder, string issuerName, string subjectName, string type, string attributes)
         {
-            builder.AddTrust(issuerName).AddSubject(subjectName, trustClaim);
+            builder.AddTrust(issuerName).AddSubject(subjectName, type, attributes);
             return builder;
         }
 
         public static TrustBuilder AddTrustTrue(this TrustBuilder builder, string issuerName, string subjectName)
         {
-            builder.AddTrust(issuerName, subjectName, TrustBuilder.CreateTrustClaim());
+            builder.AddTrust(issuerName, subjectName, TrustBuilder.BINARYTRUST_TC1,  TrustBuilder.CreateBinaryTrustAttributes());
             return builder;
         }
 
-        public static TrustBuilder AddSubject(this TrustBuilder builder, string subjectName, Claim trustClaim)
+        public static TrustBuilder AddSubject(this TrustBuilder builder, string subjectName, string type, string attributes)
         {
             var key = ScriptService.GetKey(Encoding.UTF8.GetBytes(subjectName));
             var address = ScriptService.GetAddress(key);
 
             int[] indexs = new int[] { 0 };
 
-            builder.AddClaim(trustClaim);
-
-            builder.AddSubject(address, subjectName, new int[] { trustClaim.Index });
+            builder.AddSubject(address);
+            builder.AddType(type, attributes);
             return builder;
         }
 
@@ -65,7 +64,7 @@ namespace UnitTest.TrustchainCore.Extensions
             var key = ScriptService.GetKey(Encoding.UTF8.GetBytes(name));
             var address = ScriptService.GetAddress(key);
 
-            builder.SetServer(address, ScriptService.ScriptName, (Identity identity, byte[] data) =>
+            builder.SetServer(address, ScriptService.ScriptName, (byte[] data) =>
             {
                 return ScriptService.Sign(key, data);
             });

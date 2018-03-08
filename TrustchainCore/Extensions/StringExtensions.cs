@@ -5,6 +5,20 @@ namespace TrustchainCore.Extensions
 {
     public static class StringExtensions
     {
+        /// <summary>
+        /// ToLower with a fail safe on null.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns>Returns a empty string if source is null</returns>
+        public static string ToLowerSafe(this string s)
+        {
+            if (s == null)
+                return string.Empty;
+
+            return s.ToLower();
+        }
+
+
         public static string Left(this string s, int count)
         {
             if (s == null || s.Length < count)
@@ -93,8 +107,7 @@ namespace TrustchainCore.Extensions
 
         public static int ToInteger(this string s)
         {
-            int integerValue = 0;
-            int.TryParse(s, out integerValue);
+            int.TryParse(s, out int integerValue);
             return integerValue;
         }
 

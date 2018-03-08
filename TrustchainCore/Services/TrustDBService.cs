@@ -19,10 +19,6 @@ namespace TrustchainCore.Services
                 return DBContext.Packages
                 .Include(c => c.Timestamps)
                 .Include(c => c.Trusts)
-                    .ThenInclude(c => c.Subjects)
-                .Include(c => c.Trusts)
-                    .ThenInclude(c => c.Claims)
-                .Include(c => c.Trusts)
                     .ThenInclude(c => c.Timestamp);
                 
             }
@@ -33,19 +29,10 @@ namespace TrustchainCore.Services
             get
             {
                 return DBContext.Trusts
-                    .Include(c => c.Timestamp)
-                    .Include(c => c.Subjects)
-                    .Include(c => c.Claims);
+                    .Include(c => c.Timestamp);
             }
         }
 
-        public IQueryable<Subject> Subjects
-        {
-            get
-            {
-                return DBContext.Subjects.AsQueryable();
-            }
-        }
 
         public IQueryable<ProofEntity> Proofs
         {
@@ -70,12 +57,17 @@ namespace TrustchainCore.Services
 
         public void Add(Trust trust)
         {
+            BaseAdd(trust);
+            DBContext.SaveChanges();
+        }
+
+        private void BaseAdd(Trust trust)
+        {
             var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, trust.Id));
             if (dbTrust == null)
                 DBContext.Trusts.Add(trust);
             else
                 throw new ApplicationException("Trust already exist");
-
         }
 
         public bool Add(Package package)
