@@ -84,9 +84,9 @@ namespace TrustchainCore.Services
 
             public SchemaValidationResult Validate(Package package)
             {
-                if (_options == TrustSchemaValidationOptions.Full)
-                    if (package.Id == null)
-                        result.Errors.Add("Package.PackageID is missing");
+                //if (_options == TrustSchemaValidationOptions.Full)
+                //    if (package.Id == null)
+                //        result.Errors.Add("Package.PackageID is missing");
 
                 try
                 {

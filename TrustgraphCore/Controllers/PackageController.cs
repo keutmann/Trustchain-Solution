@@ -56,12 +56,12 @@ namespace TrustgraphCore.Controllers
         [Route("add")]
         public ActionResult AddPackage([FromBody]Package package)
         {
-
             var validationResult = _trustSchemaService.Validate(package);
             if (validationResult.ErrorsFound > 0)
                 return ApiError(validationResult, null, "Validation failed");
             // Timestamp validation service disabled for the moment
-
+            if(package.Id == null ||package.Id.Length == 0)
+                new TrustBuilder(_serviceProvider) { Package = package }.Build();
 
             _trustDBService.Add(package);   // Add to database
             _graphTrustService.Add(package);    // Add to Graph

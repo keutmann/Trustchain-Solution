@@ -19,9 +19,11 @@ namespace TrustchainCore.Strategy
                 ms.WriteBytes(trust.IssuerAddress);
                 ms.WriteString(trust.SubjectScript.ToLowerSafe());
                 ms.WriteBytes(trust.SubjectAddress);
-                ms.WriteString(trust.Type);
-                ms.WriteString(trust.Scope);
+
+                ms.WriteString(trust.Type.ToLowerSafe());
+                ms.WriteString(trust.Scope.ToLowerSafe());
                 ms.WriteString(trust.Attributes);
+
                 ms.WriteInteger(trust.Cost);
                 ms.WriteInteger(trust.Activate);
                 ms.WriteInteger(trust.Expire);

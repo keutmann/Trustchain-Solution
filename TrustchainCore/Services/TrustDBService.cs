@@ -62,10 +62,18 @@ namespace TrustchainCore.Services
         private void BaseAdd(Trust trust)
         {
             var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, trust.Id));
-            if (dbTrust == null)
-                DBContext.Trusts.Add(trust);
-            else
+            if (dbTrust != null)
                 throw new ApplicationException("Trust already exist");
+
+            dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.IssuerAddress, trust.IssuerAddress)
+                         && StructuralComparisons.StructuralEqualityComparer.Equals(p.SubjectAddress, trust.SubjectAddress)
+                         && p.Type == trust.Type 
+                         && p.Scope == trust.Scope);
+
+            if(dbTrust != null)
+                DBContext.Trusts.Remove(dbTrust);
+
+            DBContext.Trusts.Add(trust);
         }
 
         public bool Add(Package package)
