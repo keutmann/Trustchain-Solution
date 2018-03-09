@@ -51,7 +51,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            VerfifyContext(context, 2);
+            //VerfifyContext(context, 2);
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "B", "C", ConfirmAttributes);
@@ -76,7 +76,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            VerfifyContext(context, 3);
+            //VerfifyContext(context, 3);
 
             VerfifyResult(context, "A", "B");
             VerfifyResult(context, "A", "B", ConfirmAttributes);

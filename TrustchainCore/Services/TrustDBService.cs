@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System;
 using System.Collections;
+using TrustchainCore.Builders;
 
 namespace TrustchainCore.Services
 {
@@ -18,9 +19,7 @@ namespace TrustchainCore.Services
             {
                 return DBContext.Packages
                 .Include(c => c.Timestamps)
-                .Include(c => c.Trusts)
-                    .ThenInclude(c => c.Timestamp);
-                
+                .Include(c => c.Trusts);
             }
         }
 
@@ -28,8 +27,7 @@ namespace TrustchainCore.Services
         {
             get
             {
-                return DBContext.Trusts
-                    .Include(c => c.Timestamp);
+                return DBContext.Trusts;
             }
         }
 
@@ -72,6 +70,11 @@ namespace TrustchainCore.Services
 
         public bool Add(Package package)
         {
+            //if(package.Id == null || package.Id.Length == 0)
+            //{
+            //    //var builder = new TrustBuilder()
+            //}
+
             if (DBContext.Packages.Any(f => f.Id == package.Id))
                 throw new ApplicationException("Package already exist");
 
@@ -82,17 +85,17 @@ namespace TrustchainCore.Services
                     continue;
 
 
-                if (package.Timestamps == null && trust.Timestamp == null)
-                {
-                    package.Trusts.Remove(trust);
-                    continue;
-                }
+                //if (package.Timestamps == null && trust.Timestamp == null)
+                //{
+                //    package.Trusts.Remove(trust);
+                //    continue;
+                //}
 
-                if (dbTrust.Timestamp == null)
-                {
-                    DBContext.Trusts.Remove(dbTrust);
-                    continue;
-                }
+                //if (dbTrust.Timestamp == null)
+                //{
+                //    DBContext.Trusts.Remove(dbTrust);
+                //    continue;
+                //}
 
                 // Check timestamp
             }

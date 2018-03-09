@@ -44,6 +44,12 @@ namespace TrustchainCore.Migrations
                     b.Property<byte[]>("Id")
                         .IsRequired();
 
+                    b.Property<byte[]>("ServerAddress");
+
+                    b.Property<string>("ServerScript");
+
+                    b.Property<byte[]>("ServerSignature");
+
                     b.HasKey("DatabaseID");
 
                     b.HasAlternateKey("Id");
@@ -132,6 +138,12 @@ namespace TrustchainCore.Migrations
 
                     b.Property<byte[]>("SubjectSignature");
 
+                    b.Property<string>("TimestampAlgorithm");
+
+                    b.Property<byte[]>("TimestampRecipt");
+
+                    b.Property<string>("Timestamps");
+
                     b.Property<string>("Type");
 
                     b.HasKey("DatabaseID");
@@ -169,27 +181,6 @@ namespace TrustchainCore.Migrations
                     b.ToTable("Workflow");
                 });
 
-            modelBuilder.Entity("TrustchainCore.Model.Package", b =>
-                {
-                    b.OwnsOne("TrustchainCore.Model.ServerIdentity", "Server", b1 =>
-                        {
-                            b1.Property<int>("PackageDatabaseID");
-
-                            b1.Property<byte[]>("Address");
-
-                            b1.Property<string>("Script");
-
-                            b1.Property<byte[]>("Signature");
-
-                            b1.ToTable("Package");
-
-                            b1.HasOne("TrustchainCore.Model.Package")
-                                .WithOne("Server")
-                                .HasForeignKey("TrustchainCore.Model.ServerIdentity", "PackageDatabaseID")
-                                .OnDelete(DeleteBehavior.Cascade);
-                        });
-                });
-
             modelBuilder.Entity("TrustchainCore.Model.Timestamp", b =>
                 {
                     b.HasOne("TrustchainCore.Model.Package")
@@ -203,24 +194,6 @@ namespace TrustchainCore.Migrations
                     b.HasOne("TrustchainCore.Model.Package")
                         .WithMany("Trusts")
                         .HasForeignKey("PackageDatabaseID");
-
-                    b.OwnsOne("TrustchainCore.Model.TrustTimestamp", "Timestamp", b1 =>
-                        {
-                            b1.Property<int>("TrustDatabaseID");
-
-                            b1.Property<string>("Algorithm");
-
-                            b1.Property<byte[]>("Recipt");
-
-                            b1.Property<string>("Timestamps");
-
-                            b1.ToTable("Trust");
-
-                            b1.HasOne("TrustchainCore.Model.Trust")
-                                .WithOne("Timestamp")
-                                .HasForeignKey("TrustchainCore.Model.TrustTimestamp", "TrustDatabaseID")
-                                .OnDelete(DeleteBehavior.Cascade);
-                        });
                 });
 #pragma warning restore 612, 618
         }

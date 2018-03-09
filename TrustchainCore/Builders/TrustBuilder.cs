@@ -169,17 +169,11 @@ namespace TrustchainCore.Builders
             if (string.IsNullOrEmpty(script))
                 script = DerivationStrategyFactory.BTC_PKH;
 
-            var identity = Package.Server = new ServerIdentity();
-            SetIdentity(identity, address, script, sign);
+            Package.ServerAddress = address;
+            Package.ServerScript = script;
+            Package.ServerSign = sign;
 
             return this;
-        }
-
-        public void SetIdentity(Identity identity, byte[] address, string script, SignDelegate sign)
-        {
-            identity.Script = script;
-            identity.Address = address;
-            identity.Sign = sign;
         }
 
         public TrustBuilder SignIssuer(Trust trust = null, SignDelegate sign = null)
@@ -204,18 +198,13 @@ namespace TrustchainCore.Builders
             if (package == null)
                 package = Package;
 
-            if (sign != null)
-                return Sign(Package.Server, Package.Id, sign);
+            if (sign != null) 
+                Package.ServerSignature = sign(Package.Id);
             else
-                return Sign(Package.Server, Package.Id, Package.Server.Sign);
-        }
-
-        public TrustBuilder Sign(Identity identity, byte[] data, SignDelegate sign)
-        {
-            if(sign != null)
-                identity.Signature = sign(data);
+                Package.ServerSignature = Package.ServerSign(Package.Id); 
             return this;
         }
+
 
         public TrustBuilder BuildTrustID(Trust trust = null)
         {

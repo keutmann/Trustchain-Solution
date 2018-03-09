@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using TrustchainCore.Collections;
 using TrustgraphCore.Enumerations;
 using TrustchainCore.Model;
+using TrustchainCore.Builders;
 
 namespace TrustgraphCore.Services
 {
@@ -67,35 +68,45 @@ namespace TrustgraphCore.Services
             {
                 foreach (var ts in tracker.Subjects.Values)
                 {
-                    foreach (var claimEntry in ts.Claims)
+                    var trust = new Trust
                     {
-                        var trust = new Trust
+                        IssuerAddress = tracker.Issuer.Address,
+                        SubjectAddress = ts.TargetIssuer.Address
+                    };
+
+                    if (ts.Claims.Count() > 0)
+                    {
+                        foreach (var claimEntry in ts.Claims)
                         {
-                            IssuerAddress = tracker.Issuer.Address,
-                            SubjectAddress = ts.TargetIssuer.Address
-                        };
 
-                        var claimIndex = claimEntry.Value;
-                        var trackerClaim = TrustService.Graph.Claims[claimIndex];
+                            var claimIndex = claimEntry.Value;
+                            var trackerClaim = TrustService.Graph.Claims[claimIndex];
 
-                        if (TrustService.Graph.ClaimType.TryGetValue(trackerClaim.Type, out string type))
-                            trust.Type = type;
+                            if (TrustService.Graph.ClaimType.TryGetValue(trackerClaim.Type, out string type))
+                                trust.Type = type;
 
-                        if (TrustService.Graph.ClaimAttributes.TryGetValue(trackerClaim.Attributes, out string attributes))
-                            trust.Attributes = attributes;
+                            if (TrustService.Graph.ClaimAttributes.TryGetValue(trackerClaim.Attributes, out string attributes))
+                                trust.Attributes = attributes;
 
-                        if (TrustService.Graph.Scopes.TryGetValue(trackerClaim.Scope, out string scope))
-                            trust.Scope = scope;
+                            if (TrustService.Graph.Scopes.TryGetValue(trackerClaim.Scope, out string scope))
+                                trust.Scope = scope;
 
-                        if (TrustService.Graph.Notes.TryGetValue(trackerClaim.Note, out string note))
-                            trust.Note = note;
+                            if (TrustService.Graph.Notes.TryGetValue(trackerClaim.Note, out string note))
+                                trust.Note = note;
 
-                        trust.Cost = trackerClaim.Cost;
-                        trust.Expire = 0;
-                        trust.Activate = 0;
-
-                        context.Results.Trusts.Add(trust);
+                            trust.Cost = trackerClaim.Cost;
+                            trust.Expire = 0;
+                            trust.Activate = 0;
+                        }
                     }
+                    else
+                    {
+                        trust.Type = TrustBuilder.BINARYTRUST_TC1;
+                        trust.Attributes = TrustBuilder.CreateBinaryTrustAttributes(true);
+                    }
+
+                    context.Results.Trusts.Add(trust);
+
                 }
             }
         }
@@ -191,11 +202,11 @@ namespace TrustgraphCore.Services
                 return;
 
             if(context.Flags == QueryFlags.IncludeClaimTrust)
-                if (subject.Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out index)) // Check local scope for claims
-                    claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex).Value, index));
-                else
-                    if (subject.Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index)) // Check global scope for claims
-                        claims.Add(new Tuple<long, int>(new SubjectClaimIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex).Value, index));
+            if (subject.Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out index)) // Check local scope for claims
+                claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex).Value, index));
+            else
+                if (subject.Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index)) // Check global scope for claims
+                    claims.Add(new Tuple<long, int>(new SubjectClaimIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex).Value, index));
             
             BuildResult(context, tracker, claims); // Target found!
 

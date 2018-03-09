@@ -52,8 +52,6 @@ namespace UnitTest.TrustchainCore.Extensions
             var key = ScriptService.GetKey(Encoding.UTF8.GetBytes(subjectName));
             var address = ScriptService.GetAddress(key);
 
-            int[] indexs = new int[] { 0 };
-
             builder.AddSubject(address);
             builder.AddType(type, attributes);
             return builder;

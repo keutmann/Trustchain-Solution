@@ -6,10 +6,12 @@ using TrustchainCore.Controllers;
 using TrustchainCore.Interfaces;
 using TruststampCore.Interfaces;
 using System;
+using TrustchainCore.Enumerations;
+using TrustchainCore.Builders;
 
 namespace TrustgraphCore.Controllers
 {
-    [Route("api/graph/[controller]")]
+    [Route("api/[controller]")]
     public class PackageController : ApiController
     {
         private IGraphTrustService _graphTrustService;
@@ -17,15 +19,17 @@ namespace TrustgraphCore.Controllers
         private ITrustDBService _trustDBService;
         private IProofService _proofService;
         private IBlockchainServiceFactory _blockchainServiceFactory;
+        private IServiceProvider _serviceProvider;
 
 
-        public PackageController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService, IBlockchainServiceFactory blockchainServiceFactory)
+        public PackageController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService, IBlockchainServiceFactory blockchainServiceFactory, IServiceProvider serviceProvider)
         {
             _graphTrustService = graphTrustService;
             _trustSchemaService = trustSchemaService;
             _trustDBService = trustDBService;
             _proofService = proofService;
             _blockchainServiceFactory = blockchainServiceFactory;
+            _serviceProvider = serviceProvider;
         }
 
 #if DEBUG
@@ -49,6 +53,7 @@ namespace TrustgraphCore.Controllers
         /// <returns></returns>
         [Produces("application/json")]
         [HttpPost]
+        [Route("add")]
         public ActionResult AddPackage([FromBody]Package package)
         {
 
@@ -64,6 +69,29 @@ namespace TrustgraphCore.Controllers
 
             return ApiOk("Package added");
         }
- 
+
+        /// <summary>
+        /// Build a package for the client to sign.
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns>trust</returns>
+        [Produces("application/json")]
+        [HttpPost]
+        [Route("build")]
+        public ActionResult BuildPackage([FromBody]Package package)
+        {
+            var validationResult = _trustSchemaService.Validate(package, TrustSchemaValidationOptions.Basic);
+            if (validationResult.ErrorsFound > 0)
+                return ApiError(validationResult, null, "Validation failed");
+
+            var trustBuilder = new TrustBuilder(_serviceProvider)
+            {
+                Package = package
+            };
+            trustBuilder.Build();
+
+            return ApiOk(package);
+        }
+
     }
 }

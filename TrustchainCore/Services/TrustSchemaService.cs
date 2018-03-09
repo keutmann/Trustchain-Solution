@@ -84,7 +84,7 @@ namespace TrustchainCore.Services
 
             public SchemaValidationResult Validate(Package package)
             {
-                if(_options == TrustSchemaValidationOptions.Full)
+                if (_options == TrustSchemaValidationOptions.Full)
                     if (package.Id == null)
                         result.Errors.Add("Package.PackageID is missing");
 
@@ -177,9 +177,7 @@ namespace TrustchainCore.Services
 
                 if (_options == TrustSchemaValidationOptions.Full)
                 {
-                    if (trust.SubjectSignature == null || trust.SubjectSignature.Length == 0)
-                        result.Errors.Add(location + "Missing subject signature");
-                    else
+                    if (trust.SubjectSignature != null)
                     {
                         var scriptService = _derivationStrategyFactory.GetService(trust.SubjectScript);
 

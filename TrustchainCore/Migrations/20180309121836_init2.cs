@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace TrustchainCore.Migrations
 {
-    public partial class init : Migration
+    public partial class init2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -30,9 +30,9 @@ namespace TrustchainCore.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Algorithm = table.Column<string>(nullable: true),
                     Id = table.Column<byte[]>(nullable: false),
-                    Server_Address = table.Column<byte[]>(nullable: true),
-                    Server_Script = table.Column<string>(nullable: true),
-                    Server_Signature = table.Column<byte[]>(nullable: true)
+                    ServerAddress = table.Column<byte[]>(nullable: true),
+                    ServerScript = table.Column<string>(nullable: true),
+                    ServerSignature = table.Column<byte[]>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -117,10 +117,10 @@ namespace TrustchainCore.Migrations
                     SubjectAddress = table.Column<byte[]>(nullable: true),
                     SubjectScript = table.Column<string>(nullable: true),
                     SubjectSignature = table.Column<byte[]>(nullable: true),
-                    Type = table.Column<string>(nullable: true),
-                    Timestamp_Algorithm = table.Column<string>(nullable: true),
-                    Timestamp_Recipt = table.Column<byte[]>(nullable: true),
-                    Timestamp_Timestamps = table.Column<string>(nullable: true)
+                    TimestampAlgorithm = table.Column<string>(nullable: true),
+                    TimestampRecipt = table.Column<byte[]>(nullable: true),
+                    Timestamps = table.Column<string>(nullable: true),
+                    Type = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

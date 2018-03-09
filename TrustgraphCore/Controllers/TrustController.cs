@@ -11,7 +11,7 @@ using TrustchainCore.Enumerations;
 
 namespace TrustgraphCore.Controllers
 {
-    [Route("api/graph/[controller]")]
+    [Route("api/[controller]")]
     public class TrustController : ApiController
     {
         private IGraphTrustService _graphTrustService;
@@ -19,7 +19,7 @@ namespace TrustgraphCore.Controllers
         private ITrustDBService _trustDBService;
         private IProofService _proofService;
         private IBlockchainServiceFactory _blockchainServiceFactory;
-        private IServiceProvider _serviceProvider { get; set; }
+        private IServiceProvider _serviceProvider;
 
 
 
@@ -71,6 +71,7 @@ namespace TrustgraphCore.Controllers
         /// <returns></returns>
         [Produces("application/json")]
         [HttpPost]
+        [Route("add")]
         public ActionResult AddTrust([FromBody]Trust trust)
         {
             trust.PackageDatabaseID = null; // NO package! 
@@ -86,5 +87,56 @@ namespace TrustgraphCore.Controllers
             return ApiOk("Trust added");
         }
 
+
+        /// <summary>
+        /// Create a trust, that is not added but returned for signing.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("build")]
+        public ActionResult Get(byte[] issuer, byte[] subject, string issuerScript = "", string type = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
+        {
+            if (issuer == null || issuer.Length < 1)
+                throw new ApplicationException("Missing issuer");
+
+            if (subject == null || subject.Length < 1)
+                throw new ApplicationException("Missing subject");
+
+            if (string.IsNullOrEmpty(attributes))
+                if (type == TrustBuilder.BINARYTRUST_TC1)
+                    attributes = TrustBuilder.CreateBinaryTrustAttributes();
+
+            var trustBuilder = new TrustBuilder(_serviceProvider);
+            trustBuilder.AddTrust()
+                .SetIssuer(issuer, issuerScript)
+                .AddType(type, attributes)
+                .AddSubject(subject)
+                .BuildTrustID();
+
+            return ApiOk(trustBuilder.CurrentTrust);
+        }
+
+
+        /// <summary>
+        /// Build a trust for the client to sign.
+        /// </summary>
+        /// <param name="trust"></param>
+        /// <returns>trust</returns>
+        [Produces("application/json")]
+        [HttpPost]
+        [Route("build")]
+        public ActionResult BuildTrust([FromBody]Trust trust)
+        {
+            var validationResult = _trustSchemaService.Validate(trust, TrustSchemaValidationOptions.Basic);
+            if (validationResult.ErrorsFound > 0)
+                return ApiError(validationResult, null, "Validation failed");
+
+            var trustBuilder = new TrustBuilder(_serviceProvider);
+            trustBuilder
+                .AddTrust(trust)
+                .BuildTrustID();
+
+            return ApiOk(trust);
+        }
     }
 }

@@ -29,16 +29,11 @@ namespace TrustchainCore.Repository
         {
             builder.Entity<Package>().HasKey(p => p.DatabaseID);
             builder.Entity<Package>().HasAlternateKey(p => p.Id);
-            builder.Entity<Package>()
-                .OwnsOne(c => c.Server);
 
             builder.Entity<Trust>().HasKey(p => p.DatabaseID);
             
             builder.Entity<Trust>().HasIndex(p => p.Id).IsUnique(true);
             builder.Entity<Trust>().HasIndex(p => new { p.IssuerAddress, p.SubjectAddress, p.Type, p.Scope }).IsUnique(true);
-            builder.Entity<Trust>()
-                .OwnsOne(c => c.Timestamp);
-
             builder.Entity<Timestamp>().HasKey(p => p.DatabaseID);
 
             // Proof
