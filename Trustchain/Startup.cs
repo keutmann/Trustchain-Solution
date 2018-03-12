@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using TrustchainCore.Attributes;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace Trustchain
 {
@@ -83,7 +85,21 @@ namespace Trustchain
             app.LoadGraph(); // Load the Trust Graph from Database
             app.Truststamp();
             ConfigureTimers(app);
+
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
+                RequestPath = "/Resources",
+
+
+            });
+
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
+                RequestPath = "/Resources"
+            });
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -98,6 +114,7 @@ namespace Trustchain
                 //routes.MapRoute(
                 //    name: "stamp",
                 //    template: "v1/stamp/{blockchain}/{action=Index}/{source?}");
+                //routes.MapRoute("Proof.htm");
 
                 routes.MapRoute(
                     name: "default",
