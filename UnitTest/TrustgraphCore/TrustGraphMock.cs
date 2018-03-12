@@ -22,7 +22,6 @@ namespace UnitTest.TrustgraphCore
         protected ITrustDBService _trustDBService = null;
         protected IGraphQueryService _graphQueryService = null;
         protected TrustController _trustController = null;
-        protected PackageController _packageController = null;
         protected IGraphLoadSaveService _graphLoadSaveService = null;
 
         protected string BinaryTrustTrueAttributes = null;
@@ -41,7 +40,6 @@ namespace UnitTest.TrustgraphCore
             //_graphQueryService = new GraphQueryService(_graphTrustService);
             _graphQueryService = ServiceProvider.GetRequiredService<IGraphQueryService>();
             _trustController = ServiceProvider.GetRequiredService<TrustController>();
-            _packageController = ServiceProvider.GetRequiredService<PackageController>();
             _graphLoadSaveService = ServiceProvider.GetRequiredService<IGraphLoadSaveService>();
 
             BinaryTrustTrueAttributes = TrustBuilder.CreateBinaryTrustAttributes(true);

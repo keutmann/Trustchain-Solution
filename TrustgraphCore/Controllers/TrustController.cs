@@ -8,6 +8,7 @@ using TruststampCore.Interfaces;
 using System;
 using TrustchainCore.Builders;
 using TrustchainCore.Enumerations;
+using TrustchainCore.Extensions;
 
 namespace TrustgraphCore.Controllers
 {
@@ -33,58 +34,61 @@ namespace TrustgraphCore.Controllers
             _serviceProvider = serviceProvider;
         }
 
-        ///// <summary>
-        ///// Create a trust, that is not added but returned for signing.
-        ///// </summary>
-        ///// <returns></returns>
-        //[HttpGet]
-        //public ActionResult Get(byte[] issuer, byte[] subject, string issuerScript = "", string claimType = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
-        //{
-        //    if (issuer == null || issuer.Length < 1)
-        //        throw new ApplicationException("Missing issuer");
-
-        //    if (subject == null || subject.Length < 1)
-        //        throw new ApplicationException("Missing subject");
-
-        //    if (string.IsNullOrEmpty(attributes))
-        //        if (claimType == TrustBuilder.BINARYTRUST_TC1)
-        //            attributes = TrustBuilder.CreateTrustClaim().Attributes;
-
-        //    var claim = TrustBuilder.CreateClaim(claimType, scope, attributes);
-
-        //    var trustBuilder = new TrustBuilder(_serviceProvider);
-        //    trustBuilder.AddTrust()
-        //        .SetIssuer(issuer, issuerScript)
-        //        .AddClaim(claim)
-        //        .AddSubject(subject, alias, new int[] { claim.Index })
-        //        .BuildTrustID();
-
-        //    return ApiOk(trustBuilder.CurrentTrust);
-        //}
-
-
+  
         /// <summary>
-        /// Add a trust to the Graph and database.
-        /// The trust will be packaged at a time interval and timestamped.
+        /// Add a package to the Graph and database.
+        /// If the package is not timestamped, then it will be at a time interval.
         /// </summary>
-        /// <param name="trust"></param>
+        /// <param name="package"></param>
         /// <returns></returns>
         [Produces("application/json")]
         [HttpPost]
         [Route("add")]
-        public ActionResult AddTrust([FromBody]Trust trust)
+        public ActionResult Add([FromBody]Package package)
         {
-            trust.PackageDatabaseID = null; // NO package! 
-
-            var validationResult = _trustSchemaService.Validate(trust, TrustSchemaValidationOptions.Full);
+            var validationResult = _trustSchemaService.Validate(package, TrustSchemaValidationOptions.Full);
             if (validationResult.ErrorsFound > 0)
                 return ApiError(validationResult, null, "Validation failed");
             // Timestamp validation service disabled for the moment
 
-            _trustDBService.Add(trust);   // Add to database
-            _graphTrustService.Add(trust);    // Add to Graph
+            if ((package.Id != null && package.Id.Length > 0))
+            {
+                if (_trustDBService.DBContext.Packages.Any(f => f.Id == package.Id))
+                    throw new ApplicationException("Package already exist");
+            }
 
-            return ApiOk("Trust added");
+            foreach (var trust in package.Trusts)
+            {
+                this.AddTrust(trust);
+            }
+
+            _trustDBService.DBContext.SaveChanges();
+
+            return ApiOk("Package added");
+        }
+
+
+        private void AddTrust(Trust trust)
+        {
+            if (_trustDBService.TrustExist(trust))
+                return; // TODO: Ignore the same trust for now.
+                //throw new ApplicationException("Trust already exist");
+
+            var dbTrust = _trustDBService.GetSimilarTrust(trust);
+            if (dbTrust != null)
+            {
+                // TODO: Needs to verfify with Timestamp if exist, for deciding action!
+                // For now, we just remove the old trust
+                _trustDBService.DBContext.Trusts.Remove(dbTrust);
+                _graphTrustService.Remove(trust);
+            }
+
+            _trustDBService.Add(trust);   // Add to database
+
+            var time = DateTime.Now.ToUnixTime();
+            if ((trust.Expire  == 0 || trust.Expire > time) 
+                && (trust.Activate == 0 || trust.Activate <= time)) 
+                _graphTrustService.Add(trust);    // Add to Graph
         }
 
 
@@ -125,18 +129,19 @@ namespace TrustgraphCore.Controllers
         [Produces("application/json")]
         [HttpPost]
         [Route("build")]
-        public ActionResult BuildTrust([FromBody]Trust trust)
+        public ActionResult BuildTrust([FromBody]Package package)
         {
-            var validationResult = _trustSchemaService.Validate(trust, TrustSchemaValidationOptions.Basic);
+            var validationResult = _trustSchemaService.Validate(package, TrustSchemaValidationOptions.Basic);
             if (validationResult.ErrorsFound > 0)
                 return ApiError(validationResult, null, "Validation failed");
 
-            var trustBuilder = new TrustBuilder(_serviceProvider);
-            trustBuilder
-                .AddTrust(trust)
-                .BuildTrustID();
+            var trustBuilder = new TrustBuilder(_serviceProvider)
+            {
+                Package = package
+            };
+            trustBuilder.Build();
 
-            return ApiOk(trust);
+            return ApiOk(package);
         }
     }
 }

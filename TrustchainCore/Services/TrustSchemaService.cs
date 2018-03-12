@@ -162,7 +162,7 @@ namespace TrustchainCore.Services
                     {
                         var scriptService = _derivationStrategyFactory.GetService(trust.IssuerScript);
 
-                        if (!scriptService.VerifySignatureMessage(trust.Id, trust.IssuerSignature, trust.IssuerAddress))
+                        if (!scriptService.VerifySignature(trust.Id, trust.IssuerSignature, trust.IssuerAddress))
                         {
                             result.Errors.Add(location + "Invalid issuer signature");
                         }
@@ -172,8 +172,8 @@ namespace TrustchainCore.Services
 
             private void ValidateSubject(Trust trust, string location, SchemaValidationResult result)
             {
-                if (trust.SubjectAddress == null || trust.SubjectAddress.Length == 0)
-                    result.Errors.Add(location + "Missing subject address");
+                //if (trust.SubjectAddress == null || trust.SubjectAddress.Length == 0)
+                //    result.Errors.Add(location + "Missing subject address");
 
                 if (_options == TrustSchemaValidationOptions.Full)
                 {
@@ -181,7 +181,7 @@ namespace TrustchainCore.Services
                     {
                         var scriptService = _derivationStrategyFactory.GetService(trust.SubjectScript);
 
-                        if (!scriptService.VerifySignatureMessage(trust.Id, trust.SubjectSignature, trust.SubjectAddress))
+                        if (!scriptService.VerifySignature(trust.Id, trust.SubjectSignature, trust.SubjectAddress))
                         {
                             result.Errors.Add(location + "Invalid subject signature");
                         }

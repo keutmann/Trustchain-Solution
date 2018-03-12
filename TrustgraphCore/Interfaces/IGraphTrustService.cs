@@ -14,6 +14,7 @@ namespace TrustgraphCore.Interfaces
         void Add(Package package);
         void Add(IEnumerable<Trust> trusts);
         void Add(Trust trust);
+        void Remove(Trust trust);
 
         GraphSubject CreateGraphSubject(byte[] subjectAddress);
         //void InitSubjectModel(Subject node, Claim claim, GraphSubject edge);

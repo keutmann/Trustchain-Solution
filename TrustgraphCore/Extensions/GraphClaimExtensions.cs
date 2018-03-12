@@ -32,5 +32,13 @@ namespace TrustgraphCore.Extensions
             return true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Remove(this Dictionary<long, int> claims, int scope, int type)
+        {
+            var subjectClaimIndex = new SubjectClaimIndex { Scope = scope, Type = type };
+            if (claims.ContainsKey(subjectClaimIndex.Value))
+                claims.Remove(subjectClaimIndex.Value);
+        }
+
     }
 }

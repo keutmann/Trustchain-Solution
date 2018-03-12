@@ -53,26 +53,24 @@ namespace TrustchainCore.Services
             DBContext = trustDBContext;
         }
 
-        public void Add(Trust trust)
-        {
-            BaseAdd(trust);
-            DBContext.SaveChanges();
-        }
-
-        private void BaseAdd(Trust trust)
+        public bool TrustExist(Trust trust)
         {
             var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, trust.Id));
-            if (dbTrust != null)
-                throw new ApplicationException("Trust already exist");
+            return (dbTrust != null);
+        }
 
-            dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.IssuerAddress, trust.IssuerAddress)
-                         && StructuralComparisons.StructuralEqualityComparer.Equals(p.SubjectAddress, trust.SubjectAddress)
-                         && p.Type == trust.Type 
-                         && p.Scope == trust.Scope);
+        public Trust GetSimilarTrust(Trust trust)
+        {
+            var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.IssuerAddress, trust.IssuerAddress)
+                                 && StructuralComparisons.StructuralEqualityComparer.Equals(p.SubjectAddress, trust.SubjectAddress)
+                                 && p.Type == trust.Type
+                                 && p.Scope == trust.Scope);
 
-            if(dbTrust != null)
-                DBContext.Trusts.Remove(dbTrust);
+            return dbTrust;
+        }
 
+        public void Add(Trust trust)
+        {
             DBContext.Trusts.Add(trust);
         }
 

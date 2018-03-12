@@ -5,6 +5,7 @@ using TrustgraphCore.Interfaces;
 using TrustchainCore.Builders;
 using TrustgraphCore.Extensions;
 using TrustgraphCore.Enumerations;
+using System;
 
 namespace TrustgraphCore.Services
 {
@@ -45,6 +46,43 @@ namespace TrustgraphCore.Services
 
             var graphClaim = EnsureGraphClaim(trust);
             graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Type, graphClaim.Index);
+        }
+
+        public void Remove(Trust trust)
+        {
+            if (!Graph.IssuerIndex.TryGetValue(trust.IssuerAddress, out int issuerIndex))
+                return; // No issuer, then no trust!
+
+            if (!Graph.IssuerIndex.TryGetValue(trust.SubjectAddress, out int subjectIndex))
+                return; // No subject, then no trust!
+
+            var graphIssuer = Graph.Issuers[issuerIndex];
+            if (!graphIssuer.Subjects.ContainsKey(subjectIndex))
+                return; // No subject to the issuer to be removed!
+
+            var subject = graphIssuer.Subjects[subjectIndex];
+
+            var graphClaim = CreateGraphClaim(trust);
+            var id = graphClaim.ID();
+
+            if (!Graph.ClaimIndex.TryGetValue(id, out int claimIndex))
+                return; // No cliam, no trust to remove!
+
+            var claim = Graph.Claims[claimIndex];
+            if (!subject.Claims.GetIndex(claim.Scope, claim.Type, out int subjectClaimIndex))
+                return; // No claim on subject that is a match;
+
+            subject.Claims.Remove(claim.Scope, claim.Type);
+
+            if (subject.Claims.Count > 0)
+                return; // There are more claims, therefore do not remove subject.
+
+            graphIssuer.Subjects.Remove(subjectIndex);
+            if (graphIssuer.Subjects.Count > 0)
+                return; // There are more subjects, therefore do not remove issuer.
+
+            // Is it possble to remove the issuer?, as we do not know if any other is referencing to it.
+            // There is no backpointer, so this would be a DB query.
         }
 
         public GraphIssuer EnsureGraphIssuer(byte[] address)
