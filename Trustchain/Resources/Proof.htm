@@ -1,30 +1,45 @@
-﻿<!DOCTYPE html>
-<html>
+﻿<html>
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Proof</title>
     <style>
         .valid {
             color: green;
-            font-size: larger;
+        }
+        .invalid {
+            color: red;
         }
     </style>
 </head>
 <body>
     <h1>Proof</h1>
-
-    <p>Name</p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p id="valid">The proof is <span class="valid">Valid</span></p>
-
+    <p>The proof is <span class="" id="valid">(calculating)</span></p>
+    <pre id="json"></pre>
+    <p>The hash is SHA256(SHA256(name + content)) (in hex)</p>
+    <p>The address is RIPEMD(publicKey) (in hex)</p>
+    <p>Signature is privateKey signature of hash (in hex)</p>
     <script>
-var param = getQueryParams(window.location.href);
 
+function OnReady() {
+    var param = getQueryParams(window.location.href);
 
+    document.getElementById("json").innerHTML = JSON.stringify(param, undefined, 2);
 
+    var address = new tce.buffer.Buffer(param.address, 'HEX');
+    var hash = new tce.buffer.Buffer(param.hash, 'HEX');
+    var signature = new tce.buffer.Buffer(param.signature, 'HEX');
 
+    var valid = tce.bitcoin.message.verifyCompact(hash, address, signature);
+    var validElement = document.getElementById("valid");
+    if(valid) {
+        validElement.className = "valid";
+        validElement.innerText = "valid";
+    }
+    else{
+        validElement.className = "Invalid";
+        validElement.innerText = "invalid";
+    }
+}
 
 function getQueryParams(url) {
     var qparams = {},
@@ -1803,7 +1818,7 @@ function getQueryParams(url) {
                     require('./convert')
 
                     module.exports = BigInteger
-                }, { "./bigi": 3, "./convert": 4 }], 6: [function (require, module, exports) {
+                }, { "./bigi": 3, "./convert": 4 }],6 : [function (require, module, exports) {
                     module.exports = {
                         "_args": [
                             [
@@ -2890,6 +2905,10 @@ function getQueryParams(url) {
                         return signature.toCompact(i, this.compressed)
                     }
 
+                    ECPair.prototype.getPublicKeyHash = function () {
+                        return bcrypto.hash160(this.getPublicKeyBuffer());
+                    }
+
                     ECPair.prototype.toWIF = function () {
                         if (!this.d) throw new Error('Missing private key')
 
@@ -3387,10 +3406,27 @@ function getQueryParams(url) {
                             return keyPair.getAddress() === address
                         }
 
+                    
+                        function verifyCompact(hash, address, signature, network) {
+                            //var network = network || NETWORKS.bitcoin
+
+                            var parsed = ECSignature.parseCompact(signature)
+                            var e = BigInteger.fromBuffer(hash)
+                            var Q = ecdsa.recoverPubKey(e, parsed.signature, parsed.i)
+
+                            var keyPair = new ECPair(null, Q, {
+                                compressed: parsed.compressed,
+                                network: network
+                            })
+
+                            return keyPair.getPublicKeyHash().toString('HEX') === address.toString('HEX')
+                        }
+
                         module.exports = {
                             magicHash: magicHash,
                             sign: sign,
-                            verify: verify
+                            verify: verify,
+                            verifyCompact: verifyCompact
                         }
 
                     }).call(this, require("buffer").Buffer)
@@ -14046,6 +14082,10 @@ function getQueryParams(url) {
                 }, { "./support/isBuffer": 88, "_process": 70, "inherits": 87 }]
             }, {}, [1])(1)
     });
+
+        (function () {
+            OnReady();
+        })();
 
     </script>
 </body>
