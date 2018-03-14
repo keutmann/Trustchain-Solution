@@ -5,7 +5,7 @@ using TrustgraphCore.Interfaces;
 using TrustchainCore.Builders;
 using TrustgraphCore.Extensions;
 using TrustgraphCore.Enumerations;
-using System;
+using System.Linq;
 
 namespace TrustgraphCore.Services
 {
@@ -147,10 +147,10 @@ namespace TrustgraphCore.Services
         }
         public GraphClaim CreateGraphClaim(Trust trust)
         {
-            return CreateGraphClaim(trust.Type, trust.Scope, trust.Attributes, 100, "");
+            return CreateGraphClaim(trust.Type, trust.Scope, trust.Attributes, 100);
         }
 
-        public GraphClaim CreateGraphClaim(string type, string scope, string attributes, short cost = 100, string note = "")
+        public GraphClaim CreateGraphClaim(string type, string scope, string attributes, short cost = 100)
         {
             var gclaim = new GraphClaim
             {
@@ -158,7 +158,6 @@ namespace TrustgraphCore.Services
                 Scope = Graph.Scopes.Ensure(scope),
                 Cost = cost,
                 Attributes = Graph.ClaimAttributes.Ensure(attributes),
-                Note = Graph.Notes.Ensure(note),
                 Flags = 0
             };
             return gclaim;
@@ -169,6 +168,63 @@ namespace TrustgraphCore.Services
             var graphClaim = CreateGraphClaim(trust);
             var index = Graph.ClaimIndex.GetValueOrDefault(graphClaim.ID());
             return index;
+        }
+
+        /// <summary>
+        /// Build a result package from the TrackerResults
+        /// </summary>
+        /// <param name="context"></param>
+        public void BuildPackage(QueryContext context)
+        {
+            // Clear up the result
+
+            context.Results = new Package
+            {
+                Trusts = new List<Trust>(context.TrackerResults.Count)
+            };
+
+            foreach (var tracker in context.TrackerResults.Values)
+            {
+                foreach (var ts in tracker.Subjects.Values)
+                {
+                    var trust = new Trust
+                    {
+                        IssuerAddress = tracker.Issuer.Address,
+                        SubjectAddress = ts.TargetIssuer.Address
+                    };
+
+                    if (ts.Claims.Count() > 0)
+                    {
+                        foreach (var claimEntry in ts.Claims)
+                        {
+
+                            var claimIndex = claimEntry.Value;
+                            var trackerClaim = Graph.Claims[claimIndex];
+
+                            if (Graph.ClaimType.TryGetValue(trackerClaim.Type, out string type))
+                                trust.Type = type;
+
+                            if (Graph.ClaimAttributes.TryGetValue(trackerClaim.Attributes, out string attributes))
+                                trust.Attributes = attributes;
+
+                            if (Graph.Scopes.TryGetValue(trackerClaim.Scope, out string scope))
+                                trust.Scope = scope;
+
+                            trust.Cost = trackerClaim.Cost;
+                            trust.Expire = 0;
+                            trust.Activate = 0;
+                        }
+                    }
+                    else
+                    {
+                        trust.Type = TrustBuilder.BINARYTRUST_TC1;
+                        trust.Attributes = TrustBuilder.CreateBinaryTrustAttributes(true);
+                    }
+
+                    context.Results.Trusts.Add(trust);
+
+                }
+            }
         }
     }
 }

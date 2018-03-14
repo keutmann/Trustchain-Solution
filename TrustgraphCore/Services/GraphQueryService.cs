@@ -48,68 +48,10 @@ namespace TrustgraphCore.Services
                 ClearTargets(context);
             }
 
-            BuildPackage(context);
+            TrustService.BuildPackage(context);
         }
 
-        /// <summary>
-        /// Build a result package from the TrackerResults
-        /// </summary>
-        /// <param name="context"></param>
-        protected void BuildPackage(QueryContext context)
-        {
-            // Clear up the result
-
-            context.Results = new Package
-            {
-                Trusts = new List<Trust>(context.TrackerResults.Count)
-            };
-
-            foreach (var tracker in context.TrackerResults.Values)
-            {
-                foreach (var ts in tracker.Subjects.Values)
-                {
-                    var trust = new Trust
-                    {
-                        IssuerAddress = tracker.Issuer.Address,
-                        SubjectAddress = ts.TargetIssuer.Address
-                    };
-
-                    if (ts.Claims.Count() > 0)
-                    {
-                        foreach (var claimEntry in ts.Claims)
-                        {
-
-                            var claimIndex = claimEntry.Value;
-                            var trackerClaim = TrustService.Graph.Claims[claimIndex];
-
-                            if (TrustService.Graph.ClaimType.TryGetValue(trackerClaim.Type, out string type))
-                                trust.Type = type;
-
-                            if (TrustService.Graph.ClaimAttributes.TryGetValue(trackerClaim.Attributes, out string attributes))
-                                trust.Attributes = attributes;
-
-                            if (TrustService.Graph.Scopes.TryGetValue(trackerClaim.Scope, out string scope))
-                                trust.Scope = scope;
-
-                            if (TrustService.Graph.Notes.TryGetValue(trackerClaim.Note, out string note))
-                                trust.Note = note;
-
-                            trust.Cost = trackerClaim.Cost;
-                            trust.Expire = 0;
-                            trust.Activate = 0;
-                        }
-                    }
-                    else
-                    {
-                        trust.Type = TrustBuilder.BINARYTRUST_TC1;
-                        trust.Attributes = TrustBuilder.CreateBinaryTrustAttributes(true);
-                    }
-
-                    context.Results.Trusts.Add(trust);
-
-                }
-            }
-        }
+        
 
         /// <summary>
         /// Remove the targets that have been found in the last run.

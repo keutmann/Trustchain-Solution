@@ -22,9 +22,10 @@ namespace TrustgraphCore.Interfaces
         //GraphClaim EnsureSubjectClaim(GraphSubject graphSubject, Claim trustClaim);
         GraphClaim EnsureGraphClaim(Trust trust);
         GraphClaim CreateGraphClaim(Trust trust);
-        GraphClaim CreateGraphClaim(string type, string scope, string attributes, short cost = 100, string note = "");
+        GraphClaim CreateGraphClaim(string type, string scope, string attributes, short cost = 100);
         int GetClaimDataIndex(Trust trust);
         GraphSubject EnsureGraphSubject(GraphIssuer graphIssuer, byte[] subjectAddress);
+        void BuildPackage(QueryContext context);
 
     }
 }
