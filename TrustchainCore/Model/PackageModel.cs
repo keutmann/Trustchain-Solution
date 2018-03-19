@@ -133,9 +133,9 @@ namespace TrustchainCore.Model
         public uint Expire { get; set; }
         public bool ShouldSerializeExpire() { return Expire > 0; }
 
-        [JsonProperty(PropertyName = "note")]
-        public string Note { get; set; }
-        public bool ShouldSerializeNote() { return Note != null; }
+        //[JsonProperty(PropertyName = "note")]
+        //public string Note { get; set; }
+        //public bool ShouldSerializeNote() { return Note != null; }
 
         //[JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]
         //public TrustTimestamp Timestamp { get; set; }

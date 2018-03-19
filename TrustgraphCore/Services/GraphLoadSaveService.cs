@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Linq;
+using Microsoft.Extensions.Logging;
 using TrustchainCore.Interfaces;
 using TrustgraphCore.Interfaces;
+using System;
+using TrustchainCore.Extensions;
 
 namespace TrustgraphCore.Services
 {
@@ -23,7 +26,13 @@ namespace TrustgraphCore.Services
             _logger.LogInformation("Loading trust into Graph");
             var count = 0;
             // No need to load packages, just load trusts directly.
-            foreach (var trust in _trustDBService.Trusts)
+            var time = DateTime.Now.ToUnixTime();
+
+            var trusts = from trust in _trustDBService.Trusts
+                     where (trust.Activate <= time || trust.Activate == 0) && (trust.Expire > time || trust.Expire == 0)
+                     select trust;
+
+            foreach (var trust in trusts)
             {
                 count++;
                 _graphTrustService.Add(trust);
