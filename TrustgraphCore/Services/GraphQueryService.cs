@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using TrustgraphCore.Model;
 using TrustchainCore.Extensions;
 using TrustgraphCore.Interfaces;
@@ -8,8 +7,6 @@ using TrustgraphCore.Extensions;
 using System.Collections.Generic;
 using TrustchainCore.Collections;
 using TrustgraphCore.Enumerations;
-using TrustchainCore.Model;
-using TrustchainCore.Builders;
 
 namespace TrustgraphCore.Services
 {
@@ -113,16 +110,16 @@ namespace TrustgraphCore.Services
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool FollowIssuer(QueryContext context, GraphSubject subject)
         {
-            if ((subject.Flags & SubjectFlags.ContainsTrustTrue) != SubjectFlags.ContainsTrustTrue)
+            if (subject.Flags.HasFlagFast(SubjectFlags.ContainsTrustTrue))
                 return true;
 
             var follow = false;
             if (subject.Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out int index))
                 follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
 
-            if (!follow) // Check global
-                if (subject.Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index))
-                    follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
+            //if (!follow) // Check Global scope disable for now. Need more expirence.
+            //    if (subject.Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index))
+            //        follow = (TrustService.Graph.Claims[index].Flags == ClaimFlags.Trust);
             return follow;
         }
 
@@ -144,11 +141,11 @@ namespace TrustgraphCore.Services
                 return;
 
             if(context.Flags == QueryFlags.IncludeClaimTrust)
-            if (subject.Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out index)) // Check local scope for claims
-                claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex).Value, index));
-            else
-                if (subject.Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index)) // Check global scope for claims
-                    claims.Add(new Tuple<long, int>(new SubjectClaimIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex).Value, index));
+                if (subject.Claims.GetIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex, out index)) // Check local scope for claims
+                    claims.Add(new Tuple<long, int>(new SubjectClaimIndex(context.ClaimScope, TrustService.BinaryTrustTypeIndex).Value, index));
+                //else // Check Global scope disable for now. Need more expirence.
+                //    if (subject.Claims.GetIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex, out index)) // Check global scope for claims
+                //        claims.Add(new Tuple<long, int>(new SubjectClaimIndex(TrustService.GlobalScopeIndex, TrustService.BinaryTrustTypeIndex).Value, index));
             
             BuildResult(context, tracker, claims); // Target found!
 
