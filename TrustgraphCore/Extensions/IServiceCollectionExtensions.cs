@@ -4,6 +4,7 @@ using TrustchainCore.Strategy;
 using TrustgraphCore.Interfaces;
 using TrustgraphCore.Model;
 using TrustgraphCore.Services;
+using TrustgraphCore.Workflows;
 
 namespace TrustgraphCore.Extensions
 {
@@ -19,7 +20,11 @@ namespace TrustgraphCore.Extensions
             services.AddTransient<IGraphQueryService, GraphQueryService>();
             services.AddTransient<IGraphExportService, GraphExportService>();
             services.AddTransient<IQueryRequestService, QueryRequestService>();
-            
+
+            services.AddTransient<ITrustTimestampStep, TrustTimestampStep>();
+            services.AddTransient<TrustTimestampWorkflow>();
+
+
         }
 
     }

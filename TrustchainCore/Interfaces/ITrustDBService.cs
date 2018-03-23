@@ -14,7 +14,8 @@ namespace TrustchainCore.Interfaces
 
         TrustDBContext DBContext { get; }
 
-        bool TrustExist(Trust trust);
+        bool TrustExist(byte[] id);
+        Trust GetTrustById(byte[] id);
         Trust GetSimilarTrust(Trust trust);
 
         void Add(Trust trust);

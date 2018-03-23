@@ -45,6 +45,13 @@ namespace TrustchainCore.Services
             ServiceProvider = serviceProvider;
         }
 
+        public T Load<T>(int id) where T : class, IWorkflowContext
+        {
+            var container = Workflows.FirstOrDefault(p => p.DatabaseID == id);
+            var workflow = (T)Create(container);
+            return workflow;
+        }
+
         public IWorkflowContext Create(WorkflowContainer container) 
         {
             var settings = new JsonSerializerSettings

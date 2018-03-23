@@ -53,11 +53,18 @@ namespace TrustchainCore.Services
             DBContext = trustDBContext;
         }
 
-        public bool TrustExist(Trust trust)
+        public bool TrustExist(byte[] id)
         {
-            var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, trust.Id));
+            var dbTrust = GetTrustById(id);
             return (dbTrust != null);
         }
+
+        public Trust GetTrustById(byte[] id)
+        {
+            var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, id));
+            return dbTrust;
+        }
+
 
         public Trust GetSimilarTrust(Trust trust)
         {

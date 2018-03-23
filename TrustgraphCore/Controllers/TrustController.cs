@@ -70,7 +70,7 @@ namespace TrustgraphCore.Controllers
 
         private void AddTrust(Trust trust)
         {
-            if (_trustDBService.TrustExist(trust))
+            if (_trustDBService.TrustExist(trust.Id))
                 return; // TODO: Ignore the same trust for now.
                 //throw new ApplicationException("Trust already exist");
 
@@ -98,7 +98,7 @@ namespace TrustgraphCore.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("build")]
-        public ActionResult Get(byte[] issuer, byte[] subject, string issuerScript = "", string type = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
+        public ActionResult BuildTrust(byte[] issuer, byte[] subject, string issuerScript = "", string type = TrustBuilder.BINARYTRUST_TC1, string attributes = "", string scope = "", string alias = "")
         {
             if (issuer == null || issuer.Length < 1)
                 throw new ApplicationException("Missing issuer");
@@ -143,5 +143,18 @@ namespace TrustgraphCore.Controllers
 
             return ApiOk(package);
         }
+
+        [HttpGet]
+        [Route("get/{trustId}")]
+        public ActionResult Get([FromRoute]byte[] trustId)
+        {
+            if (trustId == null || trustId.Length < 1)
+                throw new ApplicationException("Missing trustId");
+
+            var trust = _trustDBService.GetTrustById(trustId);
+
+            return ApiOk(trust);
+        }
+
     }
 }

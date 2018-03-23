@@ -4,6 +4,7 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
 using TruststampCore.Interfaces;
 using TrustchainCore.Extensions;
+using System.Collections;
 
 namespace TruststampCore.Services
 {
@@ -47,7 +48,7 @@ namespace TruststampCore.Services
 
         public ProofEntity GetProof(byte[] source)
         {
-            var proof = _trustDBService.Proofs.FirstOrDefault(p => p.Source == source);
+            var proof = _trustDBService.Proofs.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Source, source));
             return proof;
         }
 
