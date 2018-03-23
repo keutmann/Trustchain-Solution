@@ -12,7 +12,6 @@ using TrustchainCore.Extensions;
 using TrustchainCore.Workflows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 
 namespace TrustchainCore.Services
 {
@@ -113,7 +112,9 @@ namespace TrustchainCore.Services
                     };
 
                     entity.Data = JsonConvert.SerializeObject(workflow, settings);
+
                     _trustDBService.DBContext.SaveChanges();
+
                     return workflow.ID; // Exit now!
                 }
             }
@@ -207,6 +208,20 @@ namespace TrustchainCore.Services
             }
 
             //Task.WaitAll(executing.ToArray());
+        }
+
+
+        public void EnsureWorkflow<T>() where T : class, IWorkflowContext
+        {
+            var workflowContainer = Workflows.FirstOrDefault(p => p.Type == typeof(T).FullName
+                                             && (p.State == WorkflowStatusType.New.ToString()
+                                             || p.State == WorkflowStatusType.Running.ToString()));
+
+            if (workflowContainer == null)
+            {
+                var wf = Create<T>();
+                Save(wf);
+            }
         }
     }
 }

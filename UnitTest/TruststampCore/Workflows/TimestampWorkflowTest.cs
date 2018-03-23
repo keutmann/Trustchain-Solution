@@ -75,8 +75,6 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
             Assert.IsNotNull(workflow);
-            //workflow.CurrentStepIndex = 2;
-            //((IMerkleStep)workflow.Steps[0]).RootHash = new byte[] { 1 };
             var id = workflowService.Save(workflow);
 
             var container = trustDBService.Workflows.FirstOrDefault(p => p.DatabaseID == id);
@@ -86,8 +84,6 @@ namespace UnitTest.TruststampCore.Workflows
             var workflow2 = workflowService.Create(container);
             Assert.IsNotNull(workflow2);
             Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
-            //Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
-            //Assert.AreEqual(((IMerkleStep)workflow.Steps[0]).RootHash[0], ((IMerkleStep)workflow2.Steps[0]).RootHash[0]);
         }
     }
 }

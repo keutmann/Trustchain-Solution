@@ -6,12 +6,15 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
 using System.Reflection;
+using TrustchainCore.Builders;
 using TrustchainCore.Extensions;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Services;
+using TrustgraphCore.Interfaces;
 using TrustgraphCore.Workflows;
 using TruststampCore.Interfaces;
 using TruststampCore.Workflows;
+using UnitTest.TrustchainCore.Extensions;
 
 namespace UnitTest.TruststampCore.Workflows
 {
@@ -81,5 +84,62 @@ namespace UnitTest.TruststampCore.Workflows
             Assert.IsNotNull(workflow2);
             Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
         }
+
+        [TestMethod]
+        public void Execute()
+        {
+            var blockchain = "btc-testnet";
+
+            var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
+            var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
+            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
+            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+            var timestampWorkflow = workflowService.Create<TimestampWorkflow>();
+
+            timestampSynchronizationService.CurrentWorkflowID = workflowService.Save(timestampWorkflow);
+
+            var trustBuilder = new TrustBuilder(ServiceProvider);
+            trustBuilder.SetServer("testserver");
+            trustBuilder.AddTrust("A", "B", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true));
+            trustBuilder.AddTrust("B", "C", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true));
+            trustBuilder.AddTrust("C", "D", TrustBuilder.BINARYTRUST_TC1, TrustBuilder.CreateBinaryTrustAttributes(true));
+            trustBuilder.Build().Sign();
+
+            trustDBService.Add(trustBuilder.Package);
+
+            foreach (var trust in trustBuilder.Package.Trusts)
+            {
+                proofService.AddProof(trust.Id);
+            }
+
+            var merkleStep = timestampWorkflow.GetStep<IMerkleStep>();
+            merkleStep.Execute();
+
+            timestampWorkflow.Proof.Blockchain = blockchain;
+            timestampWorkflow.Proof.Receipt = Guid.NewGuid().ToByteArray();
+            timestampWorkflow.Proof.Confirmations = 1;
+
+            workflowService.Save(timestampWorkflow);
+            trustDBService.DBContext.SaveChanges();
+
+
+            var trustTimestampWorkflow = workflowService.Create<TrustTimestampWorkflow>();
+            var trustTimestampStep = trustTimestampWorkflow.GetStep<ITrustTimestampStep>();
+
+            // Now execute!
+
+            trustTimestampStep.Execute();
+
+            foreach (var trust in trustBuilder.Package.Trusts)
+            {
+                var dbTrust = trustDBService.GetTrustById(trust.Id);
+
+                Assert.IsNotNull(dbTrust);
+                Assert.AreEqual(dbTrust.TimestampAlgorithm, blockchain);
+                Assert.IsNotNull(dbTrust.TimestampReceipt);
+                Assert.IsTrue(dbTrust.TimestampReceipt.Length > 0);
+            }
+        }
+
     }
 }

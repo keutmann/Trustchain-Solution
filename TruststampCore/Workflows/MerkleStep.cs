@@ -46,12 +46,13 @@ namespace TruststampCore.Workflows
             }
 
             foreach (var proof in proofs)
-            {
                 _merkleTree.Add(proof);
-            }
 
             timestampProof.MerkleRoot = _merkleTree.Build().Hash;
             timestampProof.Status = TimestampProofStatusType.Waiting.ToString();
+
+            _trustDBService.DBContext.Proofs.UpdateRange(proofs);
+            _trustDBService.DBContext.SaveChanges();
 
             CombineLog(_logger, $"Proof found {proofs.Count} - Merkleroot: {timestampProof.MerkleRoot.ConvertToHex()}");
             Context.RunStep<ILocalTimestampStep>();

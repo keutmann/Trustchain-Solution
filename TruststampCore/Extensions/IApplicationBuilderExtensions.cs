@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using TruststampCore.Interfaces;
 using TrustchainCore.Interfaces;
+using TrustchainCore.Services;
 
 namespace TruststampCore.Extensions
 {
@@ -15,7 +16,8 @@ namespace TruststampCore.Extensions
             using (var scope = scopeFactory.CreateScope())
             {
                 var timestampWorkflowService = scope.ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
-                var trustDBService = scope.ServiceProvider.GetRequiredService<ITrustDBService>();
+                //var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
+                //var trustDBService = scope.ServiceProvider.GetRequiredService<ITrustDBService>();
 
                 //// Do some clean up, because 
                 //var workflows = trustDBService.Workflows.Select(p => p);
@@ -24,7 +26,9 @@ namespace TruststampCore.Extensions
 
                 //TODO: Undelete
                 timestampWorkflowService.EnsureTimestampWorkflow(); // Make sure that there is a Timestamp engine workflow
-                //timestampWorkflowService.CreateNextTimestampWorkflow(); // Make sure that the CurrentWorkflowID is set for Proof handling
+                timestampWorkflowService.CreateNextTimestampWorkflow(); // Make sure that the CurrentWorkflowID is set for Proof handling
+
+                //workflowService.EnsureWorkflow<TrustTimestampWorkflow>();
             }
         }
     }

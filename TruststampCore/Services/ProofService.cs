@@ -29,9 +29,9 @@ namespace TruststampCore.Services
             }
         }
 
-        public ProofEntity AddProof(byte[] source)
+        public ProofEntity AddProof(byte[] source, bool save = true)
         {
-            var proof = _trustDBService.Proofs.FirstOrDefault(p => p.Source == source);
+            var proof = GetProof(source);
             if(proof == null)
             {
                 proof = new ProofEntity
@@ -41,7 +41,8 @@ namespace TruststampCore.Services
                     Registered = DateTime.Now.ToUnixTime()
                 };
                 _trustDBService.DBContext.Proofs.Add(proof);
-                _trustDBService.DBContext.SaveChanges();
+                if(save)
+                    _trustDBService.DBContext.SaveChanges();
             }
             return proof;
         }
