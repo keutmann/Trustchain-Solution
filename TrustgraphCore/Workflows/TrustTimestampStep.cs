@@ -37,7 +37,7 @@ namespace TrustgraphCore.Workflows
         {
             // Get trusts
             var trusts = from t in _trustDBService.Trusts
-                         where t.TimestampReceipt == null || t.TimestampReceipt.Length == 0
+                         where t.TimestampRecipt == null || t.TimestampRecipt.Length == 0
                          select t;
 
             foreach (var trust in trusts)
@@ -59,7 +59,7 @@ namespace TrustgraphCore.Workflows
                 if (timestampWorkflow.Proof.Confirmations > 0)
                 {
                     trust.TimestampAlgorithm = timestampWorkflow.Proof.Blockchain;
-                    trust.TimestampReceipt = proof.Receipt;
+                    trust.TimestampRecipt = proof.Receipt;
                     _trustDBService.DBContext.Trusts.Update(trust);
                 }
             }

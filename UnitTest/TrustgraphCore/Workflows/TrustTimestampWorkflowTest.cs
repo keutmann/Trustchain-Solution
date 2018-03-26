@@ -136,8 +136,8 @@ namespace UnitTest.TruststampCore.Workflows
 
                 Assert.IsNotNull(dbTrust);
                 Assert.AreEqual(dbTrust.TimestampAlgorithm, blockchain);
-                Assert.IsNotNull(dbTrust.TimestampReceipt);
-                Assert.IsTrue(dbTrust.TimestampReceipt.Length > 0);
+                Assert.IsNotNull(dbTrust.TimestampRecipt);
+                Assert.IsTrue(dbTrust.TimestampRecipt.Length > 0);
             }
         }
 

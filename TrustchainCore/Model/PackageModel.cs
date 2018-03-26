@@ -143,9 +143,9 @@ namespace TrustchainCore.Model
         public string TimestampAlgorithm { get; set; }
         public bool ShouldSerializeTimestampAlgorithm() { return !string.IsNullOrWhiteSpace(TimestampAlgorithm); }
 
-        [JsonProperty(PropertyName = "timestampReceipt")]
-        public byte[] TimestampReceipt { get; set; }
-        public bool ShouldSerializeTimestampRecipt() { return TimestampReceipt != null && TimestampReceipt.Length > 0; }
+        [JsonProperty(PropertyName = "timestampRecipt")]
+        public byte[] TimestampRecipt { get; set; }
+        public bool ShouldSerializeTimestampRecipt() { return TimestampRecipt != null && TimestampRecipt.Length > 0; }
 
 
         [UIHint("JSON")]
