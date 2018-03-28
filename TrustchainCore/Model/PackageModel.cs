@@ -69,6 +69,10 @@ namespace TrustchainCore.Model
         public byte[] Id { get; set; }
         public bool ShouldSerializeId() { return Id != null; }
 
+        //[JsonProperty(PropertyName = "created")]
+        //public long Created { get; set; }
+        //public bool ShouldSerializeCreated() { return Created > 0; }
+
         //[JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]
         //public IssuerIdentity Issuer { get; set; }
         [JsonProperty(PropertyName = "issuerScript")]
@@ -113,13 +117,16 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
 
-        [JsonProperty(PropertyName = "scope")]
-        public string Scope { get; set; }
-        public bool ShouldSerializeScope() { return !string.IsNullOrWhiteSpace(Scope); }
-
         [UIHint("JSON")]
         [JsonProperty(PropertyName = "attributes")]
         public string Attributes { get; set; }
+
+        //[JsonProperty(PropertyName = "scopeType")]
+        //public string ScopeType { get; set; }
+
+        [JsonProperty(PropertyName = "scope")]
+        public string Scope { get; set; }
+        public bool ShouldSerializeScope() { return !string.IsNullOrWhiteSpace(Scope); }
 
         [JsonProperty(PropertyName = "cost")]
         public short Cost { get; set; }

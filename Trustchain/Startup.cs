@@ -43,7 +43,6 @@ namespace Trustchain
                 });
             });
 
-
             services.TrustchainCore();
             services.TrustgraphCore();
             services.TruststrampCore();

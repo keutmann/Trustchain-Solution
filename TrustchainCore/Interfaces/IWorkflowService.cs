@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,12 @@ namespace TrustchainCore.Services
         T Load<T>(int id) where T : class, IWorkflowContext;
         IWorkflowContext Create(WorkflowContainer container);
         T Create<T>() where T : class, IWorkflowContext;
-        void Execute(IList<IWorkflowContext> workflows, int localID = 0);
+        void Execute(Dictionary<string, bool> workflows, WorkflowContainer container, int localID = 0);
         int Save(IWorkflowContext workflow);
         //WorkflowContainer Load();
         WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);
-        IList<IWorkflowContext> GetRunningWorkflows();
-        Task RunWorkflows();
+        IList<WorkflowContainer> GetRunningWorkflows();
+        void RunWorkflows();
         void EnsureWorkflow<T>() where T : class, IWorkflowContext;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TrustchainCore.Services;
-using TrustchainCore.Workflows;
+using TrustchainCore.Model;
 using TrustchainCore.Enumerations;
 using TrustchainCore.Interfaces;
 using System.Collections.Generic;
@@ -83,7 +83,7 @@ namespace UnitTest.TrustchainCore.Workflow
             Assert.AreEqual(id, workflow.ID);
             var results = workflowService.GetRunningWorkflows();
             var wf = results[0];
-            Assert.IsNotNull(wf.WorkflowService);
+            Assert.IsNotNull(wf);
 
 
         }
@@ -93,13 +93,13 @@ namespace UnitTest.TrustchainCore.Workflow
         {
             var executionSynchronizationService = ServiceProvider.GetService<IExecutionSynchronizationService>();
 
-            var list = new List<IWorkflowContext>();
+            //var list = new List<IWorkflowContext>();
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<IWorkflowContext>();
             Assert.IsNotNull(workflow);
-            list.Add(workflow);
-
-            workflowService.Execute(list);
+            //list.Add(workflow);
+            workflow.Execute();
+            //workflowService.Execute(list);
             Assert.AreEqual(WorkflowStatusType.New.ToString(), workflow.State);
             //Assert.AreEqual(0, executionSynchronizationService.Workflows.Count);
         }
@@ -109,22 +109,23 @@ namespace UnitTest.TrustchainCore.Workflow
         {
             var executionSynchronizationService = ServiceProvider.GetService<IExecutionSynchronizationService>();
 
-            var list = new List<IWorkflowContext>();
+            //var list = new List<IWorkflowContext>();
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             for (int i = 0; i < 10; i++)
             {
                 var workflow = workflowService.Create<IWorkflowContext>();
                 workflow.ID = i;
-                list.Add(workflow);
+                workflow.Execute();
+                Assert.AreEqual(WorkflowStatusType.New.ToString(), workflow.State);
             }
 
-            workflowService.Execute(list);
+            //workflowService.Execute(list);
             //Assert.AreEqual(0, executionSynchronizationService.Workflows.Count);
 
-            foreach (var item in list)
-            {
-                Assert.AreEqual(WorkflowStatusType.New.ToString(), item.State);
-            }
+            //foreach (var item in list)
+            //{
+                
+            //}
         }
 
         [TestMethod]
@@ -155,7 +156,7 @@ namespace UnitTest.TrustchainCore.Workflow
             //Assert.AreEqual(count, results.Count);
             foreach (var item in results)
             {
-                Assert.IsNotNull(item.WorkflowService);
+                Assert.IsNotNull(item);
             }
         }
 
@@ -163,7 +164,6 @@ namespace UnitTest.TrustchainCore.Workflow
         [TestMethod]
         public void RunWorkflowsOne()
         {
-
             var logger = ServiceProvider.GetRequiredService<ILogger<WorkflowServiceTest>>();
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();

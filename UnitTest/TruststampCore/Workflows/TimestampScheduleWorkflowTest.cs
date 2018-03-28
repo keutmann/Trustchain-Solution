@@ -44,18 +44,18 @@ namespace UnitTest.TruststampCore.Workflows
 
 
         [TestMethod]
-        public void ExecuteWithNoProof()
+        public async void ExecuteWithNoProof()
         {
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampScheduleWorkflow>();
-            workflow.Execute().Wait();
+            workflow.Execute();
 
             Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
             Assert.IsTrue(timestampSynchronizationService.CurrentWorkflowID == 0);
             var saveCurrentID = timestampSynchronizationService.CurrentWorkflowID;
 
-            workflow.Execute().Wait();
+            workflow.Execute();
             Assert.AreEqual(saveCurrentID, timestampSynchronizationService.CurrentWorkflowID);
             Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
         }
@@ -66,7 +66,7 @@ namespace UnitTest.TruststampCore.Workflows
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampScheduleWorkflow>();
-            workflow.Execute().Wait();
+            workflow.Execute();
 
             Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
             Assert.IsTrue(timestampSynchronizationService.CurrentWorkflowID == 0);
@@ -76,7 +76,7 @@ namespace UnitTest.TruststampCore.Workflows
             proofService.AddProof(Guid.NewGuid().ToByteArray());
             workflow.NextExecution = DateTime.MinValue.ToUnixTime();
 
-            workflow.Execute().Wait();
+            workflow.Execute();
             Assert.AreNotEqual(saveCurrentID, timestampSynchronizationService.CurrentWorkflowID);
             Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
         }

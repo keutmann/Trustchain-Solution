@@ -63,10 +63,11 @@ namespace TrustchainCore.Workflows
             }
         }
 
-        public virtual async Task Execute()
+        public virtual void Execute()
         {
-            await Task.Run(() =>
-            {
+
+            //await Task.Run(() =>
+            //{
                 if (!DoExecution())
                     return;
 
@@ -92,7 +93,7 @@ namespace TrustchainCore.Workflows
                         Save();
                     }
                 }
-            });
+            //});
         }
 
         public T GetStep<T>()

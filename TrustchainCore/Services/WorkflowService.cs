@@ -60,7 +60,7 @@ namespace TrustchainCore.Services
             };
 
             var instance = (WorkflowContext)JsonConvert.DeserializeObject(container.Data, settings);
-            //instance.WorkflowService = this;
+            instance.WorkflowService = this;
             foreach (var step in instance.Steps)
             {
                 step.Context = instance;
@@ -144,69 +144,72 @@ namespace TrustchainCore.Services
             return entity;
         }
 
-        public Task RunWorkflows()
+        public async void RunWorkflows()
         {
-            return Task.Run(() => {
+            await Task.Run(() => {
+                var localID = 0;
+                _logger.DateInformation(localID, $"TaskProcessor started");
 
                 while (true)
                 {
-                    int id = 0;
-                    var localID = id++;
+                    localID++;
+                    var containers = GetRunningWorkflows();
 
-                    var scopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
-                    using (var scope = scopeFactory.CreateScope())
+                    _logger.DateInformation(localID, $"Workflows found: {containers.Count}");
+
+                    foreach (var container in containers)
                     {
-                        Task.Run(() =>
-                        {
-                            var logger = scope.ServiceProvider.GetRequiredService<ILogger<WorkflowService>>();
+                        var workflow = Create(container);
+                        if (!workflow.DoExecution())
+                            continue;
 
-                            logger.DateInformation(localID, $"TaskProcessor started");
+                        _logger.DateInformation(localID, $"Executing workflow id : {container.DatabaseID}");
 
-                            var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
+                        workflow.Execute();
 
-                            var workflows = workflowService.GetRunningWorkflows();
-                            logger.DateInformation(localID, $"Workflows found: {workflows.Count}");
-
-                            workflowService.Execute(workflows, localID);
-
-                            logger.DateInformation(localID, $"TaskProcessor done");
-                        }).Wait();
+                        _logger.DateInformation(localID, $"ContinueWith -> Done executing workflow id {container.DatabaseID}");
                     }
+
+                    _logger.DateInformation(localID, $"TaskProcessor done");
 
                     Task.Delay(_configuration.WorkflowInterval()).Wait();
                 }
             });
+
         }
 
-        public IList<IWorkflowContext> GetRunningWorkflows()
+        public IList<WorkflowContainer> GetRunningWorkflows()
         {
-            var list = new List<IWorkflowContext>();
-            var containers = from p in _trustDBService.Workflows
+            //var list = new List<IWorkflowContext>();
+            var containers = (from p in _trustDBService.Workflows
                              where (p.State == WorkflowStatusType.New.ToString() || p.State == WorkflowStatusType.Running.ToString())
-                             select p;
-
-            foreach (var container in containers)
-            {
-                list.Add(Create(container));
-            }
-            return list;
+                             select p).ToArray();
+            return containers;
         }
 
-        public void Execute(IList<IWorkflowContext> workflows, int localID = 0)
+        public async void Execute(Dictionary<string, bool> workflows, WorkflowContainer container, int localID = 0)
         {
-            var executing = new List<Task>();
-            foreach (var workflow in workflows)
-            {
-                _logger.DateInformation(localID, $"Executing workflow id : {workflow.ID}");
-                //var task = workflow.Execute().ContinueWith(t => {
-                //    _logger.DateInformation(localID, $"ContinueWith -> Done executing workflow id {workflow.ID}");
-                //});
+            _logger.DateInformation(localID, $"Executing workflow id : {container.DatabaseID}");
+            //var task = workflow.Execute().ContinueWith(t => {
+            //    _logger.DateInformation(localID, $"ContinueWith -> Done executing workflow id {workflow.ID}");
+            //});
+            workflows.Add(container.Type, true);
 
-                workflow.Execute().Wait();
-                _logger.DateInformation(localID, $"ContinueWith -> Done executing workflow id {workflow.ID}");
-                //executing.Add(task);
-            }
+            await Task.Run(() => {
+                // Make a scope for the workflow to run in.
+                var scopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
+                using (var scope = scopeFactory.CreateScope())
+                {
+                    var localService = scope.ServiceProvider.GetRequiredService<WorkflowService>();
+                    var workflow = localService.Create(container);
+                    workflow.Execute();
+                }
+            });
 
+            workflows.Remove(container.Type);
+
+            _logger.DateInformation(localID, $"ContinueWith -> Done executing workflow id {container.DatabaseID}");
+            //executing.Add(task);
             //Task.WaitAll(executing.ToArray());
         }
 

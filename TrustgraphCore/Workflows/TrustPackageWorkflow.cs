@@ -24,9 +24,9 @@ namespace TrustgraphCore.Workflows
             base.Initialize();
         }
 
-        public override Task Execute()
+        public override void Execute()
         {
-            return base.Execute();
+            base.Execute();
         }
     }
 
