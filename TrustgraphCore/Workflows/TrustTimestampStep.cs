@@ -39,7 +39,7 @@ namespace TrustgraphCore.Workflows
             var trusts = from t in _trustDBService.Trusts
                          where t.TimestampRecipt == null || t.TimestampRecipt.Length == 0
                          select t;
-
+            
             foreach (var trust in trusts)
             {
                 var proof = _proofService.GetProof(trust.Id);

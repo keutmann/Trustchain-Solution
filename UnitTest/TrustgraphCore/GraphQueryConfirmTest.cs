@@ -128,7 +128,7 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             // Verify
-            VerfifyContext(context, 0);
+            VerfifyContext(context, 0,1);
         }
 
 

@@ -62,7 +62,7 @@ namespace Trustchain
 
         public virtual void ConfigureTimers(IApplicationBuilder app)
         {
-            app.Trustchain();
+            app.Trustchain(_services);
         }
 
 

@@ -12,8 +12,7 @@ namespace TruststampCore.Extensions
         public static void Truststamp(this IApplicationBuilder app)
         {
             // Ensure that a Timestamp workflow is running.
-            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            using (var scope = scopeFactory.CreateScope())
+            using (var scope = app.ApplicationServices.CreateScope())
             {
                 var timestampWorkflowService = scope.ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
                 //var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();

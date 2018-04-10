@@ -138,6 +138,27 @@ namespace TrustchainCore.Collections.Generic
             value = default(TValue);
             return false;
         }
+
+        /// <summary>
+        /// Enumerates the Dictionary fast and as theadsafe as possible.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="callBack"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void FastEnumerate<TKey, TValue>(this FastDictionary<TKey, TValue> dictionary, Action<KeyValuePair<TKey, TValue>> callBack)
+        {
+            int index = 0;
+            while ((uint)index < (uint)dictionary.Count)
+            {
+                if (dictionary.entries[index].hashCode >= 0)
+                    callBack.Invoke(new KeyValuePair<TKey, TValue>(dictionary.entries[index].key, dictionary.entries[index].value));
+
+                index++;
+            }
+        }
+
     }
 
 

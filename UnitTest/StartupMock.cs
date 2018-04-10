@@ -19,27 +19,28 @@ namespace UnitTest
     {
         public IServiceProvider  ServiceProvider { get; set; }
         public IServiceScope ServiceScope { get; set; }
+        public IServiceCollection Services { get; set; }
 
         [TestInitialize]
         public virtual void Init()
         {
-            var services = new ServiceCollection();
-            ConfigureServices(services);
+            Services = new ServiceCollection();
+            ConfigureServices(Services);
 
-            services.AddTransient<IConfiguration>(p => {
+            Services.AddTransient<IConfiguration>(p => {
                 var config = new ConfigurationBuilder().AddJsonFile("appsettings.json.config", optional: true).Build();
                 config["blockchain"] = "btctest"; // Use bitcoin test net
                 config["btctest_fundingkey"] = "cMcGZkth7ufvQC59NSTSCTpepSxXbig9JfhCYJtn9RppU4DXx4cy"; // btc test net WIF key 
                 return config;
                 });
 
-            services.AddTransient<IBlockingWorkflowStep, BlockingWorkflowStep>();
-            services.AddTransient<IBlockchainRepository, BlockchainRepositoryMock>();
+            Services.AddTransient<IBlockingWorkflowStep, BlockingWorkflowStep>();
+            Services.AddTransient<IBlockchainRepository, BlockchainRepositoryMock>();
 
-            services.AddTransient<TrustController>();
-            services.AddTransient<QueryController>();
+            Services.AddTransient<TrustController>();
+            Services.AddTransient<QueryController>();
 
-            ServiceScope = services.BuildServiceProvider(false).CreateScope();
+            ServiceScope = Services.BuildServiceProvider(false).CreateScope();
             ServiceProvider = ServiceScope.ServiceProvider;
             ILoggerFactory loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
             loggerFactory.AddConsole();

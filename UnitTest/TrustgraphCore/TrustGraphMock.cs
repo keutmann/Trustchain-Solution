@@ -66,9 +66,9 @@ namespace UnitTest.TrustgraphCore
 
             return queryBuilder.Query;
         }
-        protected void VerfifyContext(QueryContext context, int exspectedResults)
+        protected void VerfifyContext(QueryContext context, int exspectedResults, int exspcetedErrors = 0)
         {
-            Assert.AreEqual(0, context.Errors.Count, $"{string.Join("\r\n", context.Errors.ToArray())}");
+            Assert.AreEqual(exspcetedErrors, context.Errors.Count, $"{string.Join("\r\n", context.Errors.ToArray())}");
             Assert.AreEqual(exspectedResults, context.Results.Trusts.Count, $"Should be {exspectedResults} results!");
 
         }

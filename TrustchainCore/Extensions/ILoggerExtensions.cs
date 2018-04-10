@@ -12,5 +12,11 @@ namespace TrustchainCore.Extensions
         {
             logger.LogInformation(eventId, DateTime.Now + " - " + message, args);
         }
+
+        public static void DateInformation(this ILogger logger, string message, params object[] args)
+        {
+            var eventId = message.GetHashCode() & 0x7FFFFFFF;
+            logger.LogInformation(eventId, DateTime.Now + " - " + message, args);
+        }
     }
 }

@@ -10,20 +10,23 @@ using TrustchainCore.Repository;
 
 namespace Trustchain.Pages.Workflows
 {
-    public class IndexModel : PageModel
+    public class ListModel : PageModel
     {
-        private readonly TrustchainCore.Repository.TrustDBContext _context;
+        private readonly TrustDBContext _context;
 
-        public IndexModel(TrustchainCore.Repository.TrustDBContext context)
+        public ListModel(TrustDBContext context)
         {
             _context = context;
         }
 
         public IList<WorkflowContainer> WorkflowContainer { get;set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(string type)
         {
-            var query = _context.Workflows.GroupBy(p => p.Type).Select(p => p.OrderByDescending(t=>t.DatabaseID).First());
+            var query = from p in _context.Workflows
+                        where p.Type == type
+                        orderby p.DatabaseID descending
+                        select p;
 
             WorkflowContainer = await query.ToListAsync();
         }

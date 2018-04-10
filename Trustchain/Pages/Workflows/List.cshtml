@@ -1,5 +1,5 @@
 @page
-@model Trustchain.Pages.Workflows.IndexModel
+@model Trustchain.Pages.Workflows.ListModel
 
 @{
     ViewData["Title"] = "Workflows";
@@ -50,7 +50,9 @@
                 @Html.DisplayFor(modelItem => item.Data)
             </td>*@
             <td>
-                <a asp-page="./List" asp-route-type="@item.Type">View</a>
+                <a asp-page="./Edit" asp-route-id="@item.DatabaseID">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.DatabaseID">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.DatabaseID">Delete</a>
             </td>
         </tr>
 }

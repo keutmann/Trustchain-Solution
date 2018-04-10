@@ -19,12 +19,12 @@ namespace TrustchainCore.Services
         T Load<T>(int id) where T : class, IWorkflowContext;
         IWorkflowContext Create(WorkflowContainer container);
         T Create<T>() where T : class, IWorkflowContext;
-        void Execute(Dictionary<string, bool> workflows, WorkflowContainer container, int localID = 0);
+        //void Execute(Dictionary<string, bool> workflows, WorkflowContainer container, );
         int Save(IWorkflowContext workflow);
         //WorkflowContainer Load();
         WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);
         IList<WorkflowContainer> GetRunningWorkflows();
-        void RunWorkflows();
+        void RunWorkflows(IServiceCollection services);
         void EnsureWorkflow<T>() where T : class, IWorkflowContext;
     }
 }

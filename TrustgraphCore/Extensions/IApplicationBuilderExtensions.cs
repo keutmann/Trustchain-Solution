@@ -9,8 +9,7 @@ namespace TrustgraphCore.Extensions
     {
         public static void LoadGraph(this IApplicationBuilder app)
         {
-            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            using (var scope = scopeFactory.CreateScope())
+            using (var scope = app.ApplicationServices.CreateScope())
             {
                 var trustLoadService = scope.ServiceProvider.GetRequiredService<IGraphLoadSaveService>();
                 trustLoadService.LoadFromDatabase();

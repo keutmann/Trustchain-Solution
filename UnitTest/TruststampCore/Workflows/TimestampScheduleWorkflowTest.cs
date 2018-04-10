@@ -44,7 +44,7 @@ namespace UnitTest.TruststampCore.Workflows
 
 
         [TestMethod]
-        public async void ExecuteWithNoProof()
+        public void ExecuteWithNoProof()
         {
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();

@@ -5,6 +5,10 @@ Uninstall or disable the service.
 https://www.file.net/process/msdepsvc.exe.html
 
 
+Publish by commandline
+dotnet publish -f netcoreapp2.0 -c Release
+
+
 Database managning
 
 

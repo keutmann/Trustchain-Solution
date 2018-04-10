@@ -30,7 +30,8 @@ namespace Trustchain
                     options.Listen(IPAddress.Any, 80);
                     options.Listen(IPAddress.Any, 443, listenOptions =>
                     {
-                        listenOptions.UseHttps("xxxx", "xxxx");
+                        //listenOptions.UseHttps("xxxx", "xxxx");
+                        listenOptions.UseHttps("C:\\tmp\\www_trust_dance.pfx", "HelViqod3k");
                     });
                 })
                 .Build();
