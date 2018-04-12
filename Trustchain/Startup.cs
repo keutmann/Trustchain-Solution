@@ -81,7 +81,7 @@ namespace Trustchain
                 app.UseExceptionHandler("/Error");
             }
 
-            app.LoadGraph(); // Load the Trust Graph from Database
+            app.Graph(); // Load the Trust Graph from Database
             app.Truststamp();
             ConfigureTimers(app);
 

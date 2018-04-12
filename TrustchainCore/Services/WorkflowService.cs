@@ -12,6 +12,7 @@ using TrustchainCore.Extensions;
 using TrustchainCore.Workflows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 
 namespace TrustchainCore.Services
 {
@@ -47,6 +48,8 @@ namespace TrustchainCore.Services
         public T Load<T>(int id) where T : class, IWorkflowContext
         {
             var container = Workflows.FirstOrDefault(p => p.DatabaseID == id);
+            if (container == null)
+                return default(T);
             var workflow = (T)Create(container);
             return workflow;
         }
@@ -149,7 +152,7 @@ namespace TrustchainCore.Services
             await Task.Run(() => {
                 _logger.DateInformation($"TaskProcessor started");
 
-                var runningWorkflows = new Dictionary<string, bool>();
+                var runningWorkflows = new ConcurrentDictionary<string, bool>();
 
                 while (true)
                 {
@@ -158,22 +161,19 @@ namespace TrustchainCore.Services
                         var localWorkflowService = localScope.ServiceProvider.GetRequiredService<IWorkflowService>();
                         var containers = localWorkflowService.GetRunningWorkflows();
 
+
+
                         _logger.DateInformation($"Workflows found: {containers.Count}");
 
                         foreach (var container in containers)
                         {
                             ExecuteAsync(runningWorkflows, container, services);
-
-                            //_logger.DateInformation($"Executing workflow id : {container.DatabaseID}");
-
-                            //workflow.Execute();
-
-                            //_logger.DateInformation($"ContinueWith -> Done executing workflow id {container.DatabaseID}");
                         }
 
                         _logger.DateInformation($"TaskProcessor done");
                     }
 
+                    GC.Collect();
                     Task.Delay(_configuration.WorkflowInterval()).Wait();
                 }
             });
@@ -183,19 +183,22 @@ namespace TrustchainCore.Services
         {
             //var list = new List<IWorkflowContext>();
             var containers = (from p in _trustDBService.Workflows
-                             where (p.State == WorkflowStatusType.New.ToString() || p.State == WorkflowStatusType.Running.ToString())
+                             where (p.State == WorkflowStatusType.New.ToString()
+                             || p.State == WorkflowStatusType.Starting.ToString() 
+                             || p.State == WorkflowStatusType.Running.ToString())
                              select p).ToArray();
             return containers;
         }
 
-        public async void ExecuteAsync(Dictionary<string, bool> workflows, WorkflowContainer container, IServiceCollection services)
+        public async void ExecuteAsync(ConcurrentDictionary<string, bool> workflows, WorkflowContainer container, IServiceCollection services)
         {
             if (workflows.ContainsKey(container.Type))
                 return;
 
             _logger.DateInformation($"Executing workflow id : {container.DatabaseID}");
 
-            workflows.Add(container.Type, true);
+            if (!workflows.TryAdd(container.Type, true))
+                return;
 
             await Task.Run(() => {
                 // Make a scope for the workflow to run in.
@@ -210,23 +213,34 @@ namespace TrustchainCore.Services
                 }
             });
 
-            workflows.Remove(container.Type);
+            workflows.TryRemove(container.Type, out bool val);
 
             _logger.DateInformation($"ContinueWith -> Done executing workflow id {container.DatabaseID}");
         }
 
-
-        public void EnsureWorkflow<T>() where T : class, IWorkflowContext
+        public T GetRunningWorkflow<T>() where T : class, IWorkflowContext
         {
-            var workflowContainer = Workflows.FirstOrDefault(p => p.Type == typeof(T).FullName
+            var container = Workflows.FirstOrDefault(p => p.Type == typeof(T).FullName
                                              && (p.State == WorkflowStatusType.New.ToString()
                                              || p.State == WorkflowStatusType.Running.ToString()));
 
-            if (workflowContainer == null)
+            if (container == null)
+                return null;
+
+            return (T)Create(container);
+        }
+
+
+        public T EnsureWorkflow<T>() where T : class, IWorkflowContext
+        {
+            var runningWf = GetRunningWorkflow<T>();
+            if (runningWf == null)
             {
                 var wf = Create<T>();
                 Save(wf);
+                return wf;
             }
+            return runningWf;
         }
     }
 }

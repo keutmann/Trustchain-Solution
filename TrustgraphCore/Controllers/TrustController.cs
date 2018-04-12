@@ -59,7 +59,7 @@ namespace TrustgraphCore.Controllers
 
             foreach (var trust in package.Trusts)
             {
-                this.AddTrust(trust);
+                AddTrust(trust);
             }
 
             _trustDBService.DBContext.SaveChanges();
@@ -78,12 +78,17 @@ namespace TrustgraphCore.Controllers
             if (dbTrust != null)
             {
                 // TODO: Needs to verfify with Timestamp if exist, for deciding action!
+                // The trick is to compare "created" in order to awoid old trust being replayed.
                 // For now, we just remove the old trust
-                _trustDBService.DBContext.Trusts.Remove(dbTrust);
-                _graphTrustService.Remove(trust);
+                //if (dbTrust.Created < trust.Created)
+                //{
+                    _trustDBService.DBContext.Trusts.Remove(dbTrust);
+                    _graphTrustService.Remove(trust);
+                //}
             }
 
             _trustDBService.Add(trust);   // Add to database
+            _proofService.AddProof(trust.Id);
 
             var time = DateTime.Now.ToUnixTime();
             if ((trust.Expire  == 0 || trust.Expire > time) 

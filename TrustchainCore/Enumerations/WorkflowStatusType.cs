@@ -5,6 +5,7 @@
         New,
         Running,
         Finished,
-        Failed
+        Failed,
+        Starting
     }
 }

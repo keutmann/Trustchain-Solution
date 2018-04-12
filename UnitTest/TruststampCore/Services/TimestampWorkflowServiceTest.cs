@@ -15,7 +15,7 @@ namespace UnitTest.TruststampCore.Services
     public class TimestampWorkflowServiceTest : StartupMock
     {
         [TestMethod]
-        public void EnsureTimestampWorkflow()
+        public void EnsureTimestampScheduleWorkflow()
         {
             var timestampWorkflowService = ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
             var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
@@ -25,14 +25,14 @@ namespace UnitTest.TruststampCore.Services
                                              || p.State == WorkflowStatusType.Running.ToString()));
 
             Assert.IsNull(noEntity);
-            timestampWorkflowService.EnsureTimestampWorkflow();
+            timestampWorkflowService.EnsureTimestampScheduleWorkflow();
             var entity = trustDBService.Workflows.FirstOrDefault(p => p.Type == typeof(TimestampScheduleWorkflow).FullName
                                  && (p.State == WorkflowStatusType.New.ToString()
                                  || p.State == WorkflowStatusType.Running.ToString()));
 
             Assert.IsNotNull(entity);
 
-            timestampWorkflowService.EnsureTimestampWorkflow();
+            timestampWorkflowService.EnsureTimestampScheduleWorkflow();
 
             var count = trustDBService.Workflows.Count(p => p.Type == typeof(TimestampScheduleWorkflow).FullName
                                  && (p.State == WorkflowStatusType.New.ToString()
@@ -42,13 +42,13 @@ namespace UnitTest.TruststampCore.Services
         }
 
         [TestMethod]
-        public void CreateNextTimestampWorkflow()
+        public void EnsureTimestampWorkflow()
         {
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             var timestampWorkflowService = ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
             var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
 
-            timestampWorkflowService.CreateNextTimestampWorkflow();
+            timestampWorkflowService.EnsureTimestampWorkflow();
 
             var count = trustDBService.Workflows.Count(p => p.Type == typeof(TimestampWorkflow).FullName
                      && (p.State == WorkflowStatusType.New.ToString()

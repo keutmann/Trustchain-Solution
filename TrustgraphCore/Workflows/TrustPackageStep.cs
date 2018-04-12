@@ -1,5 +1,5 @@
-﻿using TrustchainCore.Workflows;
-using TrustgraphCore.Interfaces;
+﻿using TrustgraphCore.Interfaces;
+using TrustchainCore.Workflows;
 
 namespace TrustgraphCore.Workflows
 {

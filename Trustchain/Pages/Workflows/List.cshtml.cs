@@ -7,16 +7,22 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
+using TrustchainCore.Enumerations;
+using TrustchainCore.Extensions;
+using TrustchainCore.Services;
 
 namespace Trustchain.Pages.Workflows
 {
     public class ListModel : PageModel
     {
         private readonly TrustDBContext _context;
+        private readonly IWorkflowService _workflowService;
 
-        public ListModel(TrustDBContext context)
+
+        public ListModel(TrustDBContext context, IWorkflowService workflowService)
         {
             _context = context;
+            _workflowService = workflowService;
         }
 
         public IList<WorkflowContainer> WorkflowContainer { get;set; }
@@ -29,6 +35,24 @@ namespace Trustchain.Pages.Workflows
                         select p;
 
             WorkflowContainer = await query.ToListAsync();
+        }
+
+
+        public async Task OnGetRunNowAsync(int id)
+        {
+            var container = await _context.Workflows.FirstOrDefaultAsync(p => p.DatabaseID == id);
+
+            var wf = _workflowService.Create(container);
+            wf.NextExecution = DateTime.Now.ToUnixTime();
+            wf.State = WorkflowStatusType.Starting.ToString();
+            _workflowService.Save(wf);
+
+            await OnGetAsync(container.Type);
+        }
+
+        public bool ShowRunNow(WorkflowContainer container)
+        {
+            return WorkflowStatusType.New.ToString().EqualsIgnoreCase(container.State);
         }
     }
 }

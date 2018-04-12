@@ -1,13 +1,14 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.Configuration;
-using TrustchainCore.Interfaces;
-using TrustchainCore.Workflows;
 using TrustgraphCore.Interfaces;
+using TrustchainCore.Workflows;
 using TruststampCore.Extensions;
 using TruststampCore.Interfaces;
-using TruststampCore.Workflows;
 using System.Collections.Generic;
 using TrustchainCore.Services;
+using TrustchainCore.Interfaces;
+using Microsoft.Extensions.Logging;
+using TrustchainCore.Model;
 
 namespace TrustgraphCore.Workflows
 {
@@ -17,16 +18,24 @@ namespace TrustgraphCore.Workflows
         private ITrustDBService _trustDBService;
         private IProofService _proofService;
         private IConfiguration _configuration;
+        private ITimestampSynchronizationService _timestampSynchronizationService;
+
+        private ILogger<TrustTimestampStep> _logger;
 
         private Dictionary<int, ITimestampWorkflow> _workflows = new Dictionary<int, ITimestampWorkflow>();
 
+        private int _addedProofs = 0;
+        private int _updatedTrusts = 0;
 
-        public TrustTimestampStep(IWorkflowService workflowService, ITrustDBService trustDBService, IProofService proofService, IConfiguration configuration)
+
+
+        public TrustTimestampStep(IWorkflowService workflowService, ITrustDBService trustDBService, IProofService proofService, IConfiguration configuration, ITimestampSynchronizationService timestampSynchronizationService)
         {
             _workflowService = workflowService;
             _trustDBService = trustDBService;
             _proofService = proofService;
             _configuration = configuration;
+            _timestampSynchronizationService = timestampSynchronizationService;
         }
 
         /// <summary>
@@ -39,35 +48,57 @@ namespace TrustgraphCore.Workflows
             var trusts = from t in _trustDBService.Trusts
                          where t.TimestampRecipt == null || t.TimestampRecipt.Length == 0
                          select t;
-            
-            foreach (var trust in trusts)
+
+            if (trusts != null && trusts.Count() > 0)
             {
-                var proof = _proofService.GetProof(trust.Id);
-                if(proof == null)
+                foreach (var trust in trusts)
                 {
-                    _proofService.AddProof(trust.Id); // Fail safe, if somehow the trust has not been added to the proof list.
-                    continue;
+                    ProcessTrust(trust);
                 }
 
-                // Use local caching of TimestampWorkflow to minimize load on DB
-                if(!_workflows.TryGetValue(proof.WorkflowID, out ITimestampWorkflow timestampWorkflow))
-                {
-                    timestampWorkflow = _workflowService.Load<ITimestampWorkflow>(proof.WorkflowID);
-                    _workflows.Add(proof.WorkflowID, timestampWorkflow);
-                }
+                _trustDBService.DBContext.SaveChanges();
 
-                if (timestampWorkflow.Proof.Confirmations > 0)
-                {
-                    trust.TimestampAlgorithm = timestampWorkflow.Proof.Blockchain;
-                    trust.TimestampRecipt = proof.Receipt;
-                    _trustDBService.DBContext.Trusts.Update(trust);
-                }
+                if (_addedProofs > 0)
+                    CombineLog(_logger, $"Added Proofs {_addedProofs}");
+
+                if (_updatedTrusts > 0)
+                    CombineLog(_logger, $"Updated trusts {_updatedTrusts}");
             }
-
-            _trustDBService.DBContext.SaveChanges();
 
             // Rerun this step after x time, never to exit
             Context.Wait(_configuration.TimestampInterval()); // Default 10 min
+        }
+
+        public void ProcessTrust(Trust trust)
+        {
+            var proof = _proofService.GetProof(trust.Id);
+            if (proof == null)
+            {
+                _proofService.AddProof(trust.Id); // Fail safe, if somehow the trust has not been added to the proof list.
+                _addedProofs++;
+                return;
+            }
+
+            if (proof.WorkflowID == 0)
+                return;
+
+            // Use local caching of TimestampWorkflow to minimize load on DB
+            if (!_workflows.TryGetValue(proof.WorkflowID, out ITimestampWorkflow timestampWorkflow))
+            {
+                timestampWorkflow = _workflowService.Load<ITimestampWorkflow>(proof.WorkflowID);
+                if (timestampWorkflow == null)
+                    return;
+
+                _workflows.Add(proof.WorkflowID, timestampWorkflow);
+            }
+
+            if (timestampWorkflow.Proof.Confirmations > 0)
+            {
+                trust.TimestampAlgorithm = timestampWorkflow.Proof.Blockchain;
+                trust.TimestampRecipt = proof.Receipt;
+                _trustDBService.DBContext.Trusts.Update(trust);
+                _updatedTrusts++;
+            }
         }
     }
 }

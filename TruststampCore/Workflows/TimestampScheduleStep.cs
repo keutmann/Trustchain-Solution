@@ -20,7 +20,7 @@ namespace TruststampCore.Workflows
         {
             if(_timestampWorkflowService.CountCurrentProofs() > 0) 
             {
-                _timestampWorkflowService.CreateNextTimestampWorkflow(); // There are proofs to be timestamp'ed
+                _timestampWorkflowService.EnsureTimestampWorkflow(); // There are proofs to be timestamp'ed
             }
 
             // Rerun this step after x time, never to exit

@@ -29,23 +29,21 @@ namespace TruststampCore.Services
             return _trustDBService.Proofs.Where(p => p.WorkflowID == _timestampSynchronizationService.CurrentWorkflowID).Count();
         }
 
-        public void CreateNextTimestampWorkflow()
+        public void InitiliazeTimestampSynchronizationService()
         {
-            var wf = _workflowService.Create<TimestampWorkflow>();
-            _timestampSynchronizationService.CurrentWorkflowID = _workflowService.Save(wf);
+            var timestampWorkflow = _workflowService.GetRunningWorkflow<TimestampWorkflow>();
+            _timestampSynchronizationService.CurrentWorkflowID = timestampWorkflow.ID;
+        }
+
+        public void EnsureTimestampScheduleWorkflow()
+        {
+            _workflowService.EnsureWorkflow<TimestampScheduleWorkflow>();
         }
 
         public void EnsureTimestampWorkflow()
         {
-            var timestampWorkflowContainer = _workflowService.Workflows.FirstOrDefault(p => p.Type == typeof(TimestampScheduleWorkflow).FullName
-                                             && (p.State == WorkflowStatusType.New.ToString() 
-                                             || p.State == WorkflowStatusType.Running.ToString()));
-                                             
-            if(timestampWorkflowContainer == null)
-            {
-                var wf = _workflowService.Create<TimestampScheduleWorkflow>();
-                _workflowService.Save(wf);
-            }
+            var timestampWorkflow = _workflowService.EnsureWorkflow<TimestampWorkflow>();
+            _timestampSynchronizationService.CurrentWorkflowID = timestampWorkflow.ID;
         }
 
     }

@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Threading.Tasks;
+using TrustgraphCore.Interfaces;
 using TrustchainCore.Services;
 using TrustchainCore.Workflows;
-using TrustgraphCore.Interfaces;
 
 namespace TrustgraphCore.Workflows
 {

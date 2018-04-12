@@ -65,35 +65,31 @@ namespace TrustchainCore.Workflows
 
         public virtual void Execute()
         {
+            if (!DoExecution())
+                return;
 
-            //await Task.Run(() =>
-            //{
-                if (!DoExecution())
-                    return;
+            UpdateState();
 
-                UpdateState();
-
-                IWorkflowStep step = null;
-                while(DoExecution())
+            IWorkflowStep step = null;
+            while(DoExecution())
+            {
+                try
                 {
-                    try
-                    {
-                        step = GetCurrentStep();
+                    step = GetCurrentStep();
 
-                        ExecutedStep(step);
-                    }
-                    catch (Exception ex)
-                    {
-                        Failed(step, ex);
-                        return; // Exit fast!
-                    }
-                    finally
-                    {
-                        step.Dispose();
-                        Save();
-                    }
+                    ExecutedStep(step);
                 }
-            //});
+                catch (Exception ex)
+                {
+                    Failed(step, ex);
+                    return; // Exit fast!
+                }
+                finally
+                {
+                    step.Dispose();
+                    Save();
+                }
+            }
         }
 
         public T GetStep<T>()
@@ -159,7 +155,7 @@ namespace TrustchainCore.Workflows
 
         public virtual void UpdateState()
         {
-            if (State == WorkflowStatusType.New.ToString())
+            if (WorkflowStatusType.New.ToString().EqualsIgnoreCase(State) || WorkflowStatusType.Starting.ToString().EqualsIgnoreCase(State))
                 State = WorkflowStatusType.Running.ToString();
         }
 
@@ -209,12 +205,23 @@ namespace TrustchainCore.Workflows
         public virtual void Failed(IWorkflowStep step, Exception ex)
         {
             State = WorkflowStatusType.Failed.ToString();
+
+#if DEBUG
+            Log($"Step: {step.GetType().Name} has failed with an error: {ex.Message} - {ex.StackTrace}");
+#else
             Log($"Step: {step.GetType().Name} has failed with an error: {ex.Message}");
+#endif            
+
         }
 
         public virtual void Log(string message)
         {
             Logs.Add(new WorkflowLog { Message = message });
+
+            if(Logs.Count > 200)
+            {
+
+            }
         }
     }
 }
