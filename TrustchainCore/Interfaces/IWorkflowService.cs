@@ -25,7 +25,7 @@ namespace TrustchainCore.Services
         WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);
         IList<WorkflowContainer> GetRunningWorkflows();
         void RunWorkflows(IServiceCollection services);
-        T GetRunningWorkflow<T>() where T : class, IWorkflowContext;
+        //T GetRunningWorkflow<T>() where T : class, IWorkflowContext;
         T EnsureWorkflow<T>() where T : class, IWorkflowContext;
     }
 }

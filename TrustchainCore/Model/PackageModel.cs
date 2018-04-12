@@ -69,9 +69,9 @@ namespace TrustchainCore.Model
         public byte[] Id { get; set; }
         public bool ShouldSerializeId() { return Id != null; }
 
-        //[JsonProperty(PropertyName = "created")]
-        //public long Created { get; set; }
-        //public bool ShouldSerializeCreated() { return Created > 0; }
+        [JsonProperty(PropertyName = "created")]
+        public long Created { get; set; }
+        public bool ShouldSerializeCreated() { return Created > 0; }
 
         //[JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]
         //public IssuerIdentity Issuer { get; set; }

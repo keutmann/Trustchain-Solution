@@ -43,8 +43,8 @@ namespace Trustchain.Pages.Workflows
             var container = await _context.Workflows.FirstOrDefaultAsync(p => p.DatabaseID == id);
 
             var wf = _workflowService.Create(container);
-            wf.NextExecution = DateTime.Now.ToUnixTime();
-            wf.State = WorkflowStatusType.Starting.ToString();
+            wf.Container.NextExecution = DateTime.Now.ToUnixTime();
+            wf.Container.State = WorkflowStatusType.Starting.ToString();
             _workflowService.Save(wf);
 
             await OnGetAsync(container.Type);

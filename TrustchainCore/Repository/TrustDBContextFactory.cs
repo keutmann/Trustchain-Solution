@@ -10,7 +10,6 @@ namespace TrustchainCore.Repository
             var optionsBuilder = new DbContextOptionsBuilder<TrustDBContext>();
             optionsBuilder.UseSqlite("Filename=./trust.db", b => b.MigrationsAssembly("TrustchainCore"));
             
-
             return new TrustDBContext(optionsBuilder.Options);
         }
     }

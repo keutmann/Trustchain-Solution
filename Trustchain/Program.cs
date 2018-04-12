@@ -15,10 +15,12 @@ namespace Trustchain
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            // Renaming BuildWebHost to InitWebHost avoids problems with add-migration command.
+            // IDesignTimeDbContextFactory implemented for add-migration specifically.
+            InitWebHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        public static IWebHost InitWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseDefaultServiceProvider((context, options) =>

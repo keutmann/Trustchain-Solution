@@ -51,13 +51,13 @@ namespace UnitTest.TruststampCore.Workflows
             var workflow = workflowService.Create<TimestampScheduleWorkflow>();
             workflow.Execute();
 
-            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
+            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.Container.State);
             Assert.IsTrue(timestampSynchronizationService.CurrentWorkflowID == 0);
             var saveCurrentID = timestampSynchronizationService.CurrentWorkflowID;
 
             workflow.Execute();
             Assert.AreEqual(saveCurrentID, timestampSynchronizationService.CurrentWorkflowID);
-            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
+            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.Container.State);
         }
 
         [TestMethod]
@@ -68,17 +68,17 @@ namespace UnitTest.TruststampCore.Workflows
             var workflow = workflowService.Create<TimestampScheduleWorkflow>();
             workflow.Execute();
 
-            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
+            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.Container.State);
             Assert.IsTrue(timestampSynchronizationService.CurrentWorkflowID == 0);
             var saveCurrentID = timestampSynchronizationService.CurrentWorkflowID;
 
             var proofService = ServiceProvider.GetRequiredService<IProofService>();
             proofService.AddProof(Guid.NewGuid().ToByteArray());
-            workflow.NextExecution = DateTime.MinValue.ToUnixTime();
+            workflow.Container.NextExecution = DateTime.MinValue.ToUnixTime();
 
             workflow.Execute();
             Assert.AreNotEqual(saveCurrentID, timestampSynchronizationService.CurrentWorkflowID);
-            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.State);
+            Assert.AreEqual(WorkflowStatusType.Running.ToString(), workflow.Container.State);
         }
 
     }

@@ -9,6 +9,7 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Services;
 using TrustchainCore.Extensions;
 using Microsoft.Extensions.Logging;
+using TrustchainCore.Model;
 
 namespace TrustchainCore.Workflows
 {
@@ -18,13 +19,7 @@ namespace TrustchainCore.Workflows
         public int ID { get; set; }
 
         [JsonIgnore]
-        public string State { get; set; }
-
-        [JsonIgnore]
-        public string Tag { get; set; }
-
-        [JsonProperty(PropertyName = "nextExecution")]
-        public long NextExecution { get; set; }
+        public WorkflowContainer Container { get; set; }
 
         [JsonProperty(PropertyName = "created")]
         public long Created { get; set; }
@@ -35,8 +30,6 @@ namespace TrustchainCore.Workflows
         [JsonProperty(PropertyName = "steps", NullValueHandling = NullValueHandling.Ignore)]
         public IList<IWorkflowStep> Steps { get; set; }
 
-        //[JsonIgnore]
-        //public WorkflowStatusType Status { get; set; }
 
         [JsonProperty(PropertyName = "logs", NullValueHandling = NullValueHandling.Ignore)]
         public List<IWorkflowLog> Logs { get; set; }
@@ -47,10 +40,12 @@ namespace TrustchainCore.Workflows
         public WorkflowContext(IWorkflowService workflowService) 
         {
             WorkflowService = workflowService;
-            NextExecution = DateTime.MinValue.ToUnixTime();
+            Container = new WorkflowContainer
+            {
+                Type = GetType().FullName
+            };
             Steps = new List<IWorkflowStep>();
             Logs = new List<IWorkflowLog>();
-            State = WorkflowStatusType.New.ToString();
         }
 
         public virtual void Initialize()
@@ -144,10 +139,10 @@ namespace TrustchainCore.Workflows
             if (Steps.Count == 0)
                 return false;
 
-            if (NextExecution > DateTime.Now.ToUnixTime())
+            if (Container.NextExecution > DateTime.Now.ToUnixTime())
                 return false;
 
-            if (State == WorkflowStatusType.Finished.ToString() || State == WorkflowStatusType.Failed.ToString())
+            if (Container.State == WorkflowStatusType.Finished.ToString() || Container.State == WorkflowStatusType.Failed.ToString())
                 return false;
             
             return true;
@@ -155,8 +150,11 @@ namespace TrustchainCore.Workflows
 
         public virtual void UpdateState()
         {
-            if (WorkflowStatusType.New.ToString().EqualsIgnoreCase(State) || WorkflowStatusType.Starting.ToString().EqualsIgnoreCase(State))
-                State = WorkflowStatusType.Running.ToString();
+            if (WorkflowStatusType.New.ToString().EqualsIgnoreCase(Container.State) || WorkflowStatusType.Starting.ToString().EqualsIgnoreCase(Container.State))
+                Container.State = WorkflowStatusType.Running.ToString();
+
+            if(WorkflowStatusType.Waiting.ToString().EqualsIgnoreCase(Container.State))
+                Container.State = WorkflowStatusType.Running.ToString();
         }
 
         public virtual void Save()
@@ -166,6 +164,9 @@ namespace TrustchainCore.Workflows
 
         public IWorkflowStep GetCurrentStep()
         {
+            if (Steps.Count == 0)
+                return null;
+
             if (String.IsNullOrEmpty(CurrentStep))
                 return Steps[0];
 
@@ -187,7 +188,8 @@ namespace TrustchainCore.Workflows
 
         public virtual void Wait(int seconds)
         {
-            NextExecution = DateTime.Now.AddSeconds(seconds).ToUnixTime();
+            Container.NextExecution = DateTime.Now.AddSeconds(seconds).ToUnixTime();
+            Container.State = WorkflowStatusType.Waiting.ToString();
         }
 
         private void ExecutedStep(IWorkflowStep step)
@@ -204,7 +206,7 @@ namespace TrustchainCore.Workflows
 
         public virtual void Failed(IWorkflowStep step, Exception ex)
         {
-            State = WorkflowStatusType.Failed.ToString();
+            Container.State = WorkflowStatusType.Failed.ToString();
 
 #if DEBUG
             Log($"Step: {step.GetType().Name} has failed with an error: {ex.Message} - {ex.StackTrace}");

@@ -28,7 +28,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
-            workflow.NextExecution = 0;
+            workflow.Container.NextExecution = 0;
             workflow.Proof = new BlockchainProof
             {
                 Blockchain = "btctest",
@@ -41,7 +41,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             addressVerifyStep.Execute();
 
-            Assert.IsTrue(workflow.NextExecution > 0); // Wait is called
+            Assert.IsTrue(workflow.Container.NextExecution > 0); // Wait is called
             Assert.AreEqual(-1, workflow.Proof.Confirmations);
         }
 
@@ -66,7 +66,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
-            workflow.NextExecution = 0;
+            workflow.Container.NextExecution = 0;
             workflow.Proof = new BlockchainProof
             {
                 Blockchain = "btctest",
@@ -79,7 +79,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             addressVerifyStep.Execute();
 
-            Assert.IsTrue(workflow.NextExecution > 0); // Wait is called
+            Assert.IsTrue(workflow.Container.NextExecution > 0); // Wait is called
             Assert.AreEqual(1, workflow.Proof.Confirmations);
         }
 
@@ -98,7 +98,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
-            workflow.NextExecution = 0;
+            workflow.Container.NextExecution = 0;
             workflow.Proof = new BlockchainProof
             {
                 Blockchain = "btctest",
@@ -111,7 +111,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             addressVerifyStep.Execute();
 
-            Assert.IsTrue(workflow.NextExecution == 0); // Wait is called
+            Assert.IsTrue(workflow.Container.NextExecution == 0); // Wait is called
             Assert.AreEqual(10, workflow.Proof.Confirmations);
 
             var successStep = workflow.GetStep<ISuccessStep>();

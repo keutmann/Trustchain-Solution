@@ -18,9 +18,9 @@ namespace TruststampCore.Workflows
 
         public override void Execute()
         {
-            if(_timestampWorkflowService.CountCurrentProofs() > 0) 
+            if(_timestampWorkflowService.CountCurrentProofs() > 0)
             {
-                _timestampWorkflowService.EnsureTimestampWorkflow(); // There are proofs to be timestamp'ed
+                _timestampWorkflowService.CreateAndExecute(); // There are proofs to be timestamp'ed
             }
 
             // Rerun this step after x time, never to exit

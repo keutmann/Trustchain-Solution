@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TrustchainCore.Model;
 using TrustchainCore.Services;
 
 namespace TrustchainCore.Interfaces
@@ -12,14 +13,14 @@ namespace TrustchainCore.Interfaces
         [JsonIgnore]
         IWorkflowService WorkflowService { get; set; }
 
+        [JsonIgnore]
+        WorkflowContainer Container { get; set; }
+
         int ID { get; set; }
         List<IWorkflowLog> Logs { get; set; }
-        string State { get; set; }
         IList<IWorkflowStep> Steps { get; set; }
         //int CurrentStepIndex { get; set; }
         string CurrentStep { get; set; }
-        string Tag { get; set; }
-        long NextExecution { get; set; }
         long Created { get; set; }
 
         bool DoExecution();

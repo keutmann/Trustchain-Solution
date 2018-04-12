@@ -70,8 +70,6 @@ namespace TrustchainCore.Services
             }
 
             instance.ID = container.DatabaseID;
-            instance.State = container.State;
-            instance.Tag = container.Tag;
 
             return instance;
         }
@@ -99,34 +97,25 @@ namespace TrustchainCore.Services
 
         public int Save(IWorkflowContext workflow)
         {
-            if(workflow.ID != 0)
+            var settings = new JsonSerializerSettings
             {
-                var entity = _trustDBService.Workflows.FirstOrDefault(w => w.DatabaseID == workflow.ID);
-                if (entity != null)
-                {
-                    entity.Type = workflow.GetType().FullName;
-                    entity.State = workflow.State;
-                    entity.Tag = workflow.Tag;
+                ContractResolver = _contractReverseResolver,
+                TypeNameHandling = TypeNameHandling.Objects
+            };
+            workflow.Container.Data = JsonConvert.SerializeObject(workflow, settings);
 
-                    var settings = new JsonSerializerSettings
-                    {
-                        ContractResolver = _contractReverseResolver,
-                        TypeNameHandling = TypeNameHandling.Objects
-                    };
-
-                    entity.Data = JsonConvert.SerializeObject(workflow, settings);
-
-                    _trustDBService.DBContext.SaveChanges();
-
-                    return workflow.ID; // Exit now!
-                }
+            if (workflow.ID != 0)
+            {
+                _trustDBService.DBContext.SaveChanges();
+            }
+            else
+            {
+                _trustDBService.DBContext.Workflows.Add(workflow.Container);
+                _trustDBService.DBContext.SaveChanges();
+                workflow.ID = workflow.Container.DatabaseID;
             }
 
-            var container = CreateWorkflowContainer(workflow);
-            _trustDBService.DBContext.Workflows.Add(container);
-            _trustDBService.DBContext.SaveChanges();
-            workflow.ID = container.DatabaseID;
-            return container.DatabaseID;
+            return workflow.ID; // Exit now!
         }
 
         public WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow)
@@ -140,8 +129,8 @@ namespace TrustchainCore.Services
             var entity = new WorkflowContainer
             {
                 Type = workflow.GetType().FullName,
-                State = workflow.State,
-                Tag = workflow.Tag,
+                State = workflow.Container.State,
+                Tag = workflow.Container.Tag,
                 Data = JsonConvert.SerializeObject(workflow, settings)
             };
             return entity;
@@ -160,17 +149,18 @@ namespace TrustchainCore.Services
                     {
                         var localWorkflowService = localScope.ServiceProvider.GetRequiredService<IWorkflowService>();
                         var containers = localWorkflowService.GetRunningWorkflows();
-
-
-
-                        _logger.DateInformation($"Workflows found: {containers.Count}");
-
-                        foreach (var container in containers)
+                        
+                        if (containers.Count > 0)
                         {
-                            ExecuteAsync(runningWorkflows, container, services);
-                        }
+                            _logger.DateInformation($"Active Workflows found: {containers.Count}");
 
-                        _logger.DateInformation($"TaskProcessor done");
+                            foreach (var container in containers)
+                            {
+                                ExecuteAsync(runningWorkflows, container, services);
+                            }
+
+                            _logger.DateInformation($"TaskProcessor done");
+                        }
                     }
 
                     GC.Collect();
@@ -181,12 +171,15 @@ namespace TrustchainCore.Services
 
         public IList<WorkflowContainer> GetRunningWorkflows()
         {
+            var time = DateTime.Now.ToUnixTime();
             //var list = new List<IWorkflowContext>();
             var containers = (from p in _trustDBService.Workflows
                              where (p.State == WorkflowStatusType.New.ToString()
-                             || p.State == WorkflowStatusType.Starting.ToString() 
-                             || p.State == WorkflowStatusType.Running.ToString())
-                             select p).ToArray();
+                                 || p.State == WorkflowStatusType.Starting.ToString()
+                                 || p.State == WorkflowStatusType.Running.ToString()
+                                 || p.State == WorkflowStatusType.Waiting.ToString())
+                                 && p.NextExecution <= time
+                              select p).ToArray();
             return containers;
         }
 
@@ -195,10 +188,10 @@ namespace TrustchainCore.Services
             if (workflows.ContainsKey(container.Type))
                 return;
 
-            _logger.DateInformation($"Executing workflow id : {container.DatabaseID}");
-
             if (!workflows.TryAdd(container.Type, true))
                 return;
+
+            _logger.DateInformation($"Executing workflow id : {container.DatabaseID}");
 
             await Task.Run(() => {
                 // Make a scope for the workflow to run in.
@@ -208,8 +201,7 @@ namespace TrustchainCore.Services
                     var taskWorkflowService = taskScope.ServiceProvider.GetRequiredService<IWorkflowService>();
                     var workflow = taskWorkflowService.Create(container);
 
-                    if (workflow.DoExecution())
-                        workflow.Execute();
+                    workflow.Execute();
                 }
             });
 
@@ -218,22 +210,18 @@ namespace TrustchainCore.Services
             _logger.DateInformation($"ContinueWith -> Done executing workflow id {container.DatabaseID}");
         }
 
-        public T GetRunningWorkflow<T>() where T : class, IWorkflowContext
-        {
-            var container = Workflows.FirstOrDefault(p => p.Type == typeof(T).FullName
-                                             && (p.State == WorkflowStatusType.New.ToString()
-                                             || p.State == WorkflowStatusType.Running.ToString()));
-
-            if (container == null)
-                return null;
-
-            return (T)Create(container);
-        }
-
-
         public T EnsureWorkflow<T>() where T : class, IWorkflowContext
         {
-            var runningWf = GetRunningWorkflow<T>();
+            var container = Workflows.FirstOrDefault(p => p.Type == typeof(T).FullName
+                                 && (p.State == WorkflowStatusType.New.ToString()
+                                 || p.State == WorkflowStatusType.Starting.ToString()
+                                 || p.State == WorkflowStatusType.Running.ToString()
+                                 || p.State == WorkflowStatusType.Waiting.ToString()));
+
+            if (container == null)
+                return default(T);
+
+            var runningWf = (T)Create(container);
             if (runningWf == null)
             {
                 var wf = Create<T>();

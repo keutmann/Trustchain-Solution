@@ -16,7 +16,7 @@ namespace TrustchainCore.Workflows
         public override void Execute()
         {
             CombineLog(_logger,$"Workflow executed successfully");
-            Context.State = WorkflowStatusType.Finished.ToString();
+            Context.Container.State = WorkflowStatusType.Finished.ToString();
         }
     }
 }

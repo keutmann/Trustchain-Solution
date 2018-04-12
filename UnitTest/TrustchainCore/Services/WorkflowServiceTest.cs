@@ -100,7 +100,7 @@ namespace UnitTest.TrustchainCore.Workflow
             //list.Add(workflow);
             workflow.Execute();
             //workflowService.Execute(list);
-            Assert.AreEqual(WorkflowStatusType.New.ToString(), workflow.State);
+            Assert.AreEqual(WorkflowStatusType.New.ToString(), workflow.Container.State);
             //Assert.AreEqual(0, executionSynchronizationService.Workflows.Count);
         }
 
@@ -116,7 +116,7 @@ namespace UnitTest.TrustchainCore.Workflow
                 var workflow = workflowService.Create<IWorkflowContext>();
                 workflow.ID = i;
                 workflow.Execute();
-                Assert.AreEqual(WorkflowStatusType.New.ToString(), workflow.State);
+                Assert.AreEqual(WorkflowStatusType.New.ToString(), workflow.Container.State);
             }
 
             //workflowService.Execute(list);
@@ -142,11 +142,11 @@ namespace UnitTest.TrustchainCore.Workflow
                 list.Add(workflow);
             }
             var wf = workflowService.Create<IWorkflowContext>();
-            wf.State = WorkflowStatusType.Finished.ToString();
+            wf.Container.State = WorkflowStatusType.Finished.ToString();
             workflowService.Save(wf);
 
             wf = workflowService.Create<IWorkflowContext>();
-            wf.State = WorkflowStatusType.Failed.ToString();
+            wf.Container.State = WorkflowStatusType.Failed.ToString();
             workflowService.Save(wf);
 
             // Execute
