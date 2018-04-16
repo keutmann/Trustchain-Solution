@@ -150,7 +150,7 @@ namespace TrustgraphCore.Controllers
         }
 
         [HttpGet]
-        [Route("get/{trustId}")]
+        //[Route("get/{trustId}")]
         public ActionResult Get([FromRoute]byte[] trustId)
         {
             if (trustId == null || trustId.Length < 1)
@@ -161,5 +161,23 @@ namespace TrustgraphCore.Controllers
             return ApiOk(trust);
         }
 
+        [HttpGet]
+        [Route("get")]
+        public ActionResult Get([FromQuery]byte[] issuer, [FromQuery]byte[] subject, [FromQuery]string type, [FromQuery]string scope)
+        {
+            //if (trustId == null || trustId.Length < 1)
+            //    throw new ApplicationException("Missing trustId");
+            var query = new Trust
+            {
+                IssuerAddress = issuer,
+                SubjectAddress = subject,
+                Type = type,
+                Scope = scope
+            };
+
+            var trust = _trustDBService.GetSimilarTrust(query);
+
+            return ApiOk(trust);
+        }
     }
 }

@@ -10,7 +10,7 @@ using TrustchainCore.Model;
 
 namespace TrustchainCore.Services
 {
-    public interface IWorkflowService
+    public interface IWorkflowService : IDisposable
     {
         //ITrustDBService DBService { get; set; }
         [JsonIgnore]

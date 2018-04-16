@@ -169,7 +169,7 @@ namespace TrustchainCore.Services
                             _logger.DateInformation($"TaskProcessor done");
                         }
 
-                        _trustDBService.DBContext.Dispose();
+                        localWorkflowService.Dispose();
                     }
 
                     GC.Collect();
@@ -255,6 +255,12 @@ namespace TrustchainCore.Services
 
             var runningWf = (T)Create(container);
             return runningWf;
+        }
+
+        public void Dispose()
+        {
+            if (_trustDBService != null)
+                _trustDBService.DBContext.Dispose();
         }
     }
 }

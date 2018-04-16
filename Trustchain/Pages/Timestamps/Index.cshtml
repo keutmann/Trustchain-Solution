@@ -27,10 +27,11 @@
            data-page-list="[5,10,20,50,100,All]">
         <thead>
             <tr>
-                <th data-field="id" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.DatabaseID)</th>
+                <th data-field="databaseID" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.DatabaseID)</th>
                 <th data-field="source" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.Source)</th>
                 <th data-field="registered" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.Registered)</th>
                 <th data-field="workflowID" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.WorkflowID)</th>
+                <th data-field="receipt" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.Receipt)</th>
             </tr>
         </thead>
     </table>
