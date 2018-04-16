@@ -37,6 +37,8 @@ namespace TrustchainCore.Services
             IExecutionSynchronizationService executionSynchronizationService, ILogger<WorkflowService> logger, IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _trustDBService = trustDBService;
+            _trustDBService.ID = DateTime.Now.Ticks;
+
             _executionSynchronizationService = executionSynchronizationService;
             _contractResolver = contractResolver;
             _contractReverseResolver = contractReverseResolver;
@@ -63,6 +65,7 @@ namespace TrustchainCore.Services
             };
 
             var instance = (WorkflowContext)JsonConvert.DeserializeObject(container.Data, settings);
+            instance.Container = container;
             instance.WorkflowService = this;
             foreach (var step in instance.Steps)
             {
@@ -104,9 +107,10 @@ namespace TrustchainCore.Services
             };
             workflow.Container.Data = JsonConvert.SerializeObject(workflow, settings);
 
-            if (workflow.ID != 0)
+            if (workflow.Container.DatabaseID != 0)
             {
-                _trustDBService.DBContext.SaveChanges();
+                //_trustDBService.DBContext.Workflows.Update(workflow.Container);
+                var result = _trustDBService.DBContext.SaveChanges();
             }
             else
             {
@@ -145,22 +149,27 @@ namespace TrustchainCore.Services
 
                 while (true)
                 {
+                    
                     using (var localScope = this.ServiceProvider.CreateScope())
+                    //using(var localScope = services.BuildServiceProvider().CreateScope())
                     {
                         var localWorkflowService = localScope.ServiceProvider.GetRequiredService<IWorkflowService>();
                         var containers = localWorkflowService.GetRunningWorkflows();
-                        
+
                         if (containers.Count > 0)
                         {
                             _logger.DateInformation($"Active Workflows found: {containers.Count}");
 
                             foreach (var container in containers)
                             {
-                                ExecuteAsync(runningWorkflows, container, services);
+                                // Run workflows serialized! May still be problems with the async parallel processing
+                                localWorkflowService.Execute(runningWorkflows, container, services);
                             }
 
                             _logger.DateInformation($"TaskProcessor done");
                         }
+
+                        _trustDBService.DBContext.Dispose();
                     }
 
                     GC.Collect();
@@ -210,6 +219,25 @@ namespace TrustchainCore.Services
             _logger.DateInformation($"ContinueWith -> Done executing workflow id {container.DatabaseID}");
         }
 
+        public void Execute(ConcurrentDictionary<string, bool> workflows, WorkflowContainer container, IServiceCollection services)
+        {
+            if (workflows.ContainsKey(container.Type))
+                return;
+
+            if (!workflows.TryAdd(container.Type, true))
+                return;
+
+            _logger.DateInformation($"Executing workflow id : {container.DatabaseID}");
+
+            var workflow = Create(container);
+            workflow.Execute();
+
+            workflows.TryRemove(container.Type, out bool val);
+
+            _logger.DateInformation($"ContinueWith -> Done executing workflow id {container.DatabaseID}");
+        }
+
+
         public T EnsureWorkflow<T>() where T : class, IWorkflowContext
         {
             var container = Workflows.FirstOrDefault(p => p.Type == typeof(T).FullName
@@ -219,15 +247,13 @@ namespace TrustchainCore.Services
                                  || p.State == WorkflowStatusType.Waiting.ToString()));
 
             if (container == null)
-                return default(T);
-
-            var runningWf = (T)Create(container);
-            if (runningWf == null)
             {
                 var wf = Create<T>();
                 Save(wf);
                 return wf;
             }
+
+            var runningWf = (T)Create(container);
             return runningWf;
         }
     }

@@ -48,7 +48,7 @@ namespace UnitTest.TruststampCore.Services
             var timestampWorkflowService = ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
             var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
 
-            timestampWorkflowService.EnsureTimestampWorkflow();
+            timestampWorkflowService.CreateTimestampWorkflow();
 
             var count = trustDBService.Workflows.Count(p => p.Type == typeof(TimestampWorkflow).FullName
                      && (p.State == WorkflowStatusType.New.ToString()

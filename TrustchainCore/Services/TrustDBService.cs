@@ -11,6 +11,7 @@ namespace TrustchainCore.Services
 {
     public class TrustDBService : ITrustDBService
     {
+        public long ID { get; set; }
         public TrustDBContext DBContext { get; }
 
         public IQueryable<Package> Packages

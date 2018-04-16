@@ -19,6 +19,7 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "tag", NullValueHandling = NullValueHandling.Ignore)]
         public string Tag { get; set; }
 
+        [UIHint("UnixTime")]
         [JsonProperty(PropertyName = "nextExecution")]
         public long NextExecution { get; set; }
 

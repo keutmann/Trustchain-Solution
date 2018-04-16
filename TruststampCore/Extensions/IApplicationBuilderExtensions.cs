@@ -24,7 +24,7 @@ namespace TruststampCore.Extensions
                 //trustDBService.DBContext.SaveChanges();
 
                 //TODO: Undelete
-                timestampWorkflowService.EnsureTimestampWorkflow(); // Make sure that there is a Timestamp engine workflow
+                timestampWorkflowService.CreateAndExecute(); // Make sure that there is a Timestamp engine workflow
             }
         }
     }

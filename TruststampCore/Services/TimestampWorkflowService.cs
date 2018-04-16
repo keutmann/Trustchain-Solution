@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Enumerations;
 using TrustchainCore.Extensions;
+using Microsoft.Extensions.Configuration;
+using TruststampCore.Extensions;
 
 namespace TruststampCore.Services
 {
@@ -17,12 +19,14 @@ namespace TruststampCore.Services
         public IWorkflowService WorkflowService { get; } 
         private ITrustDBService _trustDBService;
         private ITimestampSynchronizationService _timestampSynchronizationService;
+        private IConfiguration _configuration;
 
-        public TimestampWorkflowService(IWorkflowService workflowService, ITrustDBService trustDBService, ITimestampSynchronizationService timestampSynchronizationService)
+        public TimestampWorkflowService(IWorkflowService workflowService, ITrustDBService trustDBService, ITimestampSynchronizationService timestampSynchronizationService, IConfiguration configuration)
         {
             WorkflowService = workflowService;
             _trustDBService = trustDBService;
             _timestampSynchronizationService = timestampSynchronizationService;
+            _configuration = configuration;
         }
 
         public int CountCurrentProofs()
@@ -33,15 +37,20 @@ namespace TruststampCore.Services
         public void CreateAndExecute()
         {
             var oldID = _timestampSynchronizationService.CurrentWorkflowID;
-            var wf = WorkflowService.Create<TimestampWorkflow>();
-            wf.Container.State = WorkflowStatusType.Waiting.ToString();
-            wf.Container.NextExecution = long.MaxValue;
-            _timestampSynchronizationService.CurrentWorkflowID = WorkflowService.Save(wf);
 
+            CreateTimestampWorkflow();
+
+            if (oldID == 0)
+                return;
+
+            // Activate the previous workflow
             var oldWf = WorkflowService.Load<TimestampWorkflow>(oldID);
-            oldWf.Container.State = WorkflowStatusType.Starting.ToString();
-            oldWf.Container.NextExecution = DateTime.Now.ToUnixTime();
-            WorkflowService.Save(oldWf);
+            if(oldWf != null)
+            {
+                oldWf.Container.State = WorkflowStatusType.Starting.ToString();
+                oldWf.Container.NextExecution = DateTime.Now.ToUnixTime();
+                WorkflowService.Save(oldWf);
+            }
         }
 
         public void EnsureTimestampScheduleWorkflow()
@@ -49,10 +58,12 @@ namespace TruststampCore.Services
             WorkflowService.EnsureWorkflow<TimestampScheduleWorkflow>();
         }
 
-        public void EnsureTimestampWorkflow()
+        public void CreateTimestampWorkflow()
         {
-            var timestampWorkflow = WorkflowService.EnsureWorkflow<TimestampWorkflow>();
-            _timestampSynchronizationService.CurrentWorkflowID = timestampWorkflow.ID;
+            var wf = WorkflowService.Create<TimestampWorkflow>();
+            wf.Container.State = WorkflowStatusType.Waiting.ToString();
+            wf.Container.NextExecution = DateTime.Now.AddSeconds(_configuration.TimestampInterval()).ToUnixTime();
+            _timestampSynchronizationService.CurrentWorkflowID = WorkflowService.Save(wf);
         }
 
     }

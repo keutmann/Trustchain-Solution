@@ -10,6 +10,6 @@ namespace TruststampCore.Interfaces
         int CountCurrentProofs();
         void CreateAndExecute();
         void EnsureTimestampScheduleWorkflow();
-        void EnsureTimestampWorkflow();
+        void CreateTimestampWorkflow();
     }
 }

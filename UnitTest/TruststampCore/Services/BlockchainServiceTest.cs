@@ -46,6 +46,10 @@ namespace UnitTest.TruststampCore.Services
 
             var result = blockchainService.GetTimestamp(fundingKey);
             Assert.IsTrue(result.Confirmations > 0, "No confirmations on: " + address);
+
+            Console.WriteLine($"Number of confirmations: {result.Confirmations}");
+            Console.WriteLine($"Address time: {DatetimeExtensions.FromUnixTime(result.Time)}");
+            
         }
 
         [TestMethod]

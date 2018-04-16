@@ -25,6 +25,11 @@
                 <span asp-validation-for="WorkflowContainer.State" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="WorkflowContainer.NextExecution" class="control-label"></label>
+                <input asp-for="WorkflowContainer.NextExecution" class="form-control" />
+                <span asp-validation-for="WorkflowContainer.NextExecution" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="WorkflowContainer.Tag" class="control-label"></label>
                 <input asp-for="WorkflowContainer.Tag" class="form-control" />
                 <span asp-validation-for="WorkflowContainer.Tag" class="text-danger"></span>

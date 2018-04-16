@@ -29,13 +29,15 @@ namespace TrustgraphCore.Workflows
 
 
 
-        public TrustTimestampStep(IWorkflowService workflowService, ITrustDBService trustDBService, IProofService proofService, IConfiguration configuration, ITimestampSynchronizationService timestampSynchronizationService)
+        public TrustTimestampStep(IWorkflowService workflowService, ITrustDBService trustDBService, IProofService proofService, IConfiguration configuration, ITimestampSynchronizationService timestampSynchronizationService, ILogger<TrustTimestampStep> logger)
         {
             _workflowService = workflowService;
             _trustDBService = trustDBService;
             _proofService = proofService;
             _configuration = configuration;
             _timestampSynchronizationService = timestampSynchronizationService;
+            _logger = logger;
+
         }
 
         /// <summary>
