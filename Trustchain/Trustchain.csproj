@@ -45,4 +45,7 @@
   <ItemGroup>
     <None Include="wwwroot\lib\bootstrap-table\bootstrap-table.js" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\NewFolder\" />
+  </ItemGroup>
 </Project>

@@ -70,7 +70,7 @@ namespace TrustchainCore.Model
         public bool ShouldSerializeId() { return Id != null; }
 
         [JsonProperty(PropertyName = "created")]
-        public long Created { get; set; }
+        public uint Created { get; set; }
         public bool ShouldSerializeCreated() { return Created > 0; }
 
         //[JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]

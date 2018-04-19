@@ -60,6 +60,10 @@ namespace UnitTest.TruststampCore.Workflows
 
             var localTimestampStep = workflow.GetStep<ILocalTimestampStep>();
             Assert.IsNotNull(localTimestampStep);
+
+            //var proofOneEntity = proofService.GetProof(oneHash);
+            //Assert.IsTrue(proofOneEntity.Receipt.Length > 0, "Proof one entity Receipt is not added");
+
         }
 
 
@@ -68,7 +72,8 @@ namespace UnitTest.TruststampCore.Workflows
         {
             var proofService = ServiceProvider.GetRequiredService<IProofService>();
 
-            proofService.AddProof(Guid.NewGuid().ToByteArray());
+            var proofOne = Guid.NewGuid().ToByteArray();
+            proofService.AddProof(proofOne);
             proofService.AddProof(Guid.NewGuid().ToByteArray());
             proofService.AddProof(Guid.NewGuid().ToByteArray());
 
@@ -84,6 +89,9 @@ namespace UnitTest.TruststampCore.Workflows
 
             var localTimestampStep = workflow.GetStep<ILocalTimestampStep>();
             Assert.IsNotNull(localTimestampStep);
+
+            var proofOneEntity = proofService.GetProof(proofOne);
+            Assert.IsTrue(proofOneEntity.Receipt.Length > 0, "Proof one entity Receipt is not added");
         }
     }
 }
