@@ -33,11 +33,11 @@ namespace TrustchainCore.Services
         }
 
 
-        public IQueryable<ProofEntity> Proofs
+        public IQueryable<Timestamp> Timestamps
         {
             get
             {
-                return DBContext.Proofs.AsQueryable();
+                return DBContext.Timestamps.AsQueryable();
             }
         }
 
@@ -69,8 +69,8 @@ namespace TrustchainCore.Services
 
         public Trust GetSimilarTrust(Trust trust)
         {
-            var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.IssuerAddress, trust.IssuerAddress)
-                                 && StructuralComparisons.StructuralEqualityComparer.Equals(p.SubjectAddress, trust.SubjectAddress)
+            var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, trust.Issuer.Address)
+                                 && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
                                  && p.Type == trust.Type
                                  && p.Scope == trust.Scope);
 

@@ -34,27 +34,27 @@ namespace TruststampCore.Workflows
                 return;
             }
 
-            var proofs = (from p in _trustDBService.Proofs
+            var timestamps = (from p in _trustDBService.Timestamps
                           where p.WorkflowID == Context.ID
                           select p).ToList();
 
-            if(proofs.Count == 0)
+            if(timestamps.Count == 0)
             {
                 CombineLog(_logger, $"No proofs found");
                 Context.RunStep<ISuccessStep>();
                 return; // Exit workflow succesfully
             }
 
-            foreach (var proof in proofs)
+            foreach (var proof in timestamps)
                 _merkleTree.Add(proof);
 
             timestampProof.MerkleRoot = _merkleTree.Build().Hash;
             timestampProof.Status = TimestampProofStatusType.Waiting.ToString();
 
-            _trustDBService.DBContext.Proofs.UpdateRange(proofs);
+            _trustDBService.DBContext.Timestamps.UpdateRange(timestamps);
             _trustDBService.DBContext.SaveChanges();
 
-            CombineLog(_logger, $"Proof found {proofs.Count} - Merkleroot: {timestampProof.MerkleRoot.ConvertToHex()}");
+            CombineLog(_logger, $"Timestamp found {timestamps.Count} - Merkleroot: {timestampProof.MerkleRoot.ConvertToHex()}");
             Context.RunStep<ILocalTimestampStep>();
         }
     }

@@ -8,54 +8,54 @@ using System.Collections;
 
 namespace TruststampCore.Services
 {
-    public class ProofService : IProofService
+    public class TimestampService : ITimestampService
     {
         private ITimestampSynchronizationService _timestampSynchronizationService;
         private ITrustDBService _trustDBService;
         private IBlockchainProofFactory _timestampProofFactory;
 
-        public ProofService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService, IBlockchainProofFactory timestampProofFactory)
+        public TimestampService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService, IBlockchainProofFactory timestampProofFactory)
         {
             _timestampSynchronizationService = timestampSynchronizationService;
             _trustDBService = trustDBService;
             _timestampProofFactory = timestampProofFactory;
         }
 
-        public IQueryable<ProofEntity> Proofs
+        public IQueryable<Timestamp> Timestamps
         {
             get
             {
-                return _trustDBService.Proofs;
+                return _trustDBService.Timestamps;
             }
         }
 
-        public ProofEntity AddProof(byte[] source, bool save = true)
+        public Timestamp Add(byte[] source, bool save = true)
         {
-            var proof = GetProof(source);
+            var proof = Get(source);
             if(proof == null)
             {
-                proof = new ProofEntity
+                proof = new Timestamp
                 {
                     WorkflowID = _timestampSynchronizationService.CurrentWorkflowID,
                     Source = source,
                     Registered = DateTime.Now.ToUnixTime()
                 };
-                _trustDBService.DBContext.Proofs.Add(proof);
+                _trustDBService.DBContext.Timestamps.Add(proof);
                 if(save)
                     _trustDBService.DBContext.SaveChanges();
             }
             return proof;
         }
 
-        public ProofEntity GetProof(byte[] source)
+        public Timestamp Get(byte[] source)
         {
-            var proof = _trustDBService.Proofs.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Source, source));
+            var proof = _trustDBService.Timestamps.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Source, source));
             return proof;
         }
 
-        public BlockchainProof GetBlockchainProof(byte[] source)
+        public BlockchainProof GetBlockchainTimestamp(byte[] source)
         {
-            var entity = GetProof(source);
+            var entity = Get(source);
             
             return _timestampProofFactory.Create(entity);
         }

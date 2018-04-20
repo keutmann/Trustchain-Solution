@@ -84,7 +84,7 @@ namespace UnitTest.TrustgraphCore
             var trust = context.Results.Trusts[0];
 
             VerfifyResult(context, "A", "B");
-            Assert.AreEqual(BinaryTrustFalseAttributes, trust.Attributes, $"Attributes are wrong!");
+            Assert.AreEqual(BinaryTrustFalseAttributes, trust.Claim, $"Attributes are wrong!");
         }
 
         [TestMethod]

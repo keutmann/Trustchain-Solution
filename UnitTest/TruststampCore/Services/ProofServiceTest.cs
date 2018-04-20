@@ -14,10 +14,10 @@ namespace UnitTest.TruststampCore.Services
         {
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             timestampSynchronizationService.CurrentWorkflowID = 2;
-            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+            var timestampService = ServiceProvider.GetRequiredService<ITimestampService>();
 
             var source = Guid.NewGuid().ToByteArray();
-            var entity = proofService.AddProof(source);
+            var entity = timestampService.Add(source);
 
             Assert.IsNotNull(entity);
             Assert.IsTrue(entity.DatabaseID > 0);
@@ -31,11 +31,11 @@ namespace UnitTest.TruststampCore.Services
         {
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             timestampSynchronizationService.CurrentWorkflowID = 2;
-            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+            var proofService = ServiceProvider.GetRequiredService<ITimestampService>();
             var source = Guid.NewGuid().ToByteArray();
-            var addEntity = proofService.AddProof(source);
+            var addEntity = proofService.Add(source);
 
-            var getEntity = proofService.GetProof(source);
+            var getEntity = proofService.Get(source);
             Assert.AreEqual(addEntity.DatabaseID, getEntity.DatabaseID);
             Assert.AreEqual(addEntity.WorkflowID, getEntity.WorkflowID);
             Assert.IsTrue(addEntity.Source.Equals(getEntity.Source));

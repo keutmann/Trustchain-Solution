@@ -6,6 +6,8 @@ using TrustchainCore.Builders;
 using TrustgraphCore.Extensions;
 using TrustgraphCore.Enumerations;
 using System.Linq;
+using TrustchainCore.Extensions;
+
 
 namespace TrustgraphCore.Services
 {
@@ -40,9 +42,9 @@ namespace TrustgraphCore.Services
 
         public void Add(Trust trust)
         {
-            var issuer = EnsureGraphIssuer(trust.IssuerAddress);
+            var issuer = EnsureGraphIssuer(trust.Issuer.Address);
 
-            var graphSubject = EnsureGraphSubject(issuer, trust.SubjectAddress);
+            var graphSubject = EnsureGraphSubject(issuer, trust.Subject.Address);
 
             var graphClaim = EnsureGraphClaim(trust);
             graphSubject.Claims.Ensure(graphClaim.Scope, graphClaim.Type, graphClaim.Index);
@@ -50,10 +52,10 @@ namespace TrustgraphCore.Services
 
         public void Remove(Trust trust)
         {
-            if (!Graph.IssuerIndex.TryGetValue(trust.IssuerAddress, out int issuerIndex))
+            if (!Graph.IssuerIndex.TryGetValue(trust.Issuer.Address, out int issuerIndex))
                 return; // No issuer, then no trust!
 
-            if (!Graph.IssuerIndex.TryGetValue(trust.SubjectAddress, out int subjectIndex))
+            if (!Graph.IssuerIndex.TryGetValue(trust.Subject.Address, out int subjectIndex))
                 return; // No subject, then no trust!
 
             var graphIssuer = Graph.Issuers[issuerIndex];
@@ -133,7 +135,7 @@ namespace TrustgraphCore.Services
             {
                 graphClaim.Index = Graph.Claims.Count;
 
-                if (TrustBuilder.IsTrustTrue(trust.Type, trust.Attributes))
+                if (TrustBuilder.IsTrustTrue(trust.Type, trust.Claim))
                     graphClaim.Flags |= ClaimFlags.Trust;
 
                 Graph.Claims.Add(graphClaim);
@@ -147,7 +149,7 @@ namespace TrustgraphCore.Services
         }
         public GraphClaim CreateGraphClaim(Trust trust)
         {
-            return CreateGraphClaim(trust.Type, trust.Scope, trust.Attributes, 100);
+            return CreateGraphClaim(trust.Type, trust.Scope.GetValue(), trust.Claim, 100);
         }
 
         public GraphClaim CreateGraphClaim(string type, string scope, string attributes, short cost = 100)
@@ -189,8 +191,8 @@ namespace TrustgraphCore.Services
                 {
                     var trust = new Trust
                     {
-                        IssuerAddress = tracker.Issuer.Address,
-                        SubjectAddress = ts.TargetIssuer.Address
+                        Issuer = new IssuerIdentity { Address = tracker.Issuer.Address },
+                        Subject = new SubjectIdentity { Address = ts.TargetIssuer.Address }
                     };
 
                     if (ts.Claims.Count() > 0)
@@ -205,10 +207,10 @@ namespace TrustgraphCore.Services
                                 trust.Type = type;
 
                             if (Graph.ClaimAttributes.TryGetValue(trackerClaim.Attributes, out string attributes))
-                                trust.Attributes = attributes;
+                                trust.Claim = attributes;
 
                             if (Graph.Scopes.TryGetValue(trackerClaim.Scope, out string scope))
-                                trust.Scope = scope;
+                                trust.Scope = new Scope { Value = scope };
 
                             trust.Cost = trackerClaim.Cost;
                             trust.Expire = 0;
@@ -218,7 +220,7 @@ namespace TrustgraphCore.Services
                     else
                     {
                         trust.Type = TrustBuilder.BINARYTRUST_TC1;
-                        trust.Attributes = TrustBuilder.CreateBinaryTrustAttributes(true);
+                        trust.Claim = TrustBuilder.CreateBinaryTrustAttributes(true);
                     }
 
                     context.Results.Trusts.Add(trust);

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TrustchainCore.Interfaces
 {
-    public interface IProof
+    public interface ITimestamp
     {
         byte[] Source { get; set; }
         byte[] Receipt { get; set; }

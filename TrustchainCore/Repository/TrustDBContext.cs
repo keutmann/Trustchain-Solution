@@ -7,11 +7,8 @@ namespace TrustchainCore.Repository
     {
         public DbSet<Package> Packages { get; set; }
         public DbSet<Trust> Trusts { get; set; }
-        //public DbSet<Subject> Subjects { get; set; }
-        //public DbSet<Claim> Claims { get; set; }
         public DbSet<Timestamp> Timestamps { get; set; }
 
-        public DbSet<ProofEntity> Proofs { get; set; }
         public DbSet<WorkflowContainer> Workflows { get; set; }
         public DbSet<KeyValue> KeyValues { get; set; }
 
@@ -29,17 +26,25 @@ namespace TrustchainCore.Repository
         {
             builder.Entity<Package>().HasKey(p => p.DatabaseID);
             builder.Entity<Package>().HasAlternateKey(p => p.Id);
+            builder.Entity<Package>().OwnsOne(p => p.Server);
+
 
             builder.Entity<Trust>().HasKey(p => p.DatabaseID);
-            
-            builder.Entity<Trust>().HasIndex(p => p.Id).IsUnique(true);
-            builder.Entity<Trust>().HasIndex(p => new { p.IssuerAddress, p.SubjectAddress, p.Type, p.Scope }).IsUnique(true);
-            builder.Entity<Timestamp>().HasKey(p => p.DatabaseID);
+            builder.Entity<Trust>().OwnsOne(p => p.Issuer).HasIndex(i => i.Address);
+            builder.Entity<Trust>().OwnsOne(p => p.Subject).HasIndex(i => i.Address);
+            builder.Entity<Trust>().OwnsOne(p => p.Scope);
 
-            // Proof
-            builder.Entity<ProofEntity>().HasKey(p => p.DatabaseID);
-            builder.Entity<ProofEntity>().HasIndex(p => p.Source);
-            builder.Entity<ProofEntity>().HasIndex(p => p.WorkflowID);
+            builder.Entity<Trust>().HasIndex(p => p.Id).IsUnique(true);
+
+            //builder.Entity<Trust>().HasIndex(p => p.Issuer.Address );
+            //builder.Entity<Trust>().HasIndex(p => p.Subject.Address );
+
+ //           builder.Entity<Trust>().HasMany(b => b.Timestamps).WithOne().HasForeignKey(p=>p.ParentID);
+
+            //builder.Entity<Trust>().HasIndex(p => new { p.IssuerAddress, p.SubjectAddress, p.Type, p.Scope }).IsUnique(true);
+            builder.Entity<Timestamp>().HasKey(p => p.DatabaseID);
+            builder.Entity<Timestamp>().HasIndex(p => p.Source);
+            builder.Entity<Timestamp>().HasIndex(p => p.WorkflowID);
 
             // Workflow
             builder.Entity<WorkflowContainer>().HasKey(p => p.DatabaseID);

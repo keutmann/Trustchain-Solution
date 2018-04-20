@@ -40,12 +40,12 @@ namespace UnitTest.TruststampCore.Workflows
         {
             var derivationStrategyFactory = ServiceProvider.GetRequiredService<IDerivationStrategyFactory>();
             var derivationStrategy = derivationStrategyFactory.GetService("btcpkh");
-            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+            var timestampService = ServiceProvider.GetRequiredService<ITimestampService>();
 
             var one = Encoding.UTF8.GetBytes("Hello world\n");
             var oneHash = derivationStrategy.HashOf(one);
 
-            proofService.AddProof(one);
+            timestampService.Add(one);
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
@@ -70,12 +70,12 @@ namespace UnitTest.TruststampCore.Workflows
         [TestMethod]
         public void Execute()
         {
-            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+            var proofService = ServiceProvider.GetRequiredService<ITimestampService>();
 
             var proofOne = Guid.NewGuid().ToByteArray();
-            proofService.AddProof(proofOne);
-            proofService.AddProof(Guid.NewGuid().ToByteArray());
-            proofService.AddProof(Guid.NewGuid().ToByteArray());
+            proofService.Add(proofOne);
+            proofService.Add(Guid.NewGuid().ToByteArray());
+            proofService.Add(Guid.NewGuid().ToByteArray());
 
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
@@ -90,7 +90,7 @@ namespace UnitTest.TruststampCore.Workflows
             var localTimestampStep = workflow.GetStep<ILocalTimestampStep>();
             Assert.IsNotNull(localTimestampStep);
 
-            var proofOneEntity = proofService.GetProof(proofOne);
+            var proofOneEntity = proofService.Get(proofOne);
             Assert.IsTrue(proofOneEntity.Receipt.Length > 0, "Proof one entity Receipt is not added");
         }
     }

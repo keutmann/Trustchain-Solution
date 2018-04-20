@@ -89,22 +89,22 @@ namespace TruststampCore.Workflows
 
         public void BuildMerkleTree()
         { 
-            var proofs = (from p in _trustDBService.Proofs
+            var timestamps = (from p in _trustDBService.Timestamps
                           where p.WorkflowID == Context.ID
                           select p).ToList();
 
-            if(proofs.Count == 0)
+            if(timestamps.Count == 0)
             {
                 return; // Exit workflow succesfully
             }
 
-            foreach (var proof in proofs)
+            foreach (var timestamp in timestamps)
             {
-                _merkleTree.Add(proof);
+                _merkleTree.Add(timestamp);
             }
 
             TimestampProof.MerkleRoot = _merkleTree.Build().Hash;
-            CombineLog(_logger, $"Proof found {proofs.Count} - Merkleroot: {TimestampProof.MerkleRoot.ConvertToHex()}");
+            CombineLog(_logger, $"Proof found {timestamps.Count} - Merkleroot: {TimestampProof.MerkleRoot.ConvertToHex()}");
         }
 
         public void ProcessConfirmation()

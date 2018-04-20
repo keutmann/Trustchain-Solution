@@ -17,18 +17,18 @@ namespace TruststampCore.Factories
             _workflowService = workflowService;
         }
 
-        public BlockchainProof Create(ProofEntity proofEntity)
+        public BlockchainProof Create(Timestamp timestamp)
         {
-            var workflowContainer = _workflowService.Workflows.FirstOrDefault(p => p.DatabaseID == proofEntity.WorkflowID);
+            var workflowContainer = _workflowService.Workflows.FirstOrDefault(p => p.DatabaseID == timestamp.WorkflowID);
             if (workflowContainer == null)
                 return null;
 
             var workflow = (ITimestampWorkflow)_workflowService.Create(workflowContainer);
 
             var proof = workflow.Proof;
-            proof.Proofs = new List<ProofEntity>
+            proof.Proofs = new List<Timestamp>
             {
-                proofEntity
+                timestamp
             };
 
             return proof;

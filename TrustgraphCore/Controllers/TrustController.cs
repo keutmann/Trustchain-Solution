@@ -18,13 +18,13 @@ namespace TrustgraphCore.Controllers
         private IGraphTrustService _graphTrustService;
         private ITrustSchemaService _trustSchemaService;
         private ITrustDBService _trustDBService;
-        private IProofService _proofService;
+        private ITimestampService _proofService;
         private IBlockchainServiceFactory _blockchainServiceFactory;
         private IServiceProvider _serviceProvider;
 
 
 
-        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, IProofService proofService, IBlockchainServiceFactory blockchainServiceFactory, IServiceProvider serviceProvider)
+        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, ITimestampService proofService, IBlockchainServiceFactory blockchainServiceFactory, IServiceProvider serviceProvider)
         {
             _graphTrustService = graphTrustService;
             _trustSchemaService = trustSchemaService;
@@ -88,7 +88,7 @@ namespace TrustgraphCore.Controllers
             }
 
             _trustDBService.Add(trust);   // Add to database
-            _proofService.AddProof(trust.Id);
+            _proofService.Add(trust.Id);
 
             var time = DateTime.Now.ToUnixTime();
             if ((trust.Expire  == 0 || trust.Expire > time) 
@@ -169,10 +169,10 @@ namespace TrustgraphCore.Controllers
             //    throw new ApplicationException("Missing trustId");
             var query = new Trust
             {
-                IssuerAddress = issuer,
-                SubjectAddress = subject,
+                Issuer = new IssuerIdentity { Address = issuer },
+                Subject = new SubjectIdentity { Address = subject },
                 Type = type,
-                Scope = scope
+                Scope = new Scope { Value = scope }
             };
 
             var trust = _trustDBService.GetSimilarTrust(query);

@@ -24,7 +24,7 @@ namespace UnitTest.TrustchainCore.Strategy
 
             var one = Encoding.UTF8.GetBytes("Hello world\n");
             var oneHash = hashAlgorithm.HashOf(one);
-            var oneProof = merkle.Add(new ProofEntity { Source = one });
+            var oneProof = merkle.Add(new Timestamp { Source = one });
 
             var root = merkle.Build();
 
@@ -47,8 +47,8 @@ namespace UnitTest.TrustchainCore.Strategy
 
             var one = Encoding.UTF8.GetBytes("Hello world\n");
             var two = Encoding.UTF8.GetBytes("Test\n");
-            var oneProof = merkle.Add(new ProofEntity { Source = one });
-            var twoProof = merkle.Add(new ProofEntity { Source = two });
+            var oneProof = merkle.Add(new Timestamp { Source = one });
+            var twoProof = merkle.Add(new Timestamp { Source = two });
 
             var oneHash = hashAlgorithm.HashOf(one);
             var twoHash = hashAlgorithm.HashOf(two);
@@ -82,9 +82,9 @@ namespace UnitTest.TrustchainCore.Strategy
             var one = Encoding.UTF8.GetBytes("Hello world\n");
             var two = Encoding.UTF8.GetBytes("Test\n");
             var three = Encoding.UTF8.GetBytes("Test\n");
-            var oneProof = merkle.Add(new ProofEntity { Source = one });
-            var twoProof = merkle.Add(new ProofEntity { Source = two });
-            var threeProof = merkle.Add(new ProofEntity { Source = three });
+            var oneProof = merkle.Add(new Timestamp { Source = one });
+            var twoProof = merkle.Add(new Timestamp { Source = two });
+            var threeProof = merkle.Add(new Timestamp { Source = three });
 
             var oneHash = hashAlgorithm.HashOf(one);
             var twoHash = hashAlgorithm.HashOf(two);
@@ -124,7 +124,7 @@ namespace UnitTest.TrustchainCore.Strategy
             for (int i = 0; i < length; i++)
             {
                 var data = Encoding.UTF8.GetBytes($"{i}\n");
-                nodes.Add(merkle.Add(new ProofEntity { Source = data }));
+                nodes.Add(merkle.Add(new Timestamp { Source = data }));
             }
             var root = merkle.Build();
 

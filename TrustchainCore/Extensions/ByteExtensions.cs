@@ -50,6 +50,11 @@ namespace TrustchainCore.Extensions
             return 0;
         }
 
+        public static string ToHex(this byte[] ba)
+        {
+            return BitConverter.ToString(ba).Replace("-", "");
+        }
+
     }
 
 }

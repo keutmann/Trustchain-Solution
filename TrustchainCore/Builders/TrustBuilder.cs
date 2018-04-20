@@ -152,26 +152,29 @@ namespace TrustchainCore.Builders
             return this;
         }
 
-        public TrustBuilder SetIssuer(byte[] address, string script = "", SignDelegate sign = null)
+        public TrustBuilder SetIssuer(byte[] address, string type = "", SignDelegate sign = null)
         {
-            if (string.IsNullOrEmpty(script))
-                script = DerivationStrategyFactory.BTC_PKH;
+            if (string.IsNullOrEmpty(type))
+                type = DerivationStrategyFactory.BTC_PKH;
 
-            CurrentTrust.IssuerScript = script;
-            CurrentTrust.IssuerAddress = address;
+            CurrentTrust.Issuer.Type = type;
+            CurrentTrust.Issuer.Address = address;
             CurrentTrust.IssuerSign = sign;
 
             return this;
         }
 
-        public TrustBuilder SetServer(byte[] address, string script = "", SignDelegate sign = null)
+        public TrustBuilder SetServer(byte[] address, string type = "", SignDelegate sign = null)
         {
-            if (string.IsNullOrEmpty(script))
-                script = DerivationStrategyFactory.BTC_PKH;
+            if (string.IsNullOrEmpty(type))
+                type = DerivationStrategyFactory.BTC_PKH;
 
-            Package.ServerAddress = address;
-            Package.ServerScript = script;
-            Package.ServerSign = sign;
+            if (Package.Server == null)
+                Package.Server = new ServerIdentity();
+
+            Package.Server.Address = address;
+            Package.Server.Type = type;
+            Package.Server.Sign = sign;
 
             return this;
         }
@@ -183,12 +186,12 @@ namespace TrustchainCore.Builders
 
             if (sign != null)
             {
-                trust.IssuerSignature = sign(trust.Id);
+                trust.Issuer.Signature = sign(trust.Id);
             }
             else
             {
                 if (trust.IssuerSign != null)
-                    trust.IssuerSignature = trust.IssuerSign(trust.Id);
+                    trust.Issuer.Signature = trust.IssuerSign(trust.Id);
             }
             return this;
         }
@@ -199,9 +202,9 @@ namespace TrustchainCore.Builders
                 package = Package;
 
             if (sign != null) 
-                Package.ServerSignature = sign(Package.Id);
+                Package.SetSignature(sign(Package.Id));
             else
-                Package.ServerSignature = Package.ServerSign(Package.Id); 
+                Package.SetSignature(Package.ServerSign(Package.Id)); 
             return this;
         }
 
@@ -235,7 +238,7 @@ namespace TrustchainCore.Builders
 
         public TrustBuilder AddSubject(byte[] address)
         {
-            _currentTrust.SubjectAddress = address;
+            _currentTrust.Subject.Address = address;
 
             return this;
         }
@@ -243,7 +246,7 @@ namespace TrustchainCore.Builders
         public TrustBuilder AddType(string type, string attributes)
         {
             _currentTrust.Type = type;
-            _currentTrust.Attributes = attributes;
+            _currentTrust.Claim = attributes;
 
             return this;
         }
@@ -259,7 +262,7 @@ namespace TrustchainCore.Builders
                 if(trust.Id == null)
                     BuildTrustID(trust);
 
-                merkleTree.Add(new ProofEntity() { Source = trust.Id });
+                merkleTree.Add(new Timestamp { Source = trust.Id });
             }
             Package.Id = merkleTree.Build().Hash;
                 

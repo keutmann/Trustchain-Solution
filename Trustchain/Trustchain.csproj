@@ -15,13 +15,9 @@
   <ItemGroup>
     <None Remove="Resources\Proof.htm" />
     <None Remove="trust - backup.old" />
-    <None Remove="trust.db" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Proof.htm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="trust.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

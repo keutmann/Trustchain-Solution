@@ -15,13 +15,14 @@ namespace TrustchainCore.Strategy
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                ms.WriteString(trust.IssuerScript.ToLowerSafe());
-                ms.WriteBytes(trust.IssuerAddress);
-                ms.WriteString(trust.SubjectScript.ToLowerSafe());
-                ms.WriteBytes(trust.SubjectAddress);
+                ms.WriteString(trust.Issuer.Type.ToLowerSafe());
+                ms.WriteBytes(trust.Issuer.Address);
+                ms.WriteString(trust.Subject.Type.ToLowerSafe());
+                ms.WriteBytes(trust.Subject.Address);
                 ms.WriteString(trust.Type.ToLowerSafe());
-                ms.WriteString(trust.Scope.ToLowerSafe());
-                ms.WriteString(trust.Attributes);
+                ms.WriteString(trust.Claim);
+                ms.WriteString(trust.Scope.Type.ToLowerSafe());
+                ms.WriteString(trust.Scope.Value.ToLowerSafe());
 
                 ms.WriteInteger(trust.Created);
                 ms.WriteInteger(trust.Cost);

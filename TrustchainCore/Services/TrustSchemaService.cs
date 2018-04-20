@@ -151,18 +151,21 @@ namespace TrustchainCore.Services
 
             private void ValidateIssuer(Trust trust, string location, SchemaValidationResult result)
             {
-                if (trust.IssuerAddress == null || trust.IssuerAddress.Length == 0)
+                if (trust.Issuer == null)
+                    result.Errors.Add(location + "Missing issuer");
+
+                if (trust.Issuer.Address == null || trust.Issuer.Address.Length == 0)
                     result.Errors.Add(location + "Missing issuer address");
 
                 if (_options == TrustSchemaValidationOptions.Full)
                 {
-                    if (trust.IssuerSignature == null || trust.IssuerSignature.Length == 0)
+                    if (trust.Issuer.Signature == null || trust.Issuer.Signature.Length == 0)
                         result.Errors.Add(location + "Missing issuer signature");
                     else
                     {
-                        var scriptService = _derivationStrategyFactory.GetService(trust.IssuerScript);
+                        var scriptService = _derivationStrategyFactory.GetService(trust.Issuer.Type);
 
-                        if (!scriptService.VerifySignature(trust.Id, trust.IssuerSignature, trust.IssuerAddress))
+                        if (!scriptService.VerifySignature(trust.Id, trust.Issuer.Signature, trust.Issuer.Address))
                         {
                             result.Errors.Add(location + "Invalid issuer signature");
                         }
@@ -177,11 +180,11 @@ namespace TrustchainCore.Services
 
                 if (_options == TrustSchemaValidationOptions.Full)
                 {
-                    if (trust.SubjectSignature != null)
+                    if (trust.Subject != null && trust.Subject.Signature != null)
                     {
-                        var scriptService = _derivationStrategyFactory.GetService(trust.SubjectScript);
+                        var scriptService = _derivationStrategyFactory.GetService(trust.Subject.Type);
 
-                        if (!scriptService.VerifySignature(trust.Id, trust.SubjectSignature, trust.SubjectAddress))
+                        if (!scriptService.VerifySignature(trust.Id, trust.Subject.Signature, trust.Subject.Address))
                         {
                             result.Errors.Add(location + "Invalid subject signature");
                         }

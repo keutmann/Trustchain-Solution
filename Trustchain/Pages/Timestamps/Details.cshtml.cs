@@ -19,7 +19,7 @@ namespace Trustchain.Pages.Timestamps
             _context = context;
         }
 
-        public ProofEntity ProofEntity { get; set; }
+        public Timestamp Timestamp { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,9 +28,9 @@ namespace Trustchain.Pages.Timestamps
                 return NotFound();
             }
 
-            ProofEntity = await _context.Proofs.SingleOrDefaultAsync(m => m.DatabaseID == id);
+            Timestamp = await _context.Timestamps.SingleOrDefaultAsync(m => m.DatabaseID == id);
 
-            if (ProofEntity == null)
+            if (Timestamp == null)
             {
                 return NotFound();
             }

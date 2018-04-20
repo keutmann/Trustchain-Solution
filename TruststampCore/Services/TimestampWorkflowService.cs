@@ -31,7 +31,7 @@ namespace TruststampCore.Services
 
         public int CountCurrentProofs()
         {
-            return _trustDBService.Proofs.Where(p => p.WorkflowID == _timestampSynchronizationService.CurrentWorkflowID).Count();
+            return _trustDBService.Timestamps.Where(p => p.WorkflowID == _timestampSynchronizationService.CurrentWorkflowID).Count();
         }
 
         public void CreateAndExecute()

@@ -16,7 +16,7 @@ namespace TruststampCore.Extensions
             services.AddSingleton<ITimestampSynchronizationService, TimestampSynchronizationService>();
 
             services.AddTransient<ITimestampWorkflowService, TimestampWorkflowService>();
-            services.AddTransient<IProofService, ProofService>();
+            services.AddTransient<ITimestampService, TimestampService>();
 
             services.AddTransient<IHashAlgorithm, Double256>();
             services.AddTransient<IMerkleTree, MerkleTreeSorted>();

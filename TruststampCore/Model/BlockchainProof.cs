@@ -29,7 +29,7 @@ namespace TrustchainCore.Model
         public string Status { get; set; }
 
         [JsonProperty(PropertyName = "proofs", NullValueHandling = NullValueHandling.Ignore)]
-        public List<ProofEntity> Proofs { get; set; }
+        public List<Timestamp> Proofs { get; set; }
 
         public BlockchainProof()
         {

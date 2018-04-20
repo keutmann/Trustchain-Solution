@@ -14,10 +14,10 @@ namespace TrustgraphCore.Services
         }
 
 
-        public void EnsureTrustTimestampWorkflow()
-        {
-            _workflowService.EnsureWorkflow<TrustTimestampWorkflow>();
-        }
+        //public void EnsureTrustTimestampWorkflow()
+        //{
+        //    _workflowService.EnsureWorkflow<TrustTimestampWorkflow>();
+        //}
 
     }
 }

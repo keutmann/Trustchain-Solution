@@ -12,9 +12,9 @@ namespace TrustchainCore.Model
         public MerkleNode Right { get; set; }
         public MerkleNode Parent { get; set; }
 
-        public IProof Proof { get; set; }
+        public ITimestamp Proof { get; set; }
 
-        public MerkleNode(IProof proof, IHashAlgorithm hashAlgorithm)
+        public MerkleNode(ITimestamp proof, IHashAlgorithm hashAlgorithm)
         {
             Proof = proof;
             Hash = hashAlgorithm.HashOf(proof.Source);

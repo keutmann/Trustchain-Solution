@@ -16,7 +16,7 @@ namespace TrustgraphCore.Workflows
     {
         private IWorkflowService _workflowService;
         private ITrustDBService _trustDBService;
-        private IProofService _proofService;
+        private ITimestampService _timestampService;
         private IConfiguration _configuration;
         private ITimestampSynchronizationService _timestampSynchronizationService;
 
@@ -29,11 +29,11 @@ namespace TrustgraphCore.Workflows
 
 
 
-        public TrustTimestampStep(IWorkflowService workflowService, ITrustDBService trustDBService, IProofService proofService, IConfiguration configuration, ITimestampSynchronizationService timestampSynchronizationService, ILogger<TrustTimestampStep> logger)
+        public TrustTimestampStep(IWorkflowService workflowService, ITrustDBService trustDBService, ITimestampService timestampService, IConfiguration configuration, ITimestampSynchronizationService timestampSynchronizationService, ILogger<TrustTimestampStep> logger)
         {
             _workflowService = workflowService;
             _trustDBService = trustDBService;
-            _proofService = proofService;
+            _timestampService = timestampService;
             _configuration = configuration;
             _timestampSynchronizationService = timestampSynchronizationService;
             _logger = logger;
@@ -48,7 +48,7 @@ namespace TrustgraphCore.Workflows
         {
             // Get trusts
             var trusts = from t in _trustDBService.Trusts
-                         where t.TimestampRecipt == null || t.TimestampRecipt.Length == 0
+                         where t.Timestamps == null 
                          select t;
 
             if (trusts != null && trusts.Count() > 0)
@@ -73,10 +73,10 @@ namespace TrustgraphCore.Workflows
 
         public void ProcessTrust(Trust trust)
         {
-            var proof = _proofService.GetProof(trust.Id);
+            var proof = _timestampService.Get(trust.Id);
             if (proof == null)
             {
-                _proofService.AddProof(trust.Id); // Fail safe, if somehow the trust has not been added to the proof list.
+                _timestampService.Add(trust.Id); // Fail safe, if somehow the trust has not been added to the proof list.
                 _addedProofs++;
                 return;
             }
@@ -96,9 +96,17 @@ namespace TrustgraphCore.Workflows
 
             if (timestampWorkflow.Proof.Confirmations > 0)
             {
-                trust.TimestampAlgorithm = timestampWorkflow.Proof.Blockchain;
-                trust.TimestampRecipt = proof.Receipt;
+                if (trust.Timestamps == null)
+                    trust.Timestamps = new List<Timestamp>();
+
+                var stamp = new Timestamp
+                {
+                    Algorithm = timestampWorkflow.Proof.Blockchain,
+                    Receipt = proof.Receipt
+                };
+
                 _trustDBService.DBContext.Trusts.Update(trust);
+
                 _updatedTrusts++;
             }
         }

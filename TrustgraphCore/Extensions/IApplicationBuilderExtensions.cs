@@ -14,7 +14,6 @@ namespace TrustgraphCore.Extensions
                 trustLoadService.LoadFromDatabase();
 
                 var graphWorkflowService = scope.ServiceProvider.GetRequiredService<IGraphWorkflowService>();
-                graphWorkflowService.EnsureTrustTimestampWorkflow();
             }
         }
     }

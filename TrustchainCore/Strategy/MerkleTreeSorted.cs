@@ -20,10 +20,10 @@ namespace TrustchainCore.Strategy
 
         public MerkleNode Add(byte[] data)
         {
-            return Add(new ProofEntity() { Source = data });
+            return Add(new Timestamp { Source = data });
         }
 
-        public MerkleNode Add(IProof proof)
+        public MerkleNode Add(ITimestamp proof)
         {
             var node = new MerkleNode(proof, HashAlgorithm);
             LeafNodes.Add(node);

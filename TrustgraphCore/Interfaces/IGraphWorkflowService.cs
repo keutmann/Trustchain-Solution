@@ -2,6 +2,6 @@
 {
     public interface IGraphWorkflowService
     {
-        void EnsureTrustTimestampWorkflow();
+        //void EnsureTrustTimestampWorkflow();
     }
 }

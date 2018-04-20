@@ -19,11 +19,11 @@ namespace Trustchain.Pages.Timestamps
             _context = context;
         }
 
-        public ProofEntity Timestamp { get;set; }
+        public Timestamp Timestamp { get;set; }
 
         public void OnGetAsync()
         {
-            Timestamp = new ProofEntity();
+            Timestamp = new Timestamp();
         }
     }
 }

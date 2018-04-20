@@ -14,9 +14,9 @@ namespace TruststampCore.Controllers
     public class TimestampController : ApiController
     {
 
-        private IProofService _proofService;
+        private ITimestampService _proofService;
 
-        public TimestampController(IProofService proofService)
+        public TimestampController(ITimestampService proofService)
         {
             _proofService = proofService;
         }
@@ -25,7 +25,7 @@ namespace TruststampCore.Controllers
         [Route("api/[controller]")]
         public ActionResult Add([FromBody]byte[] source)
         {
-            return ApiOk(_proofService.AddProof(source));
+            return ApiOk(_proofService.Add(source));
         }
 
         [HttpGet] // string blockchain, 
@@ -37,7 +37,7 @@ namespace TruststampCore.Controllers
                 throw new ApplicationException("Source cannot be empty.");
 
             var data = Encoding.UTF8.GetBytes(source);
-            return ApiOk(_proofService.AddProof(data));
+            return ApiOk(_proofService.Add(data));
         }
 
 
@@ -47,7 +47,7 @@ namespace TruststampCore.Controllers
         [Route("api/[controller]/{source}")]
         public ActionResult Get(string blockchain, byte[] source)
         {
-            return ApiOk(_proofService.GetBlockchainProof(source));
+            return ApiOk(_proofService.GetBlockchainTimestamp(source));
         }
 
 
@@ -56,7 +56,7 @@ namespace TruststampCore.Controllers
         public ActionResult Load(String sort, String order, String search, Int32 limit, Int32 offset, String ExtraParam)
         {
             // Get entity fieldnames
-            List<String> columnNames = typeof(ProofEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(p => p.Name).ToList();
+            List<String> columnNames = typeof(Timestamp).GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(p => p.Name).ToList();
 
             // Create a seperate list for searchable field names   
             List<String> searchFields = new List<String>(columnNames);
@@ -65,7 +65,7 @@ namespace TruststampCore.Controllers
             //searchFields.Remove("ISO2");
 
             // Perform filtering
-            IQueryable items = _proofService.Proofs.Search(search, searchFields);
+            IQueryable items = _proofService.Timestamps.Search(search, searchFields);
 
             // Sort the filtered items and apply paging
             return Ok(items.Filter(columnNames, sort, order, limit, offset));

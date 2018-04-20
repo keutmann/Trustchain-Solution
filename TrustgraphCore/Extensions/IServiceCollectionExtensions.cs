@@ -22,8 +22,8 @@ namespace TrustgraphCore.Extensions
             services.AddTransient<IQueryRequestService, QueryRequestService>();
             services.AddTransient<IGraphWorkflowService, GraphWorkflowService>();
 
-            services.AddTransient<ITrustTimestampStep, TrustTimestampStep>();
-            services.AddTransient<TrustTimestampWorkflow>();
+            //services.AddTransient<ITrustTimestampStep, TrustTimestampStep>();
+            //services.AddTransient<TrustTimestampWorkflow>();
 
 
         }

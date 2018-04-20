@@ -93,7 +93,7 @@ namespace UnitTest.TruststampCore.Workflows
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
             var trustDBService = ServiceProvider.GetRequiredService<ITrustDBService>();
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var proofService = ServiceProvider.GetRequiredService<IProofService>();
+            var proofService = ServiceProvider.GetRequiredService<ITimestampService>();
             var timestampWorkflow = workflowService.Create<TimestampWorkflow>();
 
             timestampSynchronizationService.CurrentWorkflowID = workflowService.Save(timestampWorkflow);
@@ -109,7 +109,7 @@ namespace UnitTest.TruststampCore.Workflows
 
             foreach (var trust in trustBuilder.Package.Trusts)
             {
-                proofService.AddProof(trust.Id);
+                proofService.Add(trust.Id);
             }
 
             var merkleStep = timestampWorkflow.GetStep<IMerkleStep>();
@@ -135,9 +135,12 @@ namespace UnitTest.TruststampCore.Workflows
                 var dbTrust = trustDBService.GetTrustById(trust.Id);
 
                 Assert.IsNotNull(dbTrust);
-                Assert.AreEqual(dbTrust.TimestampAlgorithm, blockchain);
-                Assert.IsNotNull(dbTrust.TimestampRecipt);
-                Assert.IsTrue(dbTrust.TimestampRecipt.Length > 0);
+                foreach (var timestamp in dbTrust.Timestamps)
+                {
+                    Assert.AreEqual(timestamp.Algorithm, blockchain);
+                    Assert.IsNotNull(timestamp.Receipt);
+                    Assert.IsTrue(timestamp.Receipt.Length > 0);
+                }
             }
         }
 
