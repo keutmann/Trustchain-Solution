@@ -157,6 +157,9 @@ namespace TrustchainCore.Builders
             if (string.IsNullOrEmpty(type))
                 type = DerivationStrategyFactory.BTC_PKH;
 
+            if (CurrentTrust.Issuer == null)
+                CurrentTrust.Issuer = new IssuerIdentity();
+
             CurrentTrust.Issuer.Type = type;
             CurrentTrust.Issuer.Address = address;
             CurrentTrust.IssuerSign = sign;
@@ -204,7 +207,8 @@ namespace TrustchainCore.Builders
             if (sign != null) 
                 Package.SetSignature(sign(Package.Id));
             else
-                Package.SetSignature(Package.ServerSign(Package.Id)); 
+                if(Package.ServerSign != null)
+                    Package.SetSignature(Package.ServerSign(Package.Id)); 
             return this;
         }
 
@@ -238,15 +242,18 @@ namespace TrustchainCore.Builders
 
         public TrustBuilder AddSubject(byte[] address)
         {
+            if (CurrentTrust.Subject == null)
+                CurrentTrust.Subject = new SubjectIdentity();
+
             _currentTrust.Subject.Address = address;
 
             return this;
         }
 
-        public TrustBuilder AddType(string type, string attributes)
+        public TrustBuilder AddType(string type, string claim)
         {
             _currentTrust.Type = type;
-            _currentTrust.Claim = attributes;
+            _currentTrust.Claim = claim;
 
             return this;
         }

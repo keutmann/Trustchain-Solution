@@ -69,10 +69,25 @@ namespace TrustchainCore.Services
 
         public Trust GetSimilarTrust(Trust trust)
         {
-            var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, trust.Issuer.Address)
-                                 && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
-                                 && p.Type == trust.Type
-                                 && p.Scope == trust.Scope);
+            //var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, trust.Issuer.Address)
+            //                     && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
+            //                     && p.Type == trust.Type
+            //                     && p.Scope == trust.Scope);
+
+            //var query = from p in DBContext.Trusts
+            //            where StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, trust.Issuer.Address)
+            //                  && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
+            //                  && p.Type == trust.Type
+            //                  && p.Scope == trust.Scope
+            //            select p;
+            var query = from p in DBContext.Trusts
+                        where trust.Issuer.Address.SequenceEqual(p.Issuer.Address)
+                              && trust.Subject.Address.SequenceEqual(p.Subject.Address)
+                              && p.Type == trust.Type
+                              && p.Scope == trust.Scope
+                        select p;
+
+            var dbTrust = query.FirstOrDefault();
 
             return dbTrust;
         }

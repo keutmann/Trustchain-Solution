@@ -7,7 +7,7 @@ using TruststampCore.Interfaces;
 namespace UnitTest.TruststampCore.Services
 {
     [TestClass]
-    public class ProofServiceTest : StartupMock
+    public class TimestampServiceTest : StartupMock
     {
         [TestMethod]
         public void AddProof()

@@ -15,20 +15,31 @@ namespace TrustchainCore.Strategy
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                ms.WriteString(trust.Issuer.Type.ToLowerSafe());
-                ms.WriteBytes(trust.Issuer.Address);
-                ms.WriteString(trust.Subject.Type.ToLowerSafe());
-                ms.WriteBytes(trust.Subject.Address);
+                if (trust.Issuer != null)
+                {
+                    ms.WriteString(trust.Issuer.Type.ToLowerSafe());
+                    ms.WriteBytes(trust.Issuer.Address);
+                }
+
+                if (trust.Subject != null)
+                {
+                    ms.WriteString(trust.Subject.Type.ToLowerSafe());
+                    ms.WriteBytes(trust.Subject.Address);
+                }
+
                 ms.WriteString(trust.Type.ToLowerSafe());
                 ms.WriteString(trust.Claim);
-                ms.WriteString(trust.Scope.Type.ToLowerSafe());
-                ms.WriteString(trust.Scope.Value.ToLowerSafe());
+
+                if (trust.Scope != null)
+                {
+                    ms.WriteString(trust.Scope.Type.ToLowerSafe());
+                    ms.WriteString(trust.Scope.Value.ToLowerSafe());
+                }
 
                 ms.WriteInteger(trust.Created);
                 ms.WriteInteger(trust.Cost);
                 ms.WriteInteger(trust.Activate);
                 ms.WriteInteger(trust.Expire);
-                //ms.WriteString(trust.Note);
 
                 return ms.ToArray();
             }
