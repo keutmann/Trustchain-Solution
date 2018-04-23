@@ -65,10 +65,9 @@ namespace UnitTest
         public override void ConfigureDbContext(IServiceCollection services)
         {
             services.AddDbContext<TrustDBContext>(options =>
-                options.UseInMemoryDatabase("UnitTest").UseLoggerFactory(LoggerFactory)
+                options.UseInMemoryDatabase("UnitTest")
                 
             );
-            
         }
 
         public override void ConfigureTimers(IApplicationBuilder app)

@@ -18,7 +18,6 @@ namespace TrustchainCore.Repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
         }
 
 

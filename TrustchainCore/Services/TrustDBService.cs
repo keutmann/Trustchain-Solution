@@ -71,25 +71,19 @@ namespace TrustchainCore.Services
 
         public Trust GetSimilarTrust(Trust trust)
         {
-            //var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, trust.Issuer.Address)
-            //                     && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
-            //                     && p.Type == trust.Type
-            //                     && p.Scope == trust.Scope);
-
-            //var query = from p in DBContext.Trusts
-            //            where StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, trust.Issuer.Address)
-            //                  && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
-            //                  && p.Type == trust.Type
-            //                  && p.Scope == trust.Scope
-            //            select p;
             var query = from p in DBContext.Trusts
-                        where trust.Issuer.Address.SequenceEqual(p.Issuer.Address)
-                              && trust.Subject.Address.SequenceEqual(p.Subject.Address)
+                        where StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, trust.Issuer.Address)
+                              && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
                               && p.Type == trust.Type
-                              && p.Scope == trust.Scope
                         select p;
-            var sql = query.ToSql();
-            Trace.WriteLine(sql);
+            if (trust.Scope != null)
+            {
+                query = query.Where(p => p.Scope.Type == trust.Scope.Type && p.Scope.Value == trust.Scope.Value);
+            }
+            else
+            {
+                query = query.Where(p => p.Scope.Type == null && p.Scope.Value == null);
+            }
 
             var dbTrust = query.FirstOrDefault();
 
