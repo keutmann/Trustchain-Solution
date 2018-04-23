@@ -6,6 +6,8 @@ using System.Linq;
 using System;
 using System.Collections;
 using TrustchainCore.Builders;
+using TrustchainCore.Extensions;
+using System.Diagnostics;
 
 namespace TrustchainCore.Services
 {
@@ -86,6 +88,8 @@ namespace TrustchainCore.Services
                               && p.Type == trust.Type
                               && p.Scope == trust.Scope
                         select p;
+            var sql = query.ToSql();
+            Trace.WriteLine(sql);
 
             var dbTrust = query.FirstOrDefault();
 

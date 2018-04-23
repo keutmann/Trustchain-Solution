@@ -20,6 +20,7 @@ namespace UnitTest
         public IServiceProvider  ServiceProvider { get; set; }
         public IServiceScope ServiceScope { get; set; }
         public IServiceCollection Services { get; set; }
+        public ILoggerFactory LoggerFactory { get; set; }
 
         [TestInitialize]
         public virtual void Init()
@@ -42,8 +43,9 @@ namespace UnitTest
 
             ServiceScope = Services.BuildServiceProvider(false).CreateScope();
             ServiceProvider = ServiceScope.ServiceProvider;
-            ILoggerFactory loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
-            loggerFactory.AddConsole();
+            LoggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
+            LoggerFactory.AddConsole();
+            
         }
 
         [TestCleanup]
@@ -63,7 +65,8 @@ namespace UnitTest
         public override void ConfigureDbContext(IServiceCollection services)
         {
             services.AddDbContext<TrustDBContext>(options =>
-                options.UseInMemoryDatabase("UnitTest")
+                options.UseInMemoryDatabase("UnitTest").UseLoggerFactory(LoggerFactory)
+                
             );
             
         }
