@@ -163,7 +163,7 @@ namespace TrustgraphCore.Controllers
 
         [HttpGet]
         [Route("get")]
-        public ActionResult Get([FromQuery]byte[] issuer, [FromQuery]byte[] subject, [FromQuery]string type, [FromQuery]string scope)
+        public ActionResult Get([FromQuery]byte[] issuer, [FromQuery]byte[] subject, [FromQuery]string type, [FromQuery]string scopevalue)
         {
             //if (trustId == null || trustId.Length < 1)
             //    throw new ApplicationException("Missing trustId");
@@ -172,7 +172,7 @@ namespace TrustgraphCore.Controllers
                 Issuer = new IssuerIdentity { Address = issuer },
                 Subject = new SubjectIdentity { Address = subject },
                 Type = type,
-                Scope = new Scope { Value = scope }
+                Scope = new Scope { Value = scopevalue }
             };
 
             var trust = _trustDBService.GetSimilarTrust(query);

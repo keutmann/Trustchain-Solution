@@ -8,18 +8,18 @@ namespace TrustgraphCore.Builders
     {
         public QueryRequest Query { get; }
 
-        public QueryRequestBuilder(string type) : this("", type)
+        public QueryRequestBuilder(string type) : this(null, type)
         {
         }
 
-        public QueryRequestBuilder(string scope, string type)
+        public QueryRequestBuilder(TrustScope scope, string type)
         {
             Query = new QueryRequest
             {
                 Issuer = null,
                 Subjects = new List<SubjectQuery>(),
-                ClaimScope = scope,
-                ClaimTypes = new List<string>() { type },
+                Scope = scope,
+                Types = new List<string>() { type },
                 Flags = QueryFlags.FullTree
             };
         }

@@ -1,14 +1,16 @@
-var TrustchainService = (function() {
+///<reference path="../typings/globals/jquery/index.d.ts" />
+
+var TrustchainService = (function () {
     function TrustchainService(settings) {
         this.settings = settings;
-    } 
+    }
 
-    TrustchainService.prototype.Query = function(targets) {
+    TrustchainService.prototype.Query = function (targets) {
         var query = this.BuildQuery(targets);
         return this.PostData('/api/graph/Query', JSON.stringify(query));
     }
 
-    TrustchainService.prototype.BuildQuery = function(targets) {
+    TrustchainService.prototype.BuildQuery = function (targets) {
         var subjects = [];
         var scope = "";
         for (var key in targets) {
@@ -17,56 +19,59 @@ var TrustchainService = (function() {
             subjects.push(subject);
             scope = target.scope;
         }
-    
+
+        if (typeof scope === 'string')
+            scope = { value: scope };
+
         var obj = {
             "issuers": this.settings.publicKeyHash,
             "subjects": subjects,
-    
+
             // Scope is used to filter on trust resolvement. It can be any text
-            "claimScope": (scope) ? scope : "", // The scope could also be specefic to country, area, products, articles or social medias etc.
-    
+            "scope": (scope) ? scope : undefined, // The scope could also be specefic to country, area, products, articles or social medias etc.
+
             // Claim made about the subject. The format is specified by the version property in the header section.
-            "claimTypes": [
+            "types": [
                 "binarytrust.tc1"
-              ],
+            ],
             "level": 0,
             //"flags": "LeafsOnly"
         }
         return obj;
     }
 
-    TrustchainService.prototype.GetTrustById = function(id) {
-        var url ='/api/trust/get/'+id; // id = encoded byte array
-    
+    TrustchainService.prototype.GetTrustById = function (id) {
+        var url = '/api/trust/get/' + id; // id = encoded byte array
+
         return this.GetData(url);
     }
 
-    TrustchainService.prototype.GetSimilarTrust = function(issuerAddress, subjectAddress, type, scope) {
-        var url ='/api/trust/get/?issuer='+issuerAddress+'&subject='+subjectAddress+'&type='+type+'&scope='+scope;
-    
+    TrustchainService.prototype.GetSimilarTrust = function (trust) {
+        var url = '/api/trust/get/?issuer=' + trust.issuer.address + '&subject=' + trust.subject.address + '&type=' + encodeURIComponent(trust.type) + '&scopevalue=' + encodeURIComponent((trust.scope) ? trust.scope.value : "");
+
         return this.GetData(url);
     }
 
 
-    TrustchainService.prototype.GetTrustTemplate = function(subject, alias) {
-        var url ='/api/trust/build?issuer='+settings.publicKeyHash+'&subject='+subject+'&alias='+alias;
-    
+    TrustchainService.prototype.GetTrustTemplate = function (subject, alias) {
+        var url = '/api/trust/build?issuer=' + settings.publicKeyHash + '&subject=' + subject + '&alias=' + alias;
+
         return this.GetData(url);
     }
 
-    TrustchainService.prototype.PostTrustTemplate = function(trust) {
+    TrustchainService.prototype.PostTrustTemplate = function (trust) {
         return this.PostData('/api/trust/build', JSON.stringify(trust));
     }
 
-    TrustchainService.prototype.PostTrustTemplate = function(package) {
+    TrustchainService.prototype.PostTrustTemplate = function (package) {
         return this.PostData('/api/package/build', JSON.stringify(package));
     }
 
-    TrustchainService.prototype.PostTrust = function(trust) {
+    TrustchainService.prototype.PostTrust = function (trust) {
         return this.PostData('/api/trust/add', JSON.stringify(trust));
     }
-    
-    TrustchainService.prototype.GetData = function(query) {
+
+    TrustchainService.prototype.GetData = function (query) {
         var deferred = $.Deferred();
         var self = this;
         var url = this.settings.infoserver + query;
@@ -87,7 +92,7 @@ var TrustchainService = (function() {
     }
 
 
-    TrustchainService.prototype.PostData = function(query, data) {
+    TrustchainService.prototype.PostData = function (query, data) {
         var deferred = $.Deferred();
         var self = this;
         var url = this.settings.infoserver + query;
@@ -109,7 +114,7 @@ var TrustchainService = (function() {
         return deferred.promise();
     }
 
-    TrustchainService.prototype.TrustServerErrorAlert = function(jqXHR, textStatus, errorThrown, server) {
+    TrustchainService.prototype.TrustServerErrorAlert = function (jqXHR, textStatus, errorThrown, server) {
         if (jqXHR.status == 404 || errorThrown == 'Not Found') {
             var msg = 'Error 404: Server ' + server + ' was not found.';
             //alert('Error 404: Server ' + server + ' was not found.');
@@ -119,7 +124,7 @@ var TrustchainService = (function() {
             var msg = textStatus + " : " + errorThrown;
             if (jqXHR.responseJSON && jqXHR.responseJSON.ExceptionMessage)
                 msg = jqXHR.responseJSON.ExceptionMessage;
-    
+
             alert(msg);
         }
     }

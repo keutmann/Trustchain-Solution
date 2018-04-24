@@ -76,13 +76,14 @@ namespace TrustchainCore.Services
                               && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
                               && p.Type == trust.Type
                         select p;
+
             if (trust.Scope != null)
             {
-                query = query.Where(p => p.Scope.Type == trust.Scope.Type && p.Scope.Value == trust.Scope.Value);
+                query = query.Where(p => p.Scope.Value == trust.Scope.Value);
             }
             else
             {
-                query = query.Where(p => p.Scope.Type == null && p.Scope.Value == null);
+                query = query.Where(p => p.Scope.Value == null);
             }
 
             var dbTrust = query.FirstOrDefault();

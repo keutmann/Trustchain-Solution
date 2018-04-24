@@ -52,7 +52,7 @@ namespace TrustgraphCore.Controllers
         [HttpGet]
         public ActionResult Get(byte[] issuer, byte[] subject, QueryFlags flags = QueryFlags.LeafsOnly)
         {
-            var builder = new QueryRequestBuilder(TrustScope.Global, TrustBuilder.BINARYTRUST_TC1);
+            var builder = new QueryRequestBuilder(null, TrustBuilder.BINARYTRUST_TC1);
             builder.Query.Flags = flags;
             builder.Add(issuer, subject);
 

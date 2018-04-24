@@ -137,20 +137,20 @@ namespace TrustgraphCore.Model
 
         internal void SetupQueryClaim(QueryRequest query)
         {
-            var scope = query.ClaimScope ?? string.Empty;
-            if (!GraphTrustService.Graph.Scopes.ContainsKey(scope))
-                Errors.Add($"Unknown claim scope {scope}");
+            var scopeValue = (query.Scope != null) ? query.Scope.Value : string.Empty;
+            if (!GraphTrustService.Graph.Scopes.ContainsKey(scopeValue))
+                Errors.Add($"Unknown claim scope {scopeValue}");
             else
-                ClaimScope = GraphTrustService.Graph.Scopes.GetIndex(scope);
+                ClaimScope = GraphTrustService.Graph.Scopes.GetIndex(scopeValue);
 
-            if (query.ClaimTypes == null || query.ClaimTypes.Count == 0)
+            if (query.Types == null || query.Types.Count == 0)
             {
                 var graphClaim = GraphTrustService.CreateGraphClaim(TrustBuilder.BINARYTRUST_TC1, "", TrustBuilder.CreateBinaryTrustAttributes(true));
                 ClaimTypes.Add(graphClaim.Index);
             }
             else
             {
-                foreach (var type in query.ClaimTypes)
+                foreach (var type in query.Types)
                 {
                     if (!GraphTrustService.Graph.ClaimType.ContainsKey(type))
                         Errors.Add($"Unknown claim type {type}");

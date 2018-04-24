@@ -4,6 +4,28 @@ using TrustgraphCore.Enumerations;
 
 namespace TrustgraphCore.Model
 {
+    [JsonObject(MemberSerialization.OptIn)]
+    public class TrustScope
+    {
+        /// <summary>
+        /// Empty Scope is global.
+        /// </summary>
+        [JsonProperty(PropertyName = "type")]
+        public string Type;
+        public bool ShouldSerializeType()
+        {
+            return !string.IsNullOrEmpty(Type);
+        }
+
+        [JsonProperty(PropertyName = "value")]
+        public string Value;
+        public bool ShouldSerializeValue()
+        {
+            return !string.IsNullOrEmpty(Value);
+        }
+    }
+
+
     /// <summary>
     /// Defines the Query send from the client.
     /// </summary>
@@ -19,17 +41,17 @@ namespace TrustgraphCore.Model
         /// <summary>
         /// The claim types to search on.
         /// </summary>
-        [JsonProperty(PropertyName = "ClaimTypes")]
-        public List<string> ClaimTypes;
+        [JsonProperty(PropertyName = "types")]
+        public List<string> Types;
 
         /// <summary>
         /// Empty Scope is global.
         /// </summary>
-        [JsonProperty(PropertyName = "ClaimScope")]
-        public string ClaimScope;
+        [JsonProperty(PropertyName = "scope")]
+        public TrustScope Scope;
         public bool ShouldSerializeClaimScope()
         {
-            return !string.IsNullOrEmpty(ClaimScope);
+            return Scope != null;
         }
 
         /// <summary>

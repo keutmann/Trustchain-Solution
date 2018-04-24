@@ -42,8 +42,9 @@
 
             var trustchainService = new TrustchainService(settings);
             var packageBuilder = new PackageBuilder(settings);
+            var query = packageBuilder.CreateTrust(param.issueraddress, "", param.subjectaddress, param.type, param.scopevalue, "", 0, 0);
 
-            trustchainService.GetSimilarTrust(param.issueraddress, param.subjectaddress, param.type, param.scope).done(function(result){
+            trustchainService.GetSimilarTrust(query).done(function(result){
 
                 var trust = result.data
                 document.getElementById("json").innerHTML = JSON.stringify(trust, undefined, 2);
@@ -52,7 +53,7 @@
                 packageBuilder.CalculateTrustId(trust)
 
                 SetResult('trustidStatus', (tce.buffer.Buffer.compare(currentId, trust.id) === 0))
-                var signatureResult = CheckSignature(trust.id, trust.issuerAddress, trust.issuerSignature)
+                var signatureResult = CheckSignature(trust.id, trust.issuer.address, trust.issuer.signature)
                 SetResult('issuerSignatureStatus', signatureResult)
 
 
@@ -75,8 +76,6 @@
             var address = address.base64ToBuffer();
             var signature = signature.base64ToBuffer();
             var valid = tce.bitcoin.ECPair.verifyCompact(address, signature, hash, tce.bitcoin.networks.testnet);
-            //var valid = tce.bitcoin.message.verifyCompact(hash, address, signature);
-            //return valid;
             return valid;
         }
 
