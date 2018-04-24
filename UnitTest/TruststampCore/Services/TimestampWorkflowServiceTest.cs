@@ -52,7 +52,8 @@ namespace UnitTest.TruststampCore.Services
 
             var count = trustDBService.Workflows.Count(p => p.Type == typeof(TimestampWorkflow).FullName
                      && (p.State == WorkflowStatusType.New.ToString()
-                     || p.State == WorkflowStatusType.Running.ToString()));
+                     || p.State == WorkflowStatusType.Running.ToString()
+                     || p.State == WorkflowStatusType.Waiting.ToString()));
 
             Assert.AreEqual(1, count);
             Assert.IsTrue(timestampSynchronizationService.CurrentWorkflowID > 0);
