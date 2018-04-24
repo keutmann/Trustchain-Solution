@@ -12,7 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{95FAF109-6E49-4E5F-AF99-97FC18CE0842}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\Database.txt = Documentation\Database.txt
-		Install.txt = Install.txt
+		Documentation\Install.txt = Documentation\Install.txt
 		Documentation\PackageSchema.json = Documentation\PackageSchema.json
 	EndProjectSection
 EndProject
