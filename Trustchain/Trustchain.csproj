@@ -4,7 +4,15 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <StartupObject>Trustchain.Program</StartupObject>
     <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+    <UserSecretsId>2af78036-f463-4616-8b5b-d83582cb7f5b</UserSecretsId>
+    <ApplicationIcon></ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Resources\**" />
+    <Content Remove="Resources\**" />
+    <EmbeddedResource Remove="Resources\**" />
+    <None Remove="Resources\**" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Remove="Controllers\StampController.cs" />
     <Compile Remove="Controllers\TrustController.cs" />
@@ -13,13 +21,7 @@
     <Content Remove="Views\Shared\DisplayTemplates\TitleDetailLink.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Resources\Proof.htm" />
     <None Remove="trust - backup.old" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\Proof.htm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.7" />
@@ -40,8 +42,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="wwwroot\lib\bootstrap-table\bootstrap-table.js" />
+    <None Include="wwwroot\resources\Trust.htm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\lib\NewFolder\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="wwwroot\resources\Proof.htm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="trust.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

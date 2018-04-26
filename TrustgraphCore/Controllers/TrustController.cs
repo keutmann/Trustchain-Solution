@@ -165,8 +165,6 @@ namespace TrustgraphCore.Controllers
         [Route("get")]
         public ActionResult Get([FromQuery]byte[] issuer, [FromQuery]byte[] subject, [FromQuery]string type, [FromQuery]string scopevalue)
         {
-            //if (trustId == null || trustId.Length < 1)
-            //    throw new ApplicationException("Missing trustId");
             var query = new Trust
             {
                 Issuer = new IssuerIdentity { Address = issuer },

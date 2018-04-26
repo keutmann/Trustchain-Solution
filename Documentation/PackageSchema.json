@@ -17,7 +17,15 @@
   },
   "cost": 100,
   "activate": 1231006505,
-  "expire": 2231006505
+  "expire": 2231006505,
+  "timestamp": [
+    {
+      "blockchain": "btc", // The blockchain used for the timestamp
+      "algorithm": "merkle.tc1-double256", // Merkle=Merkle algo, tc1=Trustchain version 1, double256=sha256(sha256))
+      "registered": 1524569739, // Transaction time used for the timestamp
+      "recipt": "rtrrtwretrettretretrewtretrewtretrewt" // Merkletree path or description text, used for recreating the merkle root value.
+    }
+  ]
 }
 
 /*

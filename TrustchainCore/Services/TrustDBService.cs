@@ -8,6 +8,8 @@ using System.Collections;
 using TrustchainCore.Builders;
 using TrustchainCore.Extensions;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TrustchainCore.Services
 {
@@ -66,6 +68,20 @@ namespace TrustchainCore.Services
         {
             var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, id));
             return dbTrust;
+        }
+
+
+        public IQueryable<Trust> GetTrusts(byte[] issuerAddress, byte[] subjectAddress, string scopeValue)
+        {
+            var query = from p in DBContext.Trusts
+                        where StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, issuerAddress)
+                              && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, subjectAddress)
+                        select p;
+
+            if (scopeValue != null)
+                query = query.Where(p => p.Scope.Value == scopeValue);
+
+            return query;
         }
 
 
@@ -142,17 +158,6 @@ namespace TrustchainCore.Services
             return task.Result;
         }
 
-        //public PackageModel ReadAllPackages()
-        //{
-        //    var query = Packages.Select(p => p);
-
-        //    //var data = from p in query where p.
-                       
-
-        //    //task.Wait();
-
-        //    return //task.Result;
-        //}
 
     }
 }

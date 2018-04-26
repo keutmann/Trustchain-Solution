@@ -12,32 +12,32 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.ProofEntity.Source)
+            @Html.DisplayNameFor(model => model.Timestamp.Source)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ProofEntity.Source)
+            @Html.DisplayFor(model => model.Timestamp.Source)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.ProofEntity.Receipt)
+            @Html.DisplayNameFor(model => model.Timestamp.Receipt)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ProofEntity.Receipt)
+            @Html.DisplayFor(model => model.Timestamp.Receipt)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.ProofEntity.Registered)
+            @Html.DisplayNameFor(model => model.Timestamp.Registered)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ProofEntity.Registered)
+            @Html.DisplayFor(model => model.Timestamp.Registered)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.ProofEntity.WorkflowID)
+            @Html.DisplayNameFor(model => model.Timestamp.WorkflowID)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ProofEntity.WorkflowID)
+            @Html.DisplayFor(model => model.Timestamp.WorkflowID)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-page="./Edit" asp-route-id="@Model.ProofEntity.DatabaseID">Edit</a> |
+    <a asp-page="./Edit" asp-route-id="@Model.Timestamp.DatabaseID">Edit</a> |
     <a asp-page="./Index">Back to List</a>
 </div>

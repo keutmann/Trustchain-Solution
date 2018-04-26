@@ -1,0 +1,75 @@
+﻿@page
+@model Trustchain.Pages.Trusts.IndexModel
+
+@{
+    ViewData["Title"] = "Trust";
+    Layout = "~/Pages/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Trust</title>
+</head>
+<body>
+<h1>Trusts</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Trusts[0].Id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Trusts[0].Created)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Trusts[0].Type)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Trusts[0].Claim)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Trusts[0].Cost)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Trusts[0].Activate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Trusts[0].Expire)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Trusts)
+            {
+                <tr>
+                    <td>
+                        <a asp-page="./Details" asp-route-id="@Convert.ToBase64String(item.Id)">@Html.DisplayFor(modelItem => item.Id)</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Created)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Claim)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Cost)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Activate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Expire)
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

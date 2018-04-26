@@ -24,9 +24,15 @@ namespace TrustchainCore.Model
         public string Algorithm { get; set; }
         public bool ShouldSerializeAlgorithm() { return !string.IsNullOrWhiteSpace(Algorithm); }
 
+        [UIHint("ByteToHex")]
         [JsonProperty(PropertyName = "id")]
         public byte[] Id { get; set; }
         public bool ShouldSerializeId() { return Id != null && Id.Length > 0; }
+
+        [UIHint("UnixTimeUInt")]
+        [JsonProperty(PropertyName = "created")]
+        public uint Created { get; set; }
+        public bool ShouldSerializeCreated() { return Created > 0; }
 
         [JsonProperty(PropertyName = "trusts", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Trust> Trusts { get; set; }
@@ -67,30 +73,18 @@ namespace TrustchainCore.Model
         public string Algorithm { get; set; }
         public bool ShouldSerializeAlgorithm() { return !string.IsNullOrWhiteSpace(Algorithm); }
 
+        [UIHint("ByteToHex")]
         [JsonProperty(PropertyName = "id")]
         public byte[] Id { get; set; }
         public bool ShouldSerializeId() { return Id != null; }
 
+        [UIHint("UnixTimeUInt")]
         [JsonProperty(PropertyName = "created")]
         public uint Created { get; set; }
         public bool ShouldSerializeCreated() { return Created > 0; }
 
         [JsonProperty(PropertyName = "issuer", NullValueHandling = NullValueHandling.Ignore)]
         public IssuerIdentity Issuer { get; set; }
-
-        //[NotMapped]
-        //[JsonProperty(PropertyName = "issuerScript")]
-        //public string IssuerScript { get; set; }
-        //public bool ShouldSerializeIssuerScript() { return !string.IsNullOrWhiteSpace(IssuerScript); }
-
-        //[NotMapped]
-        //[JsonProperty(PropertyName = "issuerAddress")]
-        //public byte[] IssuerAddress { get; set; }
-
-        //[NotMapped]
-        //[JsonProperty(PropertyName = "issuerSignature")]
-        //public byte[] IssuerSignature { get; set; }
-        //public bool ShouldSerializeIssuerSignature() { return IssuerSignature != null && IssuerSignature.Length > 0; }
 
         /// <summary>
         /// Internal property for holding the private key to sign with
@@ -101,21 +95,6 @@ namespace TrustchainCore.Model
 
         [JsonProperty(PropertyName = "subject", NullValueHandling = NullValueHandling.Ignore)]
         public SubjectIdentity Subject { get; set; }
-
-        //[NotMapped]
-        //[JsonProperty(PropertyName = "subjectScript")]
-        //public string SubjectScript { get; set; }
-        //public bool ShouldSerializeSubjectScript() { return !string.IsNullOrWhiteSpace(SubjectScript); }
-
-        //[NotMapped]
-        //[JsonProperty(PropertyName = "subjectAddress")]
-        //public byte[] SubjectAddress { get; set; }
-
-        //[ForeignKey("test")]
-        //[NotMapped]
-        //[JsonProperty(PropertyName = "subjectSignature")]
-        //public byte[] SubjectSignature { get; set; }
-        //public bool ShouldSerializeSubjectSignature() { return SubjectSignature != null && SubjectSignature.Length > 0; }
 
         /// <summary>
         /// Internal property for holding the private key to sign with
@@ -135,23 +114,21 @@ namespace TrustchainCore.Model
         //[JsonProperty(PropertyName = "scopeType")]
         //public string ScopeType { get; set; }
 
+        [UIHint("Serialize")]
         [JsonProperty(PropertyName = "scope")]
         public Scope Scope { get; set; }
         public bool ShouldSerializeScope() { return Scope!= null; }
-
-        //[NotMapped]
-        //[JsonProperty(PropertyName = "scope")]
-        //public string Scope { get; set; }
-        //public bool ShouldSerializeScope() { return !string.IsNullOrWhiteSpace(Scope); }
 
         [JsonProperty(PropertyName = "cost")]
         public short Cost { get; set; }
         public bool ShouldSerializeCost() { return Cost > 0; }
 
+        [UIHint("UnixTimeUint")]
         [JsonProperty(PropertyName = "activate")]
         public uint Activate { get; set; }
         public bool ShouldSerializeActivate() { return Activate > 0; }
 
+        [UIHint("UnixTimeUInt")]
         [JsonProperty(PropertyName = "expire")]
         public uint Expire { get; set; }
         public bool ShouldSerializeExpire() { return Expire > 0; }
@@ -160,23 +137,8 @@ namespace TrustchainCore.Model
         //public string Note { get; set; }
         //public bool ShouldSerializeNote() { return Note != null; }
 
-        //[JsonProperty(PropertyName = "timestamp", NullValueHandling = NullValueHandling.Ignore)]
-        //public TrustTimestamp Timestamp { get; set; }
 
-        //[JsonProperty(PropertyName = "timestampAlgorithm")]
-        //public string TimestampAlgorithm { get; set; }
-        //public bool ShouldSerializeTimestampAlgorithm() { return !string.IsNullOrWhiteSpace(TimestampAlgorithm); }
-
-        //[JsonProperty(PropertyName = "timestampRecipt")]
-        //public byte[] TimestampRecipt { get; set; }
-        //public bool ShouldSerializeTimestampRecipt() { return TimestampRecipt != null && TimestampRecipt.Length > 0; }
-
-
-        //[UIHint("JSON")]
-        //[JsonProperty(PropertyName = "timestamps")]
-        //public string Timestamps { get; set; }
-        //public bool ShouldSerializeTimestamps() { return !string.IsNullOrWhiteSpace(Timestamps); }
-
+        [UIHint("Serialize")]
         [JsonProperty(PropertyName = "timestamps", NullValueHandling = NullValueHandling.Ignore)]
         public IList<Timestamp> Timestamps { get; set; }
         public bool ShouldSerializeTimestamps() { return Timestamps != null && Timestamps.Count > 0; }
@@ -188,76 +150,16 @@ namespace TrustchainCore.Model
     [JsonObject(MemberSerialization.OptIn)]
     public class IssuerIdentity : Identity
     {
-        //[JsonProperty(PropertyName = "type")]
-        //public string Type { get; set; }
-        //public bool ShouldSerializeType() { return !string.IsNullOrWhiteSpace(Type); }
-
-        //[JsonProperty(PropertyName = "address")]
-        //public byte[] Address { get; set; }
-
-        //[JsonProperty(PropertyName = "signature")]
-        //public byte[] Signature { get; set; }
-        //public bool ShouldSerializeSignature()
-        //{
-        //    return Signature != null && Signature.Length > 0;
-        //}
-
-        ///// <summary>
-        ///// Internal property for holding the private key to sign with
-        ///// </summary>
-        //[JsonIgnore]
-        //[NotMapped]
-        //public SignDelegate Sign { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
     public class SubjectIdentity : Identity
     {
-        //[JsonProperty(PropertyName = "type")]
-        //public string Type { get; set; }
-        //public bool ShouldSerializeType() { return !string.IsNullOrWhiteSpace(Type); }
-
-        //[JsonProperty(PropertyName = "address")]
-        //public byte[] Address { get; set; }
-
-        //[JsonProperty(PropertyName = "signature")]
-        //public byte[] Signature { get; set; }
-        //public bool ShouldSerializeSignature()
-        //{
-        //    return Signature != null && Signature.Length > 0;
-        //}
-
-        ///// <summary>
-        ///// Internal property for holding the private key to sign with
-        ///// </summary>
-        //[JsonIgnore]
-        //[NotMapped]
-        //public SignDelegate Sign { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
     public class ServerIdentity : Identity
     {
-        //[JsonProperty(PropertyName = "type")]
-        //public string Type { get; set; }
-        //public bool ShouldSerializeType() { return !string.IsNullOrWhiteSpace(Type); }
-
-        //[JsonProperty(PropertyName = "address")]
-        //public byte[] Address { get; set; }
-
-        //[JsonProperty(PropertyName = "signature")]
-        //public byte[] Signature { get; set; }
-        //public bool ShouldSerializeSignature()
-        //{
-        //    return Signature != null && Signature.Length > 0;
-        //}
-
-        ///// <summary>
-        ///// Internal property for holding the private key to sign with
-        ///// </summary>
-        //[JsonIgnore]
-        //[NotMapped]
-        //public SignDelegate Sign { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -267,9 +169,11 @@ namespace TrustchainCore.Model
         public string Type { get; set; }
         public bool ShouldSerializeType() { return !string.IsNullOrWhiteSpace(Type); }
 
+        [UIHint("ByteToHex")]
         [JsonProperty(PropertyName = "address")]
         public byte[] Address { get; set; }
 
+        [UIHint("ByteToHex")]
         [JsonProperty(PropertyName = "signature")]
         public byte[] Signature { get; set; }
         public bool ShouldSerializeSignature()
@@ -297,26 +201,6 @@ namespace TrustchainCore.Model
         public bool ShouldSerializeValue() { return !string.IsNullOrWhiteSpace(Value); }
     }
 
-    //[JsonObject(MemberSerialization.OptIn)]
-    //public class TrustTimestamp
-    //{
-
-    //    [JsonProperty(PropertyName = "algorithm")]
-    //    public string Algorithm { get; set; }
-    //    public bool ShouldSerializeAlgorithm() { return !string.IsNullOrWhiteSpace(Algorithm); }
-
-    //    [JsonProperty(PropertyName = "recipt")]
-    //    public byte[] Recipt { get; set; }
-    //    public bool ShouldSerializeRecipt() { return Recipt != null && Recipt.Length > 0; }
-
-    //    //[JsonProperty(PropertyName = "timestamps", NullValueHandling = NullValueHandling.Ignore)]
-    //    //public IList<Timestamp> Timestamps { get; set; }
-    //    //public bool ShouldSerializeTimestamps()
-    //    //{
-    //    //    return Timestamps != null && Timestamps.Count > 0;
-    //    //}
-    //}
-
 
     [Table("Timestamp")]
     [JsonObject(MemberSerialization.OptIn)]
@@ -334,18 +218,20 @@ namespace TrustchainCore.Model
         public string Service { get; set; }
         public bool ShouldSerializeService() { return !string.IsNullOrWhiteSpace(Service); }
 
+        [UIHint("ByteToHex")]
         [JsonProperty(PropertyName = "source", NullValueHandling = NullValueHandling.Ignore)]
         public byte[] Source { get; set; }
         public bool ShouldSerializeSource() { return Source != null && Source.Length > 0; }
 
+        [UIHint("ByteToHex")]
         [JsonProperty(PropertyName = "receipt", NullValueHandling = NullValueHandling.Ignore)]
         public byte[] Receipt { get; set; }
         public bool ShouldSerializeReceipt() { return Receipt != null && Receipt.Length > 0; }
 
+        [UIHint("UnixTimeLong")]
         [JsonProperty(PropertyName = "registered")]
         public long Registered { get; set; }
         public bool ShouldSerializeRegistered() { return Registered != 0; }
-
 
         [JsonIgnore]
         public int WorkflowID { get; set; }

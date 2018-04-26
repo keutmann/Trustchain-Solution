@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
 
@@ -16,6 +17,7 @@ namespace TrustchainCore.Interfaces
 
         bool TrustExist(byte[] id);
         Trust GetTrustById(byte[] id);
+        IQueryable<Trust> GetTrusts(byte[] issuerAddress, byte[] subjectAddress, string scopeValue);
         Trust GetSimilarTrust(Trust trust);
 
         void Add(Trust trust);

@@ -1,0 +1,4 @@
+﻿@model byte[]
+@{
+    @((Model != null) ? BitConverter.ToString(Model).Replace("-", "") : "")
+}
