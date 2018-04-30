@@ -1,16 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
+using TrustchainCore.Collections.Generic;
+using TrustchainCore.Extensions;
+using System.Collections;
+using Trustchain.AspNetCore.Mvc.RazorPages;
 
 namespace Trustchain.Pages.Timestamps
 {
-    public class IndexModel : PageModel
+    public class IndexModel : ListPageModel<Timestamp>
     {
         private readonly TrustDBContext _context;
 
@@ -19,11 +20,57 @@ namespace Trustchain.Pages.Timestamps
             _context = context;
         }
 
-        public Timestamp Timestamp { get;set; }
 
-        public void OnGetAsync()
+        public async Task OnGetAsync(string sortOrder, string sortField, string currentFilter, string searchString, byte[] source, int? pageIndex)
         {
-            Timestamp = new Timestamp();
+            InitProperties(sortOrder, sortField, currentFilter, searchString, pageIndex);
+
+            var query = from s in _context.Timestamps
+                        select s;
+
+            if (source != null)
+                query = query.Where(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Source, source));
+            else
+                query = BuildQuery(CurrentFilter, query);
+
+            query = AddSorting(query, "Registered", "_desc");
+
+            List = await PaginatedList<Timestamp>.CreateAsync(query.AsNoTracking(), PageIndex, PageSize);
         }
+
+
+
+        private IQueryable<Timestamp> BuildQuery(string searchString, IQueryable<Timestamp> query)
+        {
+            if (String.IsNullOrEmpty(searchString))
+                return query;
+
+            if (searchString.IsHex())
+            {
+                var hex = searchString.FromHexToBytes();
+                query = query.Where(s => StructuralComparisons.StructuralEqualityComparer.Equals(s.Source, hex));
+                query = query.Where(s => StructuralComparisons.StructuralEqualityComparer.Equals(s.Receipt, hex));
+
+                return query;
+            }
+
+            if (DateTime.TryParse(searchString, out DateTime time))
+            {
+                var unixTime = time.ToUnixTime();
+                query = query.Where(s => s.Registered == unixTime);
+                return query;
+            }
+
+            if (int.TryParse(searchString, out int workflowId))
+                query = query.Where(s => s.WorkflowID == workflowId);
+
+            var likeSearch = $"%{searchString}%";
+            query = query.Where(s => EF.Functions.Like(s.Blockchain, likeSearch)
+                || EF.Functions.Like(s.Algorithm, likeSearch)
+                || EF.Functions.Like(s.Service, likeSearch));
+
+            return query;
+        }
+
     }
 }

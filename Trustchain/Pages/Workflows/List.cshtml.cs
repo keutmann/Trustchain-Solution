@@ -10,6 +10,7 @@ using TrustchainCore.Repository;
 using TrustchainCore.Enumerations;
 using TrustchainCore.Extensions;
 using TrustchainCore.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Trustchain.Pages.Workflows
 {
@@ -18,6 +19,7 @@ namespace Trustchain.Pages.Workflows
         private readonly TrustDBContext _context;
         private readonly IWorkflowService _workflowService;
 
+        public bool IsAdmin { get; set; }
 
         public ListModel(TrustDBContext context, IWorkflowService workflowService)
         {
@@ -26,6 +28,8 @@ namespace Trustchain.Pages.Workflows
         }
 
         public IList<WorkflowContainer> WorkflowContainer { get;set; }
+
+        
 
         public async Task OnGetAsync(string type)
         {

@@ -2,77 +2,98 @@
 @model Trustchain.Pages.Timestamps.IndexModel
 @{
     ViewData["Title"] = "Timestamps";
+    Layout = "~/Pages/_Layout.cshtml";
 }
-<h2>Proof</h2>
-
-<div id="toolbar" class="btn-group">
-    <button id="btninfo" class="btn btn-default" type="button"><i class="glyphicon glyphicon-info-sign"></i>&nbsp;row info</button>
-</div>
-
-<div class="container-fluid">
-    <table id="table"
-           data-unique-id="ID"
-           data-sort-name="ID"
-           data-sort-order="asc"
-           data-classes="table table-condensed table-hover table-striped"
-           data-toggle="table"
-           data-side-pagination="server"
-           data-url="/api/timestamp/query"
-           data-query-params="extraServerParams"
-           data-pagination="true"
-           data-show-refresh="true"
-           data-search="true"
-           data-toolbar="#toolbar"
-           data-page-size="20"
-           data-page-list="[5,10,20,50,100,All]">
-        <thead>
+<h1>Timestamps</h1>
+<form asp-page="./Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find:
+            <input type="text" name="searchString" value="@Model.CurrentFilter" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-page="./Index">Reset</a>
+        </p>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].Source)
+            </th>
+            <th>
+                <a asp-page="./Index" asp-route-sortOrder="@Model.CurrentSortOrder!" asp-route-sortField="Registered" asp-route-currentFilter="@Model.CurrentFilter" asp-route-pageIndex="@Model.List.PageIndex">
+                    @Html.DisplayNameFor(model => model.List[0].Registered)
+                </a>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].Blockchain)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].Algorithm)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].Service)
+            </th>
+            <th>
+                <a asp-page="./Index" asp-route-sortOrder="@Model.CurrentSortOrder!" asp-route-sortField="WorkflowID" asp-route-currentFilter="@Model.CurrentFilter" asp-route-pageIndex="@Model.List.PageIndex">
+                    @Html.DisplayNameFor(model => model.List[0].WorkflowID)
+                </a>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].Receipt)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.List)
+        {
             <tr>
-                <th data-field="databaseID" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.DatabaseID)</th>
-                <th data-field="source" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.Source)</th>
-                <th data-field="registered" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.Registered)</th>
-                <th data-field="workflowID" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.WorkflowID)</th>
-                <th data-field="receipt" data-sortable="true">@Html.DisplayNameFor(model => model.Timestamp.Receipt)</th>
+                <td>
+                    <a asp-page="./Details" asp-route-id="@Convert.ToBase64String(item.Source)">@Html.DisplayFor(modelItem => item.Source)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Registered)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Blockchain)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Algorithm)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Service)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WorkflowID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Receipt)
+                </td>
+
             </tr>
-        </thead>
-    </table>
-</div>
+        }
+    </tbody>
+</table>
 
-@section scripts {
-    @await Html.PartialAsync("bootstraptable")
-
-    <script type="text/javascript">
-
-    function extraServerParams(params) {
-      params.ExtraParam = 2;
-      return params;
-    }
-
-    function highLightRow($tr) {
-      $tr.addClass('highlight').siblings().removeClass('highlight');
-    }
-
-    function getId($element) {
-      var result = $($element).closest('tr').data('uniqueid');
-      return result;
-    }
-
-    $(document).ready(function () {
-      var $table = $('#table');
-
-      $('#btninfo').click(function () {
-        $tr = $table.find('tr.highlight');
-        var id = getId($tr);
-
-        var msg = (id === undefined) ? 'No row selected' : 'Country code : ' + id;
-        alert(msg);
-      });
-
-      // register row-click event
-      $table.on('click-row.bs.table', function ($element, row, $tr) {
-        highLightRow($tr);
-      });
-
-    });
-
-    </script>
+@{
+    var prevDisabled = !Model.List.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.List.HasNextPage ? "disabled" : "";
 }
+
+<a asp-page="./Index"
+   asp-route-sortOrder="@Model.CurrentSortOrder"
+   asp-route-sortField="@Model.CurrentSortField"
+   asp-route-pageIndex="@(Model.List.PageIndex - 1)"
+   asp-route-currentFilter="@Model.CurrentFilter"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-page="./Index"
+   asp-route-sortOrder="@Model.CurrentSortOrder"
+   asp-route-sortField="@Model.CurrentSortField"
+   asp-route-pageIndex="@(Model.List.PageIndex + 1)"
+   asp-route-currentFilter="@Model.CurrentFilter"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

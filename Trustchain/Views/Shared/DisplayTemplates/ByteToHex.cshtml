@@ -1,4 +1,4 @@
 ﻿@model byte[]
 @{
-    @((Model != null) ? BitConverter.ToString(Model).Replace("-", "") : "")
+    <div class="monospace">@((Model != null) ? BitConverter.ToString(Model).Replace("-", "") : "")</div>
 }

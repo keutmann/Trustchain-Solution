@@ -223,7 +223,7 @@ namespace TrustchainCore.Model
         public byte[] Source { get; set; }
         public bool ShouldSerializeSource() { return Source != null && Source.Length > 0; }
 
-        [UIHint("ByteToHex")]
+        [UIHint("ByteToHexLong")]
         [JsonProperty(PropertyName = "receipt", NullValueHandling = NullValueHandling.Ignore)]
         public byte[] Receipt { get; set; }
         public bool ShouldSerializeReceipt() { return Receipt != null && Receipt.Length > 0; }

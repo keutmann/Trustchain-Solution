@@ -33,3 +33,17 @@ body {
         display: none;
     }
 }
+
+.monospace {
+    font-family: monospace;
+    display: inline-block;
+    text-align: justify;
+}
+
+.monospace200 {
+    font-family: monospace;
+    width: 200px;
+    word-wrap: break-word;
+    display: inline-block;
+    text-align: justify;
+}

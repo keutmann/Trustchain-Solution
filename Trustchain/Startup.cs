@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using TrustchainCore.Attributes;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using System;
 
 namespace Trustchain
 {
@@ -47,8 +48,17 @@ namespace Trustchain
             services.TrustgraphCore();
             services.TruststrampCore();
 
-            _services = services;
+            // Adds a default in-memory implementation of IDistributedCache.
+            services.AddDistributedMemoryCache();
 
+            services.AddSession(options =>
+            {
+                // Set a short timeout for easy testing.
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = false;
+            });
+
+            _services = services;
         }
 
         public virtual void ConfigureDbContext(IServiceCollection services)
@@ -107,6 +117,8 @@ namespace Trustchain
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
+
+            app.UseSession();
 
             app.UseMvc(routes =>
             {
