@@ -11,15 +11,18 @@ using TrustchainCore.Enumerations;
 using TrustchainCore.Extensions;
 using TrustchainCore.Services;
 using Microsoft.Extensions.Configuration;
+using Trustchain.AspNetCore.Mvc.RazorPages;
+using TrustchainCore.Collections.Generic;
+using System.Collections;
 
 namespace Trustchain.Pages.Workflows
 {
-    public class ListModel : PageModel
+    public class ListModel : ListPageModel<WorkflowContainer>
     {
         private readonly TrustDBContext _context;
         private readonly IWorkflowService _workflowService;
 
-        public bool IsAdmin { get; set; }
+        public string WorkflowType { get; set; }
 
         public ListModel(TrustDBContext context, IWorkflowService workflowService)
         {
@@ -29,20 +32,28 @@ namespace Trustchain.Pages.Workflows
 
         public IList<WorkflowContainer> WorkflowContainer { get;set; }
 
-        
 
-        public async Task OnGetAsync(string type)
+
+        public async Task OnGetAsync(string type, string sortOrder, string sortField, string currentFilter, string searchString, int? pageIndex)
         {
+            WorkflowType = type;
+            InitProperties(sortOrder, sortField, currentFilter, searchString, pageIndex);
+
             var query = from p in _context.Workflows
                         where p.Type == type
-                        orderby p.DatabaseID descending
                         select p;
 
-            WorkflowContainer = await query.ToListAsync();
+
+            query = BuildQuery(CurrentFilter, query);
+
+
+            query = AddSorting(query, "DatabaseID", "_desc");
+
+            List = await PaginatedList<WorkflowContainer>.CreateAsync(query.AsNoTracking(), PageIndex, PageSize);
         }
 
 
-        public async Task OnGetRunNowAsync(int id)
+        public async Task OnGetRunNowAsync(int id, string sortOrder, string sortField, string currentFilter, string searchString, int? pageIndex)
         {
             var container = await _context.Workflows.FirstOrDefaultAsync(p => p.DatabaseID == id);
 
@@ -51,12 +62,24 @@ namespace Trustchain.Pages.Workflows
             wf.Container.State = WorkflowStatusType.Starting.ToString();
             _workflowService.Save(wf);
 
-            await OnGetAsync(container.Type);
+            await OnGetAsync(container.Type, sortOrder, sortField, currentFilter, searchString, pageIndex);
         }
 
         public bool ShowRunNow(WorkflowContainer container)
         {
             return WorkflowStatusType.New.ToString().EqualsIgnoreCase(container.State);
         }
+
+        private IQueryable<WorkflowContainer> BuildQuery(string searchString, IQueryable<WorkflowContainer> query)
+        {
+            if (String.IsNullOrEmpty(searchString))
+                return query;
+
+            if (int.TryParse(searchString, out int workflowId))
+                query = query.Where(s => s.DatabaseID== workflowId);
+
+            return query;
+        }
+
     }
 }

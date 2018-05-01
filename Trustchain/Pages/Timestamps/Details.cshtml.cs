@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
+using System.Collections;
 
 namespace Trustchain.Pages.Timestamps
 {
@@ -21,14 +22,14 @@ namespace Trustchain.Pages.Timestamps
 
         public Timestamp Timestamp { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(byte[] source)
         {
-            if (id == null)
+            if (source == null)
             {
                 return NotFound();
             }
 
-            Timestamp = await _context.Timestamps.SingleOrDefaultAsync(m => m.DatabaseID == id);
+            Timestamp = await _context.Timestamps.SingleOrDefaultAsync(m => StructuralComparisons.StructuralEqualityComparer.Equals(m.Source, source));
 
             if (Timestamp == null)
             {

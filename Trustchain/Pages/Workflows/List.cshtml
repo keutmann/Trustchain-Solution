@@ -8,14 +8,26 @@
 
 <h2>Workflows</h2>
 
-<p>
+<form asp-page="./Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find:
+            <input type="text" name="searchString" value="@Model.CurrentFilter" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-page="./Index">Reset</a>
+        </p>
+    </div>
+</form>
+@*<p>
     <a asp-page="Create">Create New</a>
-</p>
+</p>*@
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.WorkflowContainer[0].DatabaseID)
+                <a asp-page="./List" asp-route-sortOrder="@Model.CurrentSortOrder!" asp-route-sortField="DatabaseID" asp-route-currentFilter="@Model.CurrentFilter" asp-route-type="@Model.WorkflowType" asp-route-pageIndex="@Model.List.PageIndex">
+                    @Html.DisplayNameFor(model => model.WorkflowContainer[0].DatabaseID)
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.WorkflowContainer[0].Type)
@@ -33,7 +45,7 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.WorkflowContainer) {
+@foreach (var item in Model.List) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.DatabaseID)
@@ -68,3 +80,26 @@
 }
     </tbody>
 </table>
+@{
+    var prevDisabled = !Model.List.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.List.HasNextPage ? "disabled" : "";
+}
+
+<a asp-page="./List"
+   asp-route-sortOrder="@Model.CurrentSortOrder"
+   asp-route-sortField="@Model.CurrentSortField"
+   asp-route-pageIndex="@(Model.List.PageIndex - 1)"
+   asp-route-currentFilter="@Model.CurrentFilter"
+   asp-route-type="@Model.WorkflowType"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-page="./List"
+   asp-route-sortOrder="@Model.CurrentSortOrder"
+   asp-route-sortField="@Model.CurrentSortField"
+   asp-route-pageIndex="@(Model.List.PageIndex + 1)"
+   asp-route-currentFilter="@Model.CurrentFilter"
+   asp-route-type="@Model.WorkflowType"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

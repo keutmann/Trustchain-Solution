@@ -8,6 +8,7 @@ using TrustchainCore.Collections.Generic;
 using TrustchainCore.Extensions;
 using System.Collections;
 using Trustchain.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Routing;
 
 namespace Trustchain.Pages.Timestamps
 {
@@ -38,7 +39,14 @@ namespace Trustchain.Pages.Timestamps
             List = await PaginatedList<Timestamp>.CreateAsync(query.AsNoTracking(), PageIndex, PageSize);
         }
 
+        public RouteValueDictionary GetParam(Timestamp timestamp)
+        {
+            var dict = InitParam();
 
+            dict["source"] = Convert.ToBase64String(timestamp.Source);
+
+            return dict;
+        }
 
         private IQueryable<Timestamp> BuildQuery(string searchString, IQueryable<Timestamp> query)
         {

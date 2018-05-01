@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using TrustchainCore.Collections.Generic;
 using TrustchainCore.Extensions;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Routing;
 
 namespace Trustchain.AspNetCore.Mvc.RazorPages
 {
     public class ListPageModel<T> : PageModel
     {
         public int PageSize = 20;
+
+        public RouteValueDictionary RouteValue { get; set; }
 
         public PaginatedList<T> List { get; set; }
 
@@ -38,6 +40,19 @@ namespace Trustchain.AspNetCore.Mvc.RazorPages
             CurrentFilter = searchString;
         }
 
+        protected RouteValueDictionary InitParam()
+        {
+            var dict = this.RouteValue == null ? new RouteValueDictionary() :
+                                     new RouteValueDictionary(RouteValue);
+
+            dict["sortOrder"] = CurrentSortOrder;
+            dict["sortField"] = CurrentSortField;
+            dict["currentFilter"] = CurrentFilter;
+            dict["pageIndex"] = PageIndex;
+
+            return dict;
+        }
+
 
         protected IQueryable<T> AddSorting(IQueryable<T> query, string defaultField, string defaultSort)
         {
@@ -49,7 +64,7 @@ namespace Trustchain.AspNetCore.Mvc.RazorPages
                     query = query.OrderByDescending(CurrentSortField);
             }
             else
-            if (String.IsNullOrWhiteSpace(defaultField))
+            if (!String.IsNullOrWhiteSpace(defaultField))
             {
                 if (defaultSort == "")
                     query = query.OrderBy(defaultField);

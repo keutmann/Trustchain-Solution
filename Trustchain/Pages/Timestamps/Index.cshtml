@@ -50,7 +50,7 @@
         {
             <tr>
                 <td>
-                    <a asp-page="./Details" asp-route-id="@Convert.ToBase64String(item.Source)">@Html.DisplayFor(modelItem => item.Source)</a>
+                    <a asp-page="./Details" asp-route-source="@Convert.ToBase64String(item.Source)">@Html.DisplayFor(modelItem => item.Source)</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Registered)

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Serialization;
 using TrustchainCore.Factories;
 using TrustchainCore.Interfaces;
+using TrustchainCore.Model;
 using TrustchainCore.Services;
 using TrustchainCore.Strategy;
 using TrustchainCore.Workflows;
@@ -38,6 +39,8 @@ namespace TrustchainCore.Extensions
             services.AddTransient<IConfigureOptions<MvcJsonOptions>, JsonOptionsSetup>();
             services.AddTransient<IWorkflowContext, WorkflowContext>();
             services.AddTransient<ISuccessStep, SuccessStep>();
+
+            services.AddTransient<WorkflowContainer>();
 
 
 
