@@ -66,7 +66,7 @@ namespace TrustchainCore.Services
 
         public Trust GetTrustById(byte[] id)
         {
-            var dbTrust = DBContext.Trusts.FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, id));
+            var dbTrust = DBContext.Trusts.AsNoTracking().Include(p => p.Timestamps).FirstOrDefault(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Id, id));
             return dbTrust;
         }
 

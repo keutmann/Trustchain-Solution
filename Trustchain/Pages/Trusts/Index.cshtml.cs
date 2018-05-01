@@ -77,7 +77,7 @@ namespace Trustchain.Pages.Trusts
 
         private IQueryable<Trust> BuildQuery(string searchString)
         {
-            var query = from s in _trustDBService.DBContext.Trusts
+            var query = from s in _trustDBService.DBContext.Trusts.AsNoTracking().Include(p=>p.Timestamps)
                         select s;
 
             if (String.IsNullOrEmpty(searchString))

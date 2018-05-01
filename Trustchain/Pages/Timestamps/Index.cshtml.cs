@@ -26,8 +26,9 @@ namespace Trustchain.Pages.Timestamps
         {
             InitProperties(sortOrder, sortField, currentFilter, searchString, pageIndex);
 
-            var query = from s in _context.Timestamps
+            var query = from s in _context.Timestamps.AsNoTracking()
                         select s;
+
 
             if (source != null)
                 query = query.Where(p => StructuralComparisons.StructuralEqualityComparer.Equals(p.Source, source));

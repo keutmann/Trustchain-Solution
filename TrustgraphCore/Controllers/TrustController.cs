@@ -9,6 +9,7 @@ using System;
 using TrustchainCore.Builders;
 using TrustchainCore.Enumerations;
 using TrustchainCore.Extensions;
+using System.Collections.Generic;
 
 namespace TrustgraphCore.Controllers
 {
@@ -87,8 +88,10 @@ namespace TrustgraphCore.Controllers
                 //}
             }
 
+            if (trust.Timestamps == null || trust.Timestamps.Count == 0)
+                trust.Timestamps = new List<Timestamp> { _proofService.Create(trust.Id) };
+
             _trustDBService.Add(trust);   // Add to database
-            _proofService.Add(trust.Id);
 
             var time = DateTime.Now.ToUnixTime();
             if ((trust.Expire  == 0 || trust.Expire > time) 

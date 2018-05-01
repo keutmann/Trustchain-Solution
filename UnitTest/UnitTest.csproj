@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TrustchainCore\DBContext\" />
     <Folder Include="TrustgraphCore\Workflows\" />
   </ItemGroup>
 

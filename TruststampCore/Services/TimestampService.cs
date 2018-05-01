@@ -29,17 +29,23 @@ namespace TruststampCore.Services
             }
         }
 
+        public Timestamp Create(byte[] source)
+        {
+            var timestamp = new Timestamp
+            {
+                WorkflowID = _timestampSynchronizationService.CurrentWorkflowID,
+                Source = source,
+                Registered = DateTime.Now.ToUnixTime()
+            };
+            return timestamp;
+        }
+
         public Timestamp Add(byte[] source, bool save = true)
         {
             var proof = Get(source);
             if(proof == null)
             {
-                proof = new Timestamp
-                {
-                    WorkflowID = _timestampSynchronizationService.CurrentWorkflowID,
-                    Source = source,
-                    Registered = DateTime.Now.ToUnixTime()
-                };
+                proof = Create(source);
                 _trustDBService.DBContext.Timestamps.Add(proof);
                 if(save)
                     _trustDBService.DBContext.SaveChanges();

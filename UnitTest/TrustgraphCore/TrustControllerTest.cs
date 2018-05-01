@@ -65,7 +65,7 @@ namespace UnitTest.TrustgraphCore
             var httpResult = (HttpResult)result.Value;
             Assert.AreEqual(HttpResultStatusType.Success.ToString(), httpResult.Status, httpResult.Message + " : " + httpResult.Data);
 
-                        var builder = new TrustBuilder(ServiceProvider);
+            var builder = new TrustBuilder(ServiceProvider);
             builder.SetServer("testserver");
             builder.AddTrust("A", "B", TrustBuilder.BINARYTRUST_TC1, BinaryTrustFalseAttributes);
             builder.Build().Sign();
@@ -117,6 +117,23 @@ namespace UnitTest.TrustgraphCore
             var context = _graphQueryService.Execute(queryBuilder.Query);
 
             Assert.AreEqual(0, context.Results.Trusts.Count(), $"Should be no trusts!");
+        }
+
+        [TestMethod]
+        public void AddWithTimestamp()
+        {
+            // Setup
+            EnsureTestGraph();
+
+            // Test Add and schema validation
+            var result = (OkObjectResult)_trustController.Add(_trustBuilder.Package);
+            var httpResult = (HttpResult)result.Value;
+            Assert.AreEqual(HttpResultStatusType.Success.ToString(), httpResult.Status, httpResult.Message + " : " + httpResult.Data);
+
+            var okResult = (OkObjectResult)_trustController.Get(_trustBuilder.CurrentTrust.Id);
+            var trust = (Trust)((HttpResult)okResult.Value).Data;
+            Assert.IsTrue(trust.Timestamps.Count > 0, "Missing timestamp entry in trust");
+
         }
 
     }
