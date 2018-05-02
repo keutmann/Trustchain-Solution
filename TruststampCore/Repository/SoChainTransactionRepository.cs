@@ -52,11 +52,33 @@ namespace TruststampCore.Repository
 
         #region ITransactionRepository Members
 
+        public string ServiceUrl
+        {
+            get
+            {
+                return $"https://chain.so/";
+            }
+        }
+
+
+        public string ApiUrl
+        {
+            get
+            {
+                return $"{ServiceUrl}api/{ApiVersion}";
+            }
+        }
+
+        public string AddressLookupUrl(string blockchain, string address)
+        {
+            return $"{ServiceUrl}address/{blockchain}/{address}";
+        }
+
         public async Task<JObject> GetUnspentAsync(string address)
         {
             while (true)
             {
-                using (var response = await Client.GetAsync($"{SoChainAddress}/get_tx_unspent/{BlockchainName}/{address}").ConfigureAwait(false))
+                using (var response = await Client.GetAsync($"{ApiUrl}/get_tx_unspent/{BlockchainName}/{address}").ConfigureAwait(false))
                 {
                     if (response.StatusCode == HttpStatusCode.NotFound)
                         return null;
@@ -76,7 +98,7 @@ namespace TruststampCore.Repository
         {
             while (true)
             {
-                using (var response = await Client.GetAsync($"{SoChainAddress}/get_tx_received/{BlockchainName}/{address}").ConfigureAwait(false))
+                using (var response = await Client.GetAsync($"{ApiUrl}/get_tx_received/{BlockchainName}/{address}").ConfigureAwait(false))
                 {
                     if (response.StatusCode == HttpStatusCode.NotFound)
                         return null;
@@ -102,7 +124,7 @@ namespace TruststampCore.Repository
             };
             var content = new StringContent(jsonTx.ToString(), Encoding.UTF8, "application/json"); 
 
-            using (var response = await Client.PostAsync($"{SoChainAddress}/send_tx/{BlockchainName}", content).ConfigureAwait(false))
+            using (var response = await Client.PostAsync($"{ApiUrl}/send_tx/{BlockchainName}", content).ConfigureAwait(false))
             {
                 var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var json = JObject.Parse(result);
@@ -119,14 +141,7 @@ namespace TruststampCore.Repository
             return new FeeRate("0.0001");
         }
 
-        #endregion
 
-        public string SoChainAddress
-        {
-            get
-            {
-                return $"https://chain.so/api/{ApiVersion}";
-            }
-        }
+        #endregion
     }
 }

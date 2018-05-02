@@ -9,5 +9,6 @@ namespace TrustchainCore.Interfaces
         MerkleNode Add(ITimestamp proof);
         MerkleNode Build();
         byte[] ComputeRoot(byte[] hash, byte[] path);
+        IHashAlgorithm HashAlgorithm { get; }
     }
 }

@@ -10,7 +10,7 @@ namespace TrustchainCore.Strategy
     public class MerkleTreeSorted : IMerkleTree
     {
         private IList<MerkleNode> LeafNodes { get; }
-        private IHashAlgorithm HashAlgorithm { get; }
+        public IHashAlgorithm HashAlgorithm { get; }
 
         public MerkleTreeSorted(IHashAlgorithm hashAlgorithm)
         {

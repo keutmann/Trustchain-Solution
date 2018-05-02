@@ -11,5 +11,7 @@ namespace TruststampCore.Interfaces
         Task<JObject> GetReceivedAsync(string address);
         Task<JObject> GetUnspentAsync(string Address);
         FeeRate GetEstimatedFee();
+        string ServiceUrl { get; }
+        string AddressLookupUrl(string blockchain, string address);
     }
 }

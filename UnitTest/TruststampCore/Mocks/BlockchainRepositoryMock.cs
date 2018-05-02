@@ -14,6 +14,14 @@ namespace UnitTest.TruststampCore.Mocks
         public string ApiVersion = "v2";
         public string BlockchainName { get; set; }
 
+        public string ServiceUrl
+        {
+            get
+            {
+                return "https://test/";
+            }
+        }
+
         public static string ReceivedData = @"{
                 ""data"" : {
                     ""txs"" : [
@@ -62,6 +70,11 @@ namespace UnitTest.TruststampCore.Mocks
         public Task<JObject> GetUnspentAsync(string Address)
         {
             return Task.Run<JObject>(() => JObject.Parse(UnspentData));
+        }
+
+        public string AddressLookupUrl(string blockchain, string address)
+        {
+            return "None";
         }
     }
 }

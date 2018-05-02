@@ -7,6 +7,7 @@ using TrustchainCore.Extensions;
 using System;
 using System.Collections.Generic;
 using TrustchainCore.Factories;
+using System.Linq;
 
 namespace UnitTest.TrustchainCore.Strategy
 {
@@ -136,7 +137,9 @@ namespace UnitTest.TrustchainCore.Strategy
             var index = 0;
             foreach (var node in nodes)
             {
-                var expectedResult = merkle.ComputeRoot(node.Hash, node.Proof.Receipt);
+                var hash = merkle.HashAlgorithm.HashOf(node.Proof.Source);
+                Assert.IsTrue(node.Hash.SequenceEqual(hash), "The source and hash are not equal");
+                var expectedResult = merkle.ComputeRoot(hash, node.Proof.Receipt);
                 Assert.IsTrue(expectedResult.Compare(root.Hash) == 0, $"Expected node number {index} and root hash are not the same");
                 index++;
             }

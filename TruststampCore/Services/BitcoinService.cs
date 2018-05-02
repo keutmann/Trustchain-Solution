@@ -16,12 +16,13 @@ namespace TruststampCore.Services
         public Network Network { get; set; }
         public IDerivationStrategy DerivationStrategy { get; set; }
 
-        private IBlockchainRepository _blockchain;
+        public IBlockchainRepository Repository { get; set; }
+
         private IDerivationStrategyFactory _derivationStrategyFactory;
 
-        public BitcoinService(IBlockchainRepository blockchain, IDerivationStrategyFactory derivationStrategyFactory)
+        public BitcoinService(IBlockchainRepository repository, IDerivationStrategyFactory derivationStrategyFactory)
         {
-            _blockchain = blockchain;
+            Repository = repository;
             _derivationStrategyFactory = derivationStrategyFactory;
 
             DerivationStrategy = _derivationStrategyFactory.GetService("btcpkh");
@@ -39,7 +40,7 @@ namespace TruststampCore.Services
             var serverKey = new Key(fundingKey);
             var serverAddress = serverKey.PubKey.GetAddress(Network);
 
-            var fee = _blockchain.GetEstimatedFee().FeePerK;
+            var fee = Repository.GetEstimatedFee().FeePerK;
 
             var coins = GetCoins(previousTx, fee, serverAddress);
 
@@ -60,7 +61,7 @@ namespace TruststampCore.Services
             var address = key.PubKey.GetAddress(Network);
             result.Address = address.Hash.ToBytes(); // Address without Network format
 
-            var json = _blockchain.GetReceivedAsync(address.ToString()).Result; //.ToWif());
+            var json = Repository.GetReceivedAsync(address.ToString()).Result; //.ToWif());
 
             var txs = json["data"]["txs"];
             if (txs == null)
@@ -90,7 +91,7 @@ namespace TruststampCore.Services
 
             Key merkleRootKey = new Key(DerivationStrategy.GetKey(merkleRoot));
             
-            var fee = _blockchain.GetEstimatedFee().FeePerK;
+            var fee = Repository.GetEstimatedFee().FeePerK;
 
             var coins = GetCoins(previousTx, fee, serverAddress);
             if(EnsureFee(fee, coins) > 0)
@@ -104,7 +105,7 @@ namespace TruststampCore.Services
                 .SetChange(serverAddress)
                 .BuildTransaction(true);
 
-            _blockchain.BroadcastAsync(sourceTx);
+            Repository.BroadcastAsync(sourceTx);
             txs.Add(sourceTx.ToBytes());
 
             var txNota = new TransactionBuilder()
@@ -115,7 +116,7 @@ namespace TruststampCore.Services
                 .SetChange(serverAddress)
                 .BuildTransaction(true);
 
-            _blockchain.BroadcastAsync(txNota);
+            Repository.BroadcastAsync(txNota);
             txs.Add(txNota.ToBytes());
 
             return txs;
@@ -137,7 +138,7 @@ namespace TruststampCore.Services
 
             if (fee.Satoshi * 2 > sumOfCoins)
             {
-                var unspent = _blockchain.GetUnspentAsync(address.ToString()); //.ToWif());
+                var unspent = Repository.GetUnspentAsync(address.ToString()); //.ToWif());
                 unspent.Wait();
                 var obj = unspent.Result;
 
