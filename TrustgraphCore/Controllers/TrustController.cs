@@ -19,18 +19,18 @@ namespace TrustgraphCore.Controllers
         private IGraphTrustService _graphTrustService;
         private ITrustSchemaService _trustSchemaService;
         private ITrustDBService _trustDBService;
-        private ITimestampService _proofService;
+        private ITimestampService _timestampService;
         private IBlockchainServiceFactory _blockchainServiceFactory;
         private IServiceProvider _serviceProvider;
 
 
 
-        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, ITimestampService proofService, IBlockchainServiceFactory blockchainServiceFactory, IServiceProvider serviceProvider)
+        public TrustController(IGraphTrustService graphTrustService, ITrustSchemaService trustSchemaService, ITrustDBService trustDBService, ITimestampService timestampService, IBlockchainServiceFactory blockchainServiceFactory, IServiceProvider serviceProvider)
         {
             _graphTrustService = graphTrustService;
             _trustSchemaService = trustSchemaService;
             _trustDBService = trustDBService;
-            _proofService = proofService;
+            _timestampService = timestampService;
             _blockchainServiceFactory = blockchainServiceFactory;
             _serviceProvider = serviceProvider;
         }
@@ -88,8 +88,7 @@ namespace TrustgraphCore.Controllers
                 //}
             }
 
-            if (trust.Timestamps == null || trust.Timestamps.Count == 0)
-                trust.Timestamps = new List<Timestamp> { _proofService.Create(trust.Id) };
+            trust.Timestamps = _timestampService.FillIn(trust.Timestamps, trust.Id);
 
             _trustDBService.Add(trust);   // Add to database
 

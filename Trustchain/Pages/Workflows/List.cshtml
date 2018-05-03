@@ -63,7 +63,7 @@
                 @Html.DisplayFor(modelItem => item.Data)
             </td>*@
             <td>
-                @if (Model.ShowRunNow(item)) {
+                @if (HttpContext.Session.Get<bool>("isadmin") && Model.ShowRunNow(item)) {
                     <a asp-page-handler="RunNow" asp-route-id="@item.DatabaseID">Run now</a> @Html.Encode("|")
                 } 
                 @if (HttpContext.Session.Get<bool>("isadmin")) {

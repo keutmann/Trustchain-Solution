@@ -43,14 +43,13 @@ namespace Trustchain.Pages.Timestamps
             if (Timestamp == null)
                 return NotFound();
 
+            if (String.IsNullOrEmpty(Timestamp.Algorithm))
+                Timestamp.Algorithm = "merkle-sha256.tc1";
 
             if (Timestamp.Source != null && Timestamp.Source.Length > 0)
             {
                 var hash = _merkleTree.HashAlgorithm.HashOf(Timestamp.Source);
                 var root = _merkleTree.ComputeRoot(hash, Timestamp.Receipt);
-
-                if (String.IsNullOrEmpty(Timestamp.Algorithm))
-                    Timestamp.Algorithm = "merkle-sha256.tc1";
 
                 if (Timestamp.WorkflowID > 0) {
                     var wf = _workflowService.Load<ITimestampWorkflow>(Timestamp.WorkflowID);

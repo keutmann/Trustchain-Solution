@@ -5,6 +5,10 @@ using TrustchainCore.Model;
 using TruststampCore.Interfaces;
 using TrustchainCore.Extensions;
 using System.Collections;
+using System.Collections.Generic;
+using TrustchainCore.Factories;
+using Microsoft.Extensions.Configuration;
+using TruststampCore.Extensions;
 
 namespace TruststampCore.Services
 {
@@ -13,12 +17,14 @@ namespace TruststampCore.Services
         private ITimestampSynchronizationService _timestampSynchronizationService;
         private ITrustDBService _trustDBService;
         private IBlockchainProofFactory _timestampProofFactory;
+        private readonly IConfiguration _configuration;
 
-        public TimestampService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService, IBlockchainProofFactory timestampProofFactory)
+        public TimestampService(ITimestampSynchronizationService timestampSynchronizationService, ITrustDBService trustDBService, IBlockchainProofFactory timestampProofFactory, IConfiguration configuration)
         {
             _timestampSynchronizationService = timestampSynchronizationService;
             _trustDBService = trustDBService;
             _timestampProofFactory = timestampProofFactory;
+            _configuration = configuration;
         }
 
         public IQueryable<Timestamp> Timestamps
@@ -28,12 +34,24 @@ namespace TruststampCore.Services
                 return _trustDBService.Timestamps;
             }
         }
+        
+        public IList<Timestamp> FillIn(IList<Timestamp> timestamps, byte[] source)
+        {
+            var list = timestamps ?? new List<Timestamp>();
+
+            var item = Create(source);
+            list.Add(item);
+            
+            return list;
+        }
 
         public Timestamp Create(byte[] source)
         {
             var timestamp = new Timestamp
             {
                 WorkflowID = _timestampSynchronizationService.CurrentWorkflowID,
+                Algorithm = MerkleStrategyFactory.MERKLE_TC1_DOUBLE256,
+                Blockchain = _configuration.Blockchain(),
                 Source = source,
                 Registered = DateTime.Now.ToUnixTime()
             };

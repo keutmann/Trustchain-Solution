@@ -121,14 +121,17 @@ namespace TrustchainCore.Strategy
         public byte[] ComputeRoot(byte[] hash, byte[] path)
         {
             var hashLength = HashAlgorithm.Length;
-            for (var i = 0; i < path.Length; i += hashLength)
+            if (path != null && path.Length > 0)
             {
-                var merkle = new byte[hashLength];
-                Array.Copy(path, i, merkle, 0, hashLength);
-                if (hash.Compare(merkle) < 0)
-                    hash = HashAlgorithm.HashOf(hash.Combine(merkle));
-                else
-                    hash = HashAlgorithm.HashOf(merkle.Combine(hash));
+                for (var i = 0; i < path.Length; i += hashLength)
+                {
+                    var merkle = new byte[hashLength];
+                    Array.Copy(path, i, merkle, 0, hashLength);
+                    if (hash.Compare(merkle) < 0)
+                        hash = HashAlgorithm.HashOf(hash.Combine(merkle));
+                    else
+                        hash = HashAlgorithm.HashOf(merkle.Combine(hash));
+                }
             }
             return hash;
         }
