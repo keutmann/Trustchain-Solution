@@ -9,6 +9,7 @@ using TrustchainCore.Extensions;
 using System.Collections;
 using Trustchain.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
+using System.Linq.Expressions;
 
 namespace Trustchain.Pages.Timestamps
 {
@@ -54,7 +55,7 @@ namespace Trustchain.Pages.Timestamps
             if (String.IsNullOrEmpty(searchString))
                 return query;
 
-            if (searchString.IsHex())
+            if (searchString.IsHex() && searchString.Length > 7)
             {
                 var hex = searchString.FromHexToBytes();
                 query = query.Where(s => StructuralComparisons.StructuralEqualityComparer.Equals(s.Source, hex));
@@ -70,15 +71,16 @@ namespace Trustchain.Pages.Timestamps
                 return query;
             }
 
+            Expression<Func<Timestamp, bool>> q = null;
             if (int.TryParse(searchString, out int workflowId))
-                query = query.Where(s => s.WorkflowID == workflowId);
+                q = s => s.WorkflowID == workflowId;
 
             var likeSearch = $"%{searchString}%";
-            query = query.Where(s => EF.Functions.Like(s.Blockchain, likeSearch)
+            q = q.Or(s => EF.Functions.Like(s.Blockchain, likeSearch)
                 || EF.Functions.Like(s.Algorithm, likeSearch)
                 || EF.Functions.Like(s.Service, likeSearch));
 
-            return query;
+            return query.Where(q);
         }
 
     }

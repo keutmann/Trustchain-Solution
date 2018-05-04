@@ -72,7 +72,7 @@ namespace Trustchain
 
         public virtual void ConfigureTimers(IApplicationBuilder app)
         {
-            app.Trustchain(_services);
+            //app.Trustchain(_services);
         }
 
 
@@ -84,7 +84,7 @@ namespace Trustchain
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
 
-                loggerFactory.AddConsole();
+                //loggerFactory.AddConsole();
             }
             else
             {

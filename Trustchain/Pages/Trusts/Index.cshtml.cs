@@ -11,6 +11,7 @@ using TrustchainCore.Interfaces;
 using TrustchainCore.Extensions;
 using System.Collections;
 using TrustchainCore.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Trustchain.Pages.Trusts
 {
@@ -72,18 +73,18 @@ namespace Trustchain.Pages.Trusts
                     break;
             }
 
-            Trusts = await PaginatedList<Trust>.CreateAsync(query.AsNoTracking(), pageIndex ?? 1, PageSize);
+            Trusts = await PaginatedList<Trust>.CreateAsync(query, pageIndex ?? 1, PageSize);
         }
 
         private IQueryable<Trust> BuildQuery(string searchString)
         {
-            var query = from s in _trustDBService.DBContext.Trusts.AsNoTracking().Include(p=>p.Timestamps)
+            var query = from s in _trustDBService.DBContext.Trusts.AsNoTracking()
                         select s;
 
             if (String.IsNullOrEmpty(searchString))
                 return query;
 
-            if (searchString.IsHex())
+            if (searchString.IsHex() && searchString.Length > 39)
             {
                 var hex = searchString.FromHexToBytes();
                 if (hex.Length == 32)
@@ -106,16 +107,23 @@ namespace Trustchain.Pages.Trusts
                 return query;
             }
 
-            if (int.TryParse(searchString, out int cost))
-                query = query.Where(s => s.Cost == cost);
+            Expression<Func<Trust, bool>> q = null;
+            if (short.TryParse(searchString, out short cost))
+                q = p => p.Cost == cost;
 
             var likeSearch = $"%{searchString}%";
-            query = query.Where(s => EF.Functions.Like(s.Type, likeSearch)
+            Expression<Func<Trust, bool>> search = s => EF.Functions.Like(s.Type, likeSearch)
                 || EF.Functions.Like(s.Claim, likeSearch)
                 || EF.Functions.Like(s.Scope.Type, likeSearch)
-                || EF.Functions.Like(s.Scope.Value, likeSearch));
+                || EF.Functions.Like(s.Scope.Value, likeSearch);
+
+            q = q.Or(search);
+
+            query = query.Where(q);
 
             return query;
         }
+
+
     }
 }
