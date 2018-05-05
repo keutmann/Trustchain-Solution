@@ -17,18 +17,25 @@ namespace UnitTest.TrustgraphCore
 {
     public class TrustGraphMock : StartupMock
     {
-        protected IGraphTrustService _graphTrustService = null;
-        protected TrustBuilder _trustBuilder = null;
-        protected ITrustDBService _trustDBService = null;
-        protected IGraphQueryService _graphQueryService = null;
-        protected TrustController _trustController = null;
-        protected IGraphLoadSaveService _graphLoadSaveService = null;
+        protected IGraphTrustService _graphTrustService { get; set; }
 
-        protected string BinaryTrustTrueAttributes = null;
-        protected string BinaryTrustFalseAttributes = null;
-        protected string ConfirmAttributes = null;
-        protected string RatingAtrributes = null;
+        protected TrustBuilder _trustBuilder { get; set; } 
 
+        protected ITrustDBService _trustDBService { get; set; } 
+
+        protected IGraphQueryService _graphQueryService { get; set; } 
+
+        protected TrustController _trustController { get; set; } 
+
+        protected IGraphLoadSaveService _graphLoadSaveService { get; set; } 
+
+        protected string BinaryTrustTrueAttributes { get; set; } 
+
+        protected string BinaryTrustFalseAttributes { get; set; } 
+
+        protected string ConfirmAttributes { get; set; }
+
+        protected string RatingAtrributes { get; set; } 
 
         [TestInitialize]
         public override void Init()

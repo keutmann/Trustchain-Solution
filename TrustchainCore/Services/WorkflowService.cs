@@ -13,6 +13,7 @@ using TrustchainCore.Workflows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace TrustchainCore.Services
 {
@@ -25,6 +26,9 @@ namespace TrustchainCore.Services
         private IContractReverseResolver _contractReverseResolver;
         private ILogger _logger;
         private IConfiguration _configuration;
+
+        private Dictionary<string, bool> runningWorkflows = new Dictionary<string, bool>();
+
 
         public IQueryable<WorkflowContainer> Workflows {
             get
@@ -140,43 +144,24 @@ namespace TrustchainCore.Services
             return entity;
         }
 
-        public async void RunWorkflows(IServiceCollection services)
+        public void RunWorkflows()
         {
-            await Task.Run(() => {
-                _logger.DateInformation($"TaskProcessor started");
+                var containers = GetRunningWorkflows();
 
-                var runningWorkflows = new ConcurrentDictionary<string, bool>();
-
-                while (true)
+                if (containers.Count > 0)
                 {
-                    
-                    using (var localScope = this.ServiceProvider.CreateScope())
-                    //using(var localScope = services.BuildServiceProvider().CreateScope())
+                    _logger.DateInformation($"Active Workflows found: {containers.Count}");
+
+                    foreach (var container in containers)
                     {
-                        var localWorkflowService = localScope.ServiceProvider.GetRequiredService<IWorkflowService>();
-                        var containers = localWorkflowService.GetRunningWorkflows();
-
-                        if (containers.Count > 0)
-                        {
-                            _logger.DateInformation($"Active Workflows found: {containers.Count}");
-
-                            foreach (var container in containers)
-                            {
-                                // Run workflows serialized! May still be problems with the async parallel processing
-                                localWorkflowService.Execute(runningWorkflows, container, services);
-                            }
-
-                            _logger.DateInformation($"TaskProcessor done");
-                        }
-
-                        localWorkflowService.Dispose();
+                        // Run workflows serialized! May still be problems with the async parallel processing
+                        Execute(container);
                     }
 
-                    GC.Collect();
-                    Task.Delay(_configuration.WorkflowInterval()).Wait();
+                    _logger.DateInformation($"TaskProcessor done");
                 }
-            });
-        }
+
+            }
 
         public IList<WorkflowContainer> GetRunningWorkflows()
         {
@@ -192,39 +177,39 @@ namespace TrustchainCore.Services
             return containers;
         }
 
-        public async void ExecuteAsync(ConcurrentDictionary<string, bool> workflows, WorkflowContainer container, IServiceCollection services)
+        //public async void ExecuteAsync(ConcurrentDictionary<string, bool> workflows, WorkflowContainer container)
+        //{
+        //    if (workflows.ContainsKey(container.Type))
+        //        return;
+
+        //    if (!workflows.TryAdd(container.Type, true))
+        //        return;
+
+        //    _logger.DateInformation($"Executing workflow id : {container.DatabaseID}");
+
+        //    await Task.Run(() => {
+        //        // Make a scope for the workflow to run in.
+        //        //var taskServiceProvider = services.BuildServiceProvider();
+        //        using (var taskScope = ServiceProvider.CreateScope())
+        //        {
+        //            var taskWorkflowService = taskScope.ServiceProvider.GetRequiredService<IWorkflowService>();
+        //            var workflow = taskWorkflowService.Create(container);
+
+        //            workflow.Execute();
+        //        }
+        //    });
+
+        //    workflows.TryRemove(container.Type, out bool val);
+
+        //    _logger.DateInformation($"ContinueWith -> Done executing workflow id {container.DatabaseID}");
+        //}
+
+        public void Execute(WorkflowContainer container)
         {
-            if (workflows.ContainsKey(container.Type))
+            if (runningWorkflows.ContainsKey(container.Type))
                 return;
 
-            if (!workflows.TryAdd(container.Type, true))
-                return;
-
-            _logger.DateInformation($"Executing workflow id : {container.DatabaseID}");
-
-            await Task.Run(() => {
-                // Make a scope for the workflow to run in.
-                //var taskServiceProvider = services.BuildServiceProvider();
-                using (var taskScope = ServiceProvider.CreateScope())
-                {
-                    var taskWorkflowService = taskScope.ServiceProvider.GetRequiredService<IWorkflowService>();
-                    var workflow = taskWorkflowService.Create(container);
-
-                    workflow.Execute();
-                }
-            });
-
-            workflows.TryRemove(container.Type, out bool val);
-
-            _logger.DateInformation($"ContinueWith -> Done executing workflow id {container.DatabaseID}");
-        }
-
-        public void Execute(ConcurrentDictionary<string, bool> workflows, WorkflowContainer container, IServiceCollection services)
-        {
-            if (workflows.ContainsKey(container.Type))
-                return;
-
-            if (!workflows.TryAdd(container.Type, true))
+            if (!runningWorkflows.TryAdd(container.Type, true))
                 return;
 
             _logger.DateInformation($"Executing workflow id : {container.DatabaseID}");
@@ -232,7 +217,7 @@ namespace TrustchainCore.Services
             var workflow = Create(container);
             workflow.Execute();
 
-            workflows.TryRemove(container.Type, out bool val);
+            runningWorkflows.Remove(container.Type, out bool val);
 
             _logger.DateInformation($"ContinueWith -> Done executing workflow id {container.DatabaseID}");
         }

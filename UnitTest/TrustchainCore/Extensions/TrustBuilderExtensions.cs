@@ -11,8 +11,7 @@ namespace UnitTest.TrustchainCore.Extensions
 {
     public static class TrustBuilderExtensions
     {
-        public static IDerivationStrategy ScriptService = new DerivationBTCPKH();
-
+        public static IDerivationStrategy ScriptService { get; set; } = new DerivationBTCPKH();
 
         public static byte[] GetAddress(string name)
         {

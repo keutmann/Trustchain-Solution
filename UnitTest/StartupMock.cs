@@ -70,7 +70,7 @@ namespace UnitTest
             );
         }
 
-        public override void ConfigureTimers(IApplicationBuilder app)
+        public override void AddBackgroundServices(IServiceCollection services)
         {
             // Do not create timers here!
         }

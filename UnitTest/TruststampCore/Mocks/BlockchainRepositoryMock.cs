@@ -11,7 +11,7 @@ namespace UnitTest.TruststampCore.Mocks
 {
     public class BlockchainRepositoryMock : IBlockchainRepository
     {
-        public string ApiVersion = "v2";
+        public string ApiVersion { get; set; } = "v2";
         public string BlockchainName { get; set; }
 
         public string ServiceUrl
@@ -22,7 +22,7 @@ namespace UnitTest.TruststampCore.Mocks
             }
         }
 
-        public static string ReceivedData = @"{
+        public static string ReceivedData { get; set; } = @"{
                 ""data"" : {
                     ""txs"" : [
                             {
@@ -32,7 +32,7 @@ namespace UnitTest.TruststampCore.Mocks
                     }
                 }";
 
-        public static string UnspentData = @"{
+        public static string UnspentData { get; set; } = @"{
                 ""data"" : {
                     ""txs"" : [
                             {

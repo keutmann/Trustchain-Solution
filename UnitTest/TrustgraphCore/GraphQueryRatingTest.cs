@@ -25,7 +25,7 @@ namespace UnitTest.TrustgraphCore
     [TestClass]
     public class GraphQueryRatingTest : TrustGraphMock
     {
-        private string ClaimRatingType = TrustBuilder.RATING_TC1;
+        private string _claimRatingType = TrustBuilder.RATING_TC1;
 
         /// <summary>
         /// 1 Source, 1 targets
@@ -38,7 +38,7 @@ namespace UnitTest.TrustgraphCore
 
             _graphTrustService.Add(_trustBuilder.Package);
 
-            var queryBuilder = new QueryRequestBuilder(ClaimRatingType);
+            var queryBuilder = new QueryRequestBuilder(_claimRatingType);
             BuildQuery(queryBuilder, "A", "D"); // Query if "person" have a confimation within A's trust sphere.
 
             // Execute
@@ -62,7 +62,7 @@ namespace UnitTest.TrustgraphCore
         {
             EnsureTestGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimRatingType);
+            var queryBuilder = new QueryRequestBuilder(_claimRatingType);
 
             BuildQuery(queryBuilder, "A", "D");
             BuildQuery(queryBuilder, "A", "B");
@@ -115,7 +115,7 @@ namespace UnitTest.TrustgraphCore
         {
             EnsureTestGraph();
 
-            var queryBuilder = new QueryRequestBuilder(ClaimRatingType);
+            var queryBuilder = new QueryRequestBuilder(_claimRatingType);
 
             BuildQuery(queryBuilder, "A", "Unreach");
 

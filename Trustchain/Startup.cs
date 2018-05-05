@@ -15,6 +15,8 @@ using TrustchainCore.Attributes;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using System;
+using Microsoft.Extensions.Hosting;
+using TrustchainCore.Services;
 
 namespace Trustchain
 {
@@ -48,6 +50,8 @@ namespace Trustchain
             services.TrustgraphCore();
             services.TruststrampCore();
 
+            AddBackgroundServices(services);
+
             // Adds a default in-memory implementation of IDistributedCache.
             services.AddDistributedMemoryCache();
 
@@ -70,15 +74,16 @@ namespace Trustchain
 
         }
 
-        public virtual void ConfigureTimers(IApplicationBuilder app)
+        public virtual void AddBackgroundServices(IServiceCollection services)
         {
-            //app.Trustchain(_services);
+            services.AddSingleton<IHostedService, WorkflowHostedService>();
         }
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -93,7 +98,6 @@ namespace Trustchain
 
             app.Graph(); // Load the Trust Graph from Database
             app.Truststamp();
-            ConfigureTimers(app);
 
             app.UseStaticFiles();
             //app.UseStaticFiles(new StaticFileOptions

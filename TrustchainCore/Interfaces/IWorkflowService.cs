@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using TrustchainCore.Interfaces;
 using TrustchainCore.Model;
@@ -25,9 +26,9 @@ namespace TrustchainCore.Services
         //WorkflowContainer Load();
         WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);
         IList<WorkflowContainer> GetRunningWorkflows();
-        void RunWorkflows(IServiceCollection services);
-        void Execute(ConcurrentDictionary<string, bool> workflows, WorkflowContainer container, IServiceCollection services);
-        void ExecuteAsync(ConcurrentDictionary<string, bool> workflows, WorkflowContainer container, IServiceCollection services);
+        void RunWorkflows();
+        void Execute(WorkflowContainer container);
+        //void ExecuteAsync(ConcurrentDictionary<string, bool> workflows, WorkflowContainer container);
         //T GetRunningWorkflow<T>() where T : class, IWorkflowContext;
         T EnsureWorkflow<T>() where T : class, IWorkflowContext;
     }

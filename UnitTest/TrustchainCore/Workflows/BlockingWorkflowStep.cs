@@ -13,7 +13,7 @@ namespace UnitTest.TrustchainCore.Workflows
 
         //public Task<int> MachineTask { get => taskCompletionSource.Task; }
         //private ILogger<BlockingWorkflowStep> _logger;
-        public int Seconds = 3;
+        public int Seconds { get; set; } = 3;
 
         public BlockingWorkflowStep()
         {
@@ -26,6 +26,7 @@ namespace UnitTest.TrustchainCore.Workflows
             Console.WriteLine($"Workflow ID : {Context.ID} BlockingWorkflowStep waited for {Seconds} sec.");
             Task.Delay(Seconds * 1000).Wait();
             Console.WriteLine($"Workflow ID : {Context.ID} BlockingWorkflowStep done waiting");
+            Context.RunStep<ISuccessStep>(); // Workflow done!
         }
 
         //public void Done(int number)

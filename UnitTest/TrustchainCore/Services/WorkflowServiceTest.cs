@@ -174,8 +174,8 @@ namespace UnitTest.TrustchainCore.Workflow
             var id = workflowService.Save(workflow);
 
             logger.LogInformation("Running RunWorkflows");
-            workflowService.RunWorkflows(Services);
-            Task.Delay(5500).Wait();
+            workflowService.RunWorkflows();
+            //Task.Delay(5500).Wait();
         }
 
         [TestMethod]
@@ -196,9 +196,9 @@ namespace UnitTest.TrustchainCore.Workflow
                 var id = workflowService.Save(workflow);
             }
             logger.LogInformation("Running RunWorkflows");
-            workflowService.RunWorkflows(Services);
+            workflowService.RunWorkflows();
 
-            Task.Delay(6500).Wait();
+            //Task.Delay(6500).Wait();
         }
 
 
