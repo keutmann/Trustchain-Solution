@@ -13,6 +13,7 @@
   "type": "binarytrust.tc1",
   "claim": "{\"trust\":true}",
   "scope": {
+    "type": "domain",
     "value": "www.reddit.com"
   },
   "cost": 100,
