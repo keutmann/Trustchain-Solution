@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
+using Trustchain.Extensions;
 
 namespace Trustchain.Pages.Workflows
 {
@@ -25,6 +26,9 @@ namespace Trustchain.Pages.Workflows
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
+            if (!HttpContext.Session.Get<bool>("isadmin"))
+                return NotFound();
+
             if (id == null)
             {
                 return NotFound();

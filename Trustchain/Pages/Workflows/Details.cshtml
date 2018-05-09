@@ -1,5 +1,6 @@
 @page
 @model Trustchain.Pages.Workflows.DetailsModel
+@using Trustchain.Extensions
 
 @{
     ViewData["Title"] = "Details";
@@ -50,6 +51,9 @@
     </dl>
 </div>
 <div>
-    <a asp-page="./Edit" asp-route-id="@Model.WorkflowContainer.DatabaseID">Edit</a> |
+    @if (HttpContext.Session.Get<bool>("isadmin"))
+    {
+        <a asp-page="./Edit" asp-route-id="@Model.WorkflowContainer.DatabaseID">Edit</a> @Html.Encode("|")
+    }
     <a asp-page="./Index">Back to List</a>
 </div>

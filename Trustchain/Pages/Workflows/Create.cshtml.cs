@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using TrustchainCore.Model;
 using TrustchainCore.Repository;
+using Trustchain.Extensions;
+
 
 namespace Trustchain.Pages.Workflows
 {
@@ -21,6 +24,9 @@ namespace Trustchain.Pages.Workflows
 
         public IActionResult OnGet()
         {
+            if (!HttpContext.Session.Get<bool>("isadmin"))
+                return NotFound();
+
             return Page();
         }
 
@@ -29,6 +35,9 @@ namespace Trustchain.Pages.Workflows
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (!HttpContext.Session.Get<bool>("isadmin"))
+                return NotFound();
+
             if (!ModelState.IsValid)
             {
                 return Page();
