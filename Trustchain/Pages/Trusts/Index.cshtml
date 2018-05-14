@@ -27,7 +27,7 @@
                 <a asp-page="./Index" asp-route-sortOrder="@Model.CurrentSortOrder!" asp-route-sortField="Created" asp-route-currentFilter="@Model.CurrentFilter" asp-route-pageIndex="@Model.Trusts.PageIndex">
                     @Html.DisplayNameFor(model => model.Trusts[0].Created)
                 </a>
-                    
+
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Trusts[0].Type)
@@ -44,35 +44,40 @@
             <th>
                 @Html.DisplayNameFor(model => model.Trusts[0].Expire)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Trusts[0].Replaced)
+            </th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Trusts)
         {
-            <tr>
-                <td>
-                    <a asp-page="./Details" asp-route-id="@Convert.ToBase64String(item.Id)">@Html.DisplayFor(modelItem => item.Id)</a>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Created)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Type)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Claim)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Cost)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Activate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Expire)
-                </td>
-
-            </tr>
+        <tr>
+            <td>
+                <a asp-page="./Details" asp-route-id="@Convert.ToBase64String(item.Id)">@Html.DisplayFor(modelItem => item.Id)</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Created)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Claim)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cost)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Activate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Expire)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Replaced)
+            </td>
+        </tr>
         }
     </tbody>
 </table>

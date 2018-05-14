@@ -22,6 +22,8 @@ namespace TrustchainCore.Interfaces
 
         void Add(Trust trust);
         bool Add(Package package);
+        void Update(Trust trust);
+
         Package GetPackage(byte[] packageId);
 
         long ID { get; set; }

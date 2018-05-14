@@ -148,6 +148,14 @@
         </tr>
         <tr>
             <td>
+                @Html.DisplayNameFor(model => Model.Trust.Replaced)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => Model.Trust.Replaced)
+            </td>
+        </tr>
+        <tr>
+            <td>
                 @Html.DisplayNameFor(model => Model.Trust.Timestamps)
             </td>
             <td>
@@ -156,7 +164,7 @@
                         @foreach (var timestamp in Model.Trust.Timestamps)
                         {
                             <tr>
-                                <td>@Html.DisplayNameFor(t=>timestamp.Source):</td>
+                                <td>@Html.DisplayNameFor(t => timestamp.Source):</td>
                                 <td><a asp-page="/Timestamps/Details" asp-route-source="@Convert.ToBase64String(timestamp.Source)">@Html.DisplayFor(t => timestamp.Source)</a></td>
                             </tr>
 

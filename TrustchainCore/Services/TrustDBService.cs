@@ -91,6 +91,7 @@ namespace TrustchainCore.Services
                         where StructuralComparisons.StructuralEqualityComparer.Equals(p.Issuer.Address, trust.Issuer.Address)
                               && StructuralComparisons.StructuralEqualityComparer.Equals(p.Subject.Address, trust.Subject.Address)
                               && p.Type == trust.Type
+                              && p.Replaced == false
                         select p;
 
             if (trust.Scope != null)
@@ -148,6 +149,14 @@ namespace TrustchainCore.Services
             DBContext.SaveChanges();
             return true;
         }
+
+        public void Update(Trust trust)
+        {
+            DBContext.Trusts.Update(trust);
+        }
+
+
+
 
         public Package GetPackage(byte[] packageId)
         {

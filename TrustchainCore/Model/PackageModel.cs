@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TrustchainCore.Interfaces;
@@ -145,6 +146,11 @@ namespace TrustchainCore.Model
 
         [JsonIgnore]
         public int? PackageDatabaseID { get; set; }
+
+        [JsonIgnore]
+        [Description("Current Trust has been replaced by a new Trust.")]
+        public bool Replaced { get; set; }
+
     }
 
     [JsonObject(MemberSerialization.OptIn)]

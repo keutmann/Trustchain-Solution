@@ -83,7 +83,8 @@ namespace TrustgraphCore.Controllers
                 // For now, we just remove the old trust
                 //if (dbTrust.Created < trust.Created)
                 //{
-                    _trustDBService.DBContext.Trusts.Remove(dbTrust);
+                    dbTrust.Replaced = true;
+                    _trustDBService.Update(dbTrust);
                     _graphTrustService.Remove(trust);
                 //}
             }
