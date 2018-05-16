@@ -1,28 +1,56 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Net;
+using Serilog;
 
 namespace Trustchain
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        public static int Main(string[] args)
         {
-            // Renaming BuildWebHost to InitWebHost avoids problems with add-migration command.
-            // IDesignTimeDbContextFactory implemented for add-migration specifically.
-            InitWebHost(args).Run();
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateLogger();
+
+            try
+            {
+                Log.Information("Getting the motors running...");
+
+                // Renaming BuildWebHost to InitWebHost avoids problems with add-migration command.
+                // IDesignTimeDbContextFactory implemented for add-migration specifically.
+                InitWebHost(args).Run();
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+                return 1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
         }
 
         public static IWebHost InitWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseConfiguration(Configuration)
                 .UseDefaultServiceProvider((context, options) =>
                 {
                     options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
@@ -36,6 +64,7 @@ namespace Trustchain
                         listenOptions.UseHttps(@"C:\tmp\www_trust_dance.pfx", password);
                     });
                 })
+                .UseSerilog()
                 .Build();
     }
 }
