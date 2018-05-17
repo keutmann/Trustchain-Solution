@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using Serilog;
+using Microsoft.Extensions.Logging;
+using Serilog.Formatting;
+using Serilog.Formatting.Compact;
+using Serilog.Formatting.Display;
 
 namespace Trustchain
 {
@@ -19,10 +23,23 @@ namespace Trustchain
 
         public static int Main(string[] args)
         {
+            var formatter = (false) ? (ITextFormatter)new RenderedCompactJsonFormatter() : new MessageTemplateTextFormatter("{Timestamp:o} {RequestId,13} [{Level:u3}] {Message} ({EventId:x8}){NewLine}{Exception}", null);
+
+            var pathFormat = "Logs/log-{Date}.txt";
+            const long DefaultFileSizeLimitBytes = 1024 * 1024 * 1024;
+            const int DefaultRetainedFileCountLimit = 31;
+
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.Async(w => w.RollingFile(
+                    formatter,
+                    Environment.ExpandEnvironmentVariables(pathFormat),
+                    fileSizeLimitBytes: DefaultFileSizeLimitBytes,
+                    retainedFileCountLimit: DefaultRetainedFileCountLimit,
+                    shared: true,
+                    flushToDiskInterval: TimeSpan.FromSeconds(2)))
                 .CreateLogger();
 
             try
