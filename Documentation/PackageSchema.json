@@ -21,13 +21,17 @@
   "expire": 2231006505,
   "timestamp": [
     {
-      "blockchain": "btc", // The blockchain used for the timestamp
-      "algorithm": "merkle.tc1-double256", // Merkle=Merkle algo, tc1=Trustchain version 1, double256=sha256(sha256))
-      "registered": 1524569739, // Transaction time used for the timestamp
-      "recipt": "rtrrtwretrettretretrewtretrewtretrewt" // Merkletree path or description text, used for recreating the merkle root value.
+      "blockchain": "btc",
+      "algorithm": "merkle.tc1-double256",
+      "registered": 1524569739,
+      "recipt": "rtrrtwretrettretretrewtretrewtretrewt"
     }
   ]
 }
+
+// Merkle=Merkle algo, tc1=Trustchain version 1, double256=sha256(sha256))
+// Transaction time used for the timestamp
+// Merkletree path or description text, used for recreating the merkle root value.
 
 /*
 A package of Trust

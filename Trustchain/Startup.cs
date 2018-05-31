@@ -17,6 +17,8 @@ using System.IO;
 using System;
 using Microsoft.Extensions.Hosting;
 using TrustchainCore.Services;
+using Trustchain.Middleware;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Trustchain
 {
@@ -69,7 +71,10 @@ namespace Trustchain
         {
             services.AddDbContext<TrustDBContext>(options =>
                 //options.UseSqlite(Configuration.GetConnectionString("TrustDB"), b => b.MigrationsAssembly("TrustchainCore"))); 
-                options.UseSqlite("Filename=./trust.db", b => b.MigrationsAssembly("TrustchainCore")));
+                options.UseSqlite("Filename=./trust.db", b => b.MigrationsAssembly("TrustchainCore"))
+                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
+
+                );
                 //options.UseSqlite("Filename=./trust.db"));
 
         }
@@ -99,20 +104,9 @@ namespace Trustchain
             app.Graph(); // Load the Trust Graph from Database
             app.Truststamp();
 
+            app.UseMiddleware<SerilogDiagnostics>();
+
             app.UseStaticFiles();
-            //app.UseStaticFiles(new StaticFileOptions
-            //{
-            //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
-            //    RequestPath = "/Resources",
-
-
-            //});
-
-            //app.UseDirectoryBrowser(new DirectoryBrowserOptions
-            //{
-            //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
-            //    RequestPath = "/Resources"
-            //});
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

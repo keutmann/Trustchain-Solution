@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Display;
+using Serilog.Events;
 
 namespace Trustchain
 {
@@ -30,6 +31,8 @@ namespace Trustchain
             const int DefaultRetainedFileCountLimit = 31;
 
             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .ReadFrom.Configuration(Configuration)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
