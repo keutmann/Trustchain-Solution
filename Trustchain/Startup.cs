@@ -102,7 +102,7 @@ namespace Trustchain
             }
 
             app.Graph(); // Load the Trust Graph from Database
-            app.Truststamp();
+            //app.Truststamp();
 
             app.UseMiddleware<SerilogDiagnostics>();
 

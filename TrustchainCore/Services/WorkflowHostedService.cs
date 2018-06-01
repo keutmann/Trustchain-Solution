@@ -40,16 +40,16 @@ namespace TrustchainCore.Services
             _logger.LogInformation(
                 "Workflow Hosted Service is working.");
 
-            using (var scope = Services.CreateScope())
+            while (!cancellationToken.IsCancellationRequested)
             {
-                var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
-                while (!cancellationToken.IsCancellationRequested)
+                using (var scope = Services.CreateScope())
                 {
-
-                    workflowService.RunWorkflows();
-
-                    Task.Delay(_configuration.WorkflowInterval()).Wait();
+                    var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
+                    {
+                        workflowService.RunWorkflows();
+                    }
                 }
+                Task.Delay(_configuration.WorkflowInterval()).Wait();
             }
         }
 
