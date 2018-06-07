@@ -13,14 +13,20 @@
     <Compile Remove="Services\Crypto.cs" />
     <Compile Remove="Services\Info.cs" />
     <Compile Remove="Services\Proof.cs" />
+    <Compile Remove="Workflows\AddressVerifyStep.cs" />
     <Compile Remove="Workflows\BitcoinWorkflow.cs" />
     <Compile Remove="Workflows\BlockchainWorkflowBatch.cs" />
     <Compile Remove="Workflows\FailedWorkflow.cs" />
+    <Compile Remove="Workflows\LocalTimestampStep.cs" />
+    <Compile Remove="Workflows\MerkleStep.cs" />
     <Compile Remove="Workflows\NewWorkflow.cs" />
     <Compile Remove="Workflows\RemotePayWorkflow.cs" />
     <Compile Remove="Workflows\RemoteStampWorkflow.cs" />
+    <Compile Remove="Workflows\RemoteTimestampStep.cs" />
     <Compile Remove="Workflows\SleepWorkflow.cs" />
     <Compile Remove="Workflows\SuccessWorkflow.cs" />
+    <Compile Remove="Workflows\TimestampScheduleStep.cs" />
+    <Compile Remove="Workflows\TimestampStep.cs" />
     <Compile Remove="Workflows\WorkflowBatch.cs" />
     <Compile Remove="Workflows\WorkflowContext.cs" />
   </ItemGroup>

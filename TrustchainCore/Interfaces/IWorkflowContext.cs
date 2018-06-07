@@ -16,21 +16,12 @@ namespace TrustchainCore.Interfaces
         [JsonIgnore]
         WorkflowContainer Container { get; set; }
 
-        int ID { get; set; }
         List<IWorkflowLog> Logs { get; set; }
-        IList<IWorkflowStep> Steps { get; set; }
-        //int CurrentStepIndex { get; set; }
-        string CurrentStep { get; set; }
-        long Created { get; set; }
 
-        bool DoExecution();
-        void Wait(int seconds);
-
-        void Initialize();
         void Execute();
-        T GetStep<T>();
-        T AddStep<T>() where T : IWorkflowStep;
-        void RunStep<T>(int seconds = 0) where T : IWorkflowStep;
+        void Wait(int seconds);
+        void Success(string state);
+        void Failed(Exception ex);
         void Log(string message);
         
     }

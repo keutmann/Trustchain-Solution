@@ -6,5 +6,6 @@ namespace TrustchainCore.Interfaces
     {
         string Message { get; set; }
         long Time { get; set; }
+        int Count { get; set; }
     }
 }

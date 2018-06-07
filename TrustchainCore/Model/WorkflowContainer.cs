@@ -13,6 +13,9 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "type", NullValueHandling = NullValueHandling.Ignore)]
         public string Type { get; set; }
 
+        [JsonProperty(PropertyName = "Active")]
+        public bool Active { get; set; }
+
         [JsonProperty(PropertyName = "state", NullValueHandling = NullValueHandling.Ignore)]
         public string State { get; set; }
 
@@ -29,7 +32,7 @@ namespace TrustchainCore.Model
 
         public WorkflowContainer()
         {
-            State = WorkflowStatusType.New.ToString();
+            Active = true;
             NextExecution = DateTime.MinValue.ToUnixTime();
         }
     }

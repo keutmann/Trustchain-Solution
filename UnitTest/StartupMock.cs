@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
-using UnitTest.TrustchainCore.Workflows;
+//using UnitTest.TrustchainCore.Workflows;
 using TruststampCore.Interfaces;
 using UnitTest.TruststampCore.Mocks;
 using TrustgraphCore.Controllers;
@@ -35,7 +35,7 @@ namespace UnitTest
                 return config;
                 });
 
-            Services.AddTransient<IBlockingWorkflowStep, BlockingWorkflowStep>();
+            //Services.AddTransient<IBlockingWorkflowStep, BlockingWorkflowStep>();
             Services.AddTransient<IBlockchainRepository, BlockchainRepositoryMock>();
 
             Services.AddTransient<TrustController>();

@@ -10,22 +10,12 @@ namespace TrustgraphCore.Workflows
     /// </summary>
     public class TrustPackageWorkflow : WorkflowContext, ITrustPackageWorkflow
     {
-        private IServiceProvider _serviceProvider;
-
-        public TrustPackageWorkflow(IWorkflowService workflowService, IServiceProvider serviceProvider) : base(workflowService)
+        public TrustPackageWorkflow()
         {
-            _serviceProvider = serviceProvider;
-        }
-
-        public override void Initialize()
-        {
-            //Steps.Add(_serviceProvider.GetRequiredService<ITimestampScheduleStep>());
-            base.Initialize();
         }
 
         public override void Execute()
         {
-            base.Execute();
         }
     }
 

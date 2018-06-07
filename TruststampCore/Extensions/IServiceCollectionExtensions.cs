@@ -21,12 +21,6 @@ namespace TruststampCore.Extensions
             services.AddTransient<IHashAlgorithm, Double256>();
             services.AddTransient<IMerkleTree, MerkleTreeSorted>();
 
-            services.AddTransient<IMerkleStep, MerkleStep>();
-            services.AddTransient<ITimestampScheduleStep, TimestampScheduleStep>();
-            services.AddTransient<IAddressVerifyStep, AddressVerifyStep>();
-            services.AddTransient<ILocalTimestampStep, LocalTimestampStep>();
-            services.AddTransient<IRemoteTimestampStep, RemoteTimestampStep>();
-
             services.AddTransient<TimestampScheduleWorkflow>();
             services.AddTransient<TimestampWorkflow>();
             services.AddTransient<IBlockchainRepository, SoChainTransactionRepository>();

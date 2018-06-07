@@ -38,7 +38,6 @@ namespace TrustchainCore.Extensions
             
             services.AddTransient<IConfigureOptions<MvcJsonOptions>, JsonOptionsSetup>();
             services.AddTransient<IWorkflowContext, WorkflowContext>();
-            services.AddTransient<ISuccessStep, SuccessStep>();
 
             services.AddTransient<WorkflowContainer>();
 

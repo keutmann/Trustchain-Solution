@@ -23,9 +23,11 @@
     <Compile Remove="Trust\TrustManager.cs" />
     <Compile Remove="Workflows\FailueWorkflow.cs" />
     <Compile Remove="Workflows\SleepWorkflow.cs" />
+    <Compile Remove="Workflows\SuccessStep.cs" />
     <Compile Remove="Workflows\SuccessWorkflow.cs" />
     <Compile Remove="Workflows\WorkflowContextOld.cs" />
     <Compile Remove="Workflows\WorkflowEngine.cs" />
+    <Compile Remove="Workflows\WorkflowStep.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,9 +17,9 @@ namespace TruststampCore.Workflows
         public IList<byte[]> OutTx { get; set; }
 
         private IBlockchainServiceFactory _blockchainServiceFactory;
+        private IKeyValueService _keyValueService;
         private IConfiguration _configuration;
         private ILogger<LocalTimestampStep> _logger;
-        private IKeyValueService _keyValueService;
 
         public LocalTimestampStep(IBlockchainServiceFactory blockchainServiceFactory, IKeyValueService keyValueService, IConfiguration configuration, ILogger<LocalTimestampStep> logger)
         {

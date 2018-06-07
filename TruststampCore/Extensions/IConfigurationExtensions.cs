@@ -21,7 +21,7 @@ namespace TruststampCore.Extensions
             return configuration.GetValue("stepretryattemptwait", defaultValue); // 10 minutes
         }
 
-        public static int TimestampInterval(this IConfiguration configuration, int defaultValue = 60*10)
+        public static int TimestampInterval(this IConfiguration configuration, int defaultValue = 1) // Change to 1
         {
             return configuration.GetValue("timestampinterval", defaultValue); // 10 minutes
         }

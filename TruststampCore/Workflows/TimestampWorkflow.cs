@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using TrustchainCore.Workflows;
 using TrustchainCore.Services;
@@ -8,44 +9,215 @@ using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using TruststampCore.Extensions;
 using TrustchainCore.Extensions;
+using TrustchainCore.Interfaces;
+using Microsoft.Extensions.Logging;
+using TruststampCore.Enumerations;
+using System.Collections.Generic;
 
 namespace TruststampCore.Workflows
 {
     public class TimestampWorkflow : WorkflowContext, ITimestampWorkflow
     {
+        public enum TimestampStates { Synchronization, Merkle, Timestamp, LocalTimestamp, RemoteTimestamp, AddressVerify }
+
+        //[JsonProperty(PropertyName = "metode", NullValueHandling = NullValueHandling.Ignore)]
+        //public BlockchainProof Proof { get; set; }
 
         [JsonProperty(PropertyName = "proof", NullValueHandling = NullValueHandling.Ignore)]
         public BlockchainProof Proof { get; set; }
 
-        private IServiceProvider _serviceProvider;
+        public int RetryAttempts { get; set; }
+
+        public IList<byte[]> OutTx { get; set; }
+
+        public TimestampStates CurrentState = TimestampStates.Synchronization;
+
+
+        [JsonIgnore]
+        public Action MethodCallback { get; set; }
+        [JsonIgnore]
+        public bool StopExecution { get; set; }
+
         private ITimestampSynchronizationService _timestampSynchronizationService;
+        private IConfiguration _configuration;
 
-        public TimestampWorkflow(IWorkflowService workflowService, ITimestampSynchronizationService timestampSynchronizationService, IServiceProvider serviceProvider) : base(workflowService)
+        private ITrustDBService _trustDBService;
+        private IMerkleTree _merkleTree;
+
+        private IBlockchainServiceFactory _blockchainServiceFactory;
+        private IKeyValueService _keyValueService;
+
+
+        private IBlockchainService _blockchainService;
+        private string _fundingKeyWIF;
+
+        private ILogger<TimestampWorkflow> _logger;
+
+
+
+        public TimestampWorkflow()
         {
-
-            _serviceProvider = serviceProvider;
-            _timestampSynchronizationService = timestampSynchronizationService;
         }
 
-        public override void Initialize()
+        public void SetCurrentState(TimestampStates state)
         {
-            AddStep<IMerkleStep>(); // Start with the MerkleStep
-
-            Proof = new BlockchainProof();
-            var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
-            Proof.Blockchain = configuration.Blockchain();
-            base.Initialize();
+            CurrentState = state;
         }
 
-        public override bool DoExecution()
+        public override void Execute()
         {
-            if (!base.DoExecution())
-                return false;
+            // Dependicies
+            _timestampSynchronizationService = WorkflowService.ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
+            _configuration = WorkflowService.ServiceProvider.GetRequiredService<IConfiguration>();
+            _trustDBService = WorkflowService.ServiceProvider.GetRequiredService<ITrustDBService>();
+            _merkleTree = WorkflowService.ServiceProvider.GetRequiredService<IMerkleTree>();
+            _blockchainServiceFactory = WorkflowService.ServiceProvider.GetRequiredService<IBlockchainServiceFactory>();
+            _keyValueService = WorkflowService.ServiceProvider.GetRequiredService<IKeyValueService>();
+            _logger = WorkflowService.ServiceProvider.GetRequiredService<ILogger<TimestampWorkflow>>();
 
-            if (ID == _timestampSynchronizationService.CurrentWorkflowID)
-                return false; // Do not execute this workflow, because Proofs are still beeing added to it.
+            // Init
+            if (Proof == null)
+            {
+                Proof = new BlockchainProof
+                {
+                    Blockchain = _configuration.Blockchain()
+                };
+            }
+            _blockchainService = _blockchainServiceFactory.GetService(Proof.Blockchain);
 
-            return true;
+
+            var time = DateTime.Now.ToUnixTime();
+
+            while(Container.Active && Container.NextExecution < time && !StopExecution)
+            {
+                CallMethod(Enum.GetName(typeof(TimestampStates), CurrentState));
+
+                if(MethodCallback != null)
+                {
+                    MethodCallback.Invoke();
+                }
+            }
+        }
+
+        public void Synchronization()
+        {
+            if (Container.DatabaseID == _timestampSynchronizationService.CurrentWorkflowID)
+            {
+                Wait(_configuration.TimestampInterval());
+            }
+            CurrentState = TimestampStates.Merkle;
+        }
+
+
+        public void Merkle()
+        {
+            var timestamps = (from p in _trustDBService.Timestamps
+                            where p.WorkflowID == Container.DatabaseID
+                            select p).ToList();
+
+            if (timestamps.Count == 0)
+            {
+                CombineLog(_logger, $"No proofs found");
+                Success();
+                return; // Exit workflow succesfully
+            }
+
+            foreach (var proof in timestamps)
+                _merkleTree.Add(proof);
+
+            Proof.MerkleRoot = _merkleTree.Build().Hash;
+            Proof.Status = TimestampProofStatusType.Waiting.ToString();
+
+            _trustDBService.DBContext.Timestamps.UpdateRange(timestamps);
+            _trustDBService.DBContext.SaveChanges();
+
+            CombineLog(_logger, $"Timestamp found {timestamps.Count} - Merkleroot: {Proof.MerkleRoot.ConvertToHex()}");
+
+            SetCurrentState(TimestampStates.Timestamp);
+        }
+
+        public void Timestamp()
+        {
+            _fundingKeyWIF = _configuration.FundingKey(Proof.Blockchain);
+            if (String.IsNullOrWhiteSpace(_fundingKeyWIF))
+            {
+                _logger.DateInformation(Container.DatabaseID, $"No server key provided, using remote timestamping");
+                SetCurrentState(TimestampStates.RemoteTimestamp);
+            }
+            else
+            {
+                SetCurrentState(TimestampStates.LocalTimestamp);
+            }
+
+        }
+
+        public void LocalTimestamp()
+        {
+            var fundingKey = _blockchainService.DerivationStrategy.KeyFromString(_fundingKeyWIF);
+
+            var tempTxKey = Proof.Blockchain + "_previousTx";
+            var previousTx = _keyValueService.Get(tempTxKey);
+            var previousTxList = (previousTx != null) ? new List<Byte[]> { previousTx } : null;
+
+            OutTx = _blockchainService.Send(Proof.MerkleRoot, fundingKey, previousTxList);
+
+            // OutTX needs to go to a central store for that blockchain
+            _keyValueService.Set(tempTxKey, OutTx[0]);
+
+            var merkleRootKey = _blockchainService.DerivationStrategy.GetKey(Proof.MerkleRoot);
+            Proof.Address = _blockchainService.DerivationStrategy.GetAddress(merkleRootKey);
+
+            var merkleAddressString = _blockchainService.DerivationStrategy.StringifyAddress(merkleRootKey);
+            CombineLog(_logger, $"Merkle root: {Proof.MerkleRoot.ConvertToHex()} has been timestamped with address: {merkleAddressString}");
+
+            SetCurrentState(TimestampStates.AddressVerify);
+            Wait(_configuration.ConfirmationWait(Proof.Blockchain));
+        }
+
+        public void RemoteTimestamp()
+        {
+            Failed(new MissingMethodException("Missing implementation of RemoteTimestampStep"));
+        }
+
+        public void AddressVerify()
+        {
+            try
+            {
+                RetryAttempts++;
+
+                var blockchainTimestamp = _blockchainService.GetTimestamp(Proof.MerkleRoot);
+                Proof.Confirmations = blockchainTimestamp.Confirmations;
+
+                if (Proof.Confirmations >= 0)
+                {
+                    var confirmationThreshold = _configuration.ConfirmationThreshold(Proof.Blockchain);
+                    if (Proof.Confirmations < confirmationThreshold)
+                    {
+                        CombineLog(_logger, $"Current confirmations {Proof.Confirmations} of {confirmationThreshold}");
+                    }
+                    else
+                    {
+                        Success(); // Workflow done!
+                        return;
+                    }
+                }
+
+                if (RetryAttempts > 60 * 24 * 7) // a week.
+                {
+                    throw new ApplicationException($"To many RetryAttempts: {RetryAttempts}, cancelling workflow.");
+                }
+
+                Wait(_configuration.ConfirmationWait(Proof.Blockchain));
+            }
+            catch (Exception ex)
+            {
+                if (RetryAttempts >= 60)
+                    throw;
+
+                _logger.LogError(Container.DatabaseID, ex, "Execute failed");
+                Log($"Step: {this.GetType().Name} has failed with an error: {ex.Message}");
+                Wait(_configuration.StepRetryAttemptWait());
+            }
         }
     }
 }

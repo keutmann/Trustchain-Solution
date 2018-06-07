@@ -12,7 +12,7 @@ using TruststampCore.Workflows;
 namespace UnitTest.TruststampCore.Workflows
 {
     [TestClass]
-    public class MerkleStepTest : StartupMock
+    public class TimestampWorkflowMerkleTest : StartupMock
     {
         // No proofs has been added 
         [TestMethod]
@@ -22,16 +22,13 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
 
-            var step = workflow.GetStep<IMerkleStep>();
-            Assert.IsNotNull(step);
+            workflow.SetCurrentState(TimestampWorkflow.TimestampStates.Merkle);
+            workflow.Execute();
 
-            step.Execute();
+            Assert.IsNotNull(workflow.Proof);
+            Assert.IsNull(workflow.Proof.MerkleRoot);
 
-            Assert.IsNotNull(step);
-            Assert.IsNull(workflow.Proof.MerkleRoot); 
-
-            var successStep = workflow.GetStep<ISuccessStep>();
-            Assert.IsNotNull(successStep);
+            Assert.IsFalse(workflow.Container.Active);
 
         }
 
@@ -50,20 +47,14 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
 
-            var step = workflow.GetStep<IMerkleStep>();
-            Assert.IsNotNull(step);
+            workflow.SetCurrentState(TimestampWorkflow.TimestampStates.Merkle);
+            workflow.MethodCallback = () => workflow.StopExecution = true;
+            workflow.Execute();
 
-            step.Execute();
-
-            Assert.IsNotNull(step);
             Assert.IsTrue(oneHash.Compare(workflow.Proof.MerkleRoot) == 0, "One hash and root hash are not the same");
 
-            var localTimestampStep = workflow.GetStep<ILocalTimestampStep>();
-            Assert.IsNotNull(localTimestampStep);
-
-            //var proofOneEntity = proofService.GetProof(oneHash);
-            //Assert.IsTrue(proofOneEntity.Receipt.Length > 0, "Proof one entity Receipt is not added");
-
+            Assert.IsTrue(workflow.CurrentState == TimestampWorkflow.TimestampStates.Timestamp);
+            Assert.IsTrue(workflow.Container.Active);
         }
 
 
@@ -80,15 +71,12 @@ namespace UnitTest.TruststampCore.Workflows
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
 
-            var step = (MerkleStep)workflow.Steps[0];
-            Assert.IsNotNull(step);
+            workflow.SetCurrentState(TimestampWorkflow.TimestampStates.Merkle);
+            workflow.MethodCallback = () => workflow.StopExecution = true;
+            workflow.Execute();
 
-            step.Execute();
-
-            Assert.IsNotNull(step);
-
-            var localTimestampStep = workflow.GetStep<ILocalTimestampStep>();
-            Assert.IsNotNull(localTimestampStep);
+            Assert.IsTrue(workflow.CurrentState == TimestampWorkflow.TimestampStates.Timestamp);
+            Assert.IsTrue(workflow.Container.Active);
 
             var proofOneEntity = proofService.Get(proofOne);
             Assert.IsTrue(proofOneEntity.Receipt.Length > 0, "Proof one entity Receipt is not added");

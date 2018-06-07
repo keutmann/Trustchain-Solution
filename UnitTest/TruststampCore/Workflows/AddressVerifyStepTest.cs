@@ -113,9 +113,6 @@ namespace UnitTest.TruststampCore.Workflows
 
             Assert.IsTrue(workflow.Container.NextExecution == 0); // Wait is called
             Assert.AreEqual(10, workflow.Proof.Confirmations);
-
-            var successStep = workflow.GetStep<ISuccessStep>();
-            Assert.IsNotNull(successStep);
         }
 
     }

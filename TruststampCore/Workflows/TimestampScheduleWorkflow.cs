@@ -1,25 +1,28 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using TrustchainCore.Services;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using TrustchainCore.Workflows;
+using TruststampCore.Extensions;
 using TruststampCore.Interfaces;
-using TruststampCore.Services;
 
 namespace TruststampCore.Workflows
 {
     public class TimestampScheduleWorkflow : WorkflowContext
     {
-        private IServiceProvider _serviceProvider;
+        private ITimestampWorkflowService _timestampWorkflowService;
+        private IConfiguration _configuration;
 
-        public TimestampScheduleWorkflow(IWorkflowService workflowService, IServiceProvider serviceProvider) : base(workflowService)
+        public override void Execute()
         {
-            _serviceProvider = serviceProvider;
-        }
+            _timestampWorkflowService = WorkflowService.ServiceProvider.GetRequiredService<ITimestampWorkflowService>();
+            _configuration = WorkflowService.ServiceProvider.GetRequiredService<IConfiguration>();
 
-        public override void Initialize()
-        {
-            Steps.Add(_serviceProvider.GetRequiredService<ITimestampScheduleStep>());
-            base.Initialize();
+            if (_timestampWorkflowService.CountCurrentProofs() > 0)
+            {
+                _timestampWorkflowService.CreateAndExecute(); // There are proofs to be timestamp'ed
+            }
+
+            // Rerun this step after x time, never to exit
+            Wait(_configuration.TimestampInterval()); // Default 10 min
         }
 
     }
