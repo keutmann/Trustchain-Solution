@@ -22,12 +22,15 @@
             <th>
                 @Html.DisplayNameFor(model => model.WorkflowContainer[0].State)
             </th>
-            @*<th>
-                @Html.DisplayNameFor(model => model.WorkflowContainer[0].Tag)
-            </th>
             <th>
-                @Html.DisplayNameFor(model => model.WorkflowContainer[0].Data)
-            </th>*@
+                @Html.DisplayNameFor(model => model.WorkflowContainer[0].Active)
+            </th>
+            @*<th>
+            @Html.DisplayNameFor(model => model.WorkflowContainer[0].Tag)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.WorkflowContainer[0].Data)
+        </th>*@
             <th></th>
         </tr>
     </thead>
@@ -43,12 +46,15 @@
             <td>
                 @Html.DisplayFor(modelItem => item.State)
             </td>
-            @*<td>
-                @Html.DisplayFor(modelItem => item.Tag)
-            </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Data)
-            </td>*@
+                @Html.DisplayFor(modelItem => item.Active)
+            </td>
+            @*<td>
+            @Html.DisplayFor(modelItem => item.Tag)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Data)
+        </td>*@
             <td>
                 <a asp-page="./List" asp-route-type="@item.Type">View</a>
             </td>

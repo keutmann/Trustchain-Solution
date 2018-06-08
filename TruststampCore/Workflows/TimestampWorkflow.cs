@@ -112,7 +112,10 @@ namespace TruststampCore.Workflows
             {
                 Wait(_configuration.TimestampInterval());
             }
-            CurrentState = TimestampStates.Merkle;
+            else
+            {
+                CurrentState = TimestampStates.Merkle;
+            }
         }
 
 

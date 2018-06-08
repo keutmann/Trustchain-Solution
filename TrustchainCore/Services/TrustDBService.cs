@@ -5,11 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System;
 using System.Collections;
-using TrustchainCore.Builders;
-using TrustchainCore.Extensions;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace TrustchainCore.Services
 {
@@ -155,9 +150,6 @@ namespace TrustchainCore.Services
             DBContext.Trusts.Update(trust);
         }
 
-
-
-
         public Package GetPackage(byte[] packageId)
         {
             var task = Packages.SingleOrDefaultAsync(f => f.Id == packageId); 
@@ -166,7 +158,6 @@ namespace TrustchainCore.Services
 
             return task.Result;
         }
-
 
     }
 }

@@ -56,5 +56,16 @@ namespace TrustchainCore.Repository
             base.OnModelCreating(builder);
         }
 
+        public void ClearAllData()
+        {
+            KeyValues.RemoveRange(KeyValues);
+            Workflows.RemoveRange(Workflows);
+            Timestamps.RemoveRange(Timestamps);
+            Trusts.RemoveRange(Trusts);
+            Packages.RemoveRange(Packages);
+
+            SaveChanges();
+        }
+
     }
 }

@@ -60,5 +60,7 @@ namespace UnitTest.TrustchainCore.DBContext
             Assert.IsTrue(trust.Timestamps[0].Source.SequenceEqual(timestampSource), "Timestamp source are not equal");
 
         }
+
+
     }
 }
