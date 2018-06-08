@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Trustchain.AspNetCore.Mvc.RazorPages;
 using TrustchainCore.Collections.Generic;
 using System.Collections;
+using TrustchainCore.Workflows;
 
 namespace Trustchain.Pages.Workflows
 {
@@ -57,7 +58,7 @@ namespace Trustchain.Pages.Workflows
         {
             var container = await _context.Workflows.FirstOrDefaultAsync(p => p.DatabaseID == id);
 
-            var wf = _workflowService.Create(container);
+            var wf = _workflowService.Create<WorkflowContext>(container);
             wf.Container.NextExecution = DateTime.Now.ToUnixTime();
             wf.Container.State = WorkflowStatusType.Starting.ToString();
             _workflowService.Save(wf);

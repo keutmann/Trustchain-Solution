@@ -10,10 +10,6 @@
     <Compile Remove="TrustchainCore\Workflows\BlockingWorkflowStep.cs" />
     <Compile Remove="TrustchainCore\Workflows\IBlockingWorkflowStep.cs" />
     <Compile Remove="TrustgraphCore\Workflows\TrustTimestampWorkflowTest.cs" />
-    <Compile Remove="TruststampCore\Workflows\AddressVerifyStepTest.cs" />
-    <Compile Remove="TruststampCore\Workflows\LocalTimestampStepTest.cs" />
-    <Compile Remove="TruststampCore\Workflows\TimestampScheduleWorkflowTest.cs" />
-    <Compile Remove="TruststampCore\Workflows\TimestampWorkflowTest.cs" />
   </ItemGroup>
 
   <ItemGroup>

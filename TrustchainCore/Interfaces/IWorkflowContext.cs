@@ -19,6 +19,7 @@ namespace TrustchainCore.Interfaces
         List<IWorkflowLog> Logs { get; set; }
 
         void Execute();
+        void UpdateContainer();
         void Wait(int seconds);
         void Success(string state);
         void Failed(Exception ex);

@@ -13,7 +13,7 @@ using UnitTest.TruststampCore.Mocks;
 namespace UnitTest.TruststampCore.Workflows
 {
     [TestClass]
-    public class AddressVerifyStepTest : StartupMock
+    public class TimestampWorkflowAddressVerifyTest : StartupMock
     {
 
         
@@ -36,20 +36,18 @@ namespace UnitTest.TruststampCore.Workflows
                 Confirmations = -1
             };
 
-            var addressVerifyStep = ServiceProvider.GetRequiredService<IAddressVerifyStep>();
-            addressVerifyStep.Context = workflow;
-
-            addressVerifyStep.Execute();
+            workflow.SetCurrentState(TimestampWorkflow.TimestampStates.AddressVerify);
+            workflow.Execute();
 
             Assert.IsTrue(workflow.Container.NextExecution > 0); // Wait is called
             Assert.AreEqual(-1, workflow.Proof.Confirmations);
         }
 
-        [TestMethod]
-        public void Unconfirmed()
-        {
+        //[TestMethod]
+        //public void Unconfirmed()
+        //{
 
-        }
+        //}
 
         [TestMethod]
         public void OneConfirmation()
@@ -74,10 +72,8 @@ namespace UnitTest.TruststampCore.Workflows
                 Confirmations = -1
             };
 
-            var addressVerifyStep = ServiceProvider.GetRequiredService<IAddressVerifyStep>();
-            addressVerifyStep.Context = workflow;
-
-            addressVerifyStep.Execute();
+            workflow.SetCurrentState(TimestampWorkflow.TimestampStates.AddressVerify);
+            workflow.Execute();
 
             Assert.IsTrue(workflow.Container.NextExecution > 0); // Wait is called
             Assert.AreEqual(1, workflow.Proof.Confirmations);
@@ -106,10 +102,8 @@ namespace UnitTest.TruststampCore.Workflows
                 Confirmations = -1
             };
 
-            var addressVerifyStep = ServiceProvider.GetRequiredService<IAddressVerifyStep>();
-            addressVerifyStep.Context = workflow;
-
-            addressVerifyStep.Execute();
+            workflow.SetCurrentState(TimestampWorkflow.TimestampStates.AddressVerify);
+            workflow.Execute();
 
             Assert.IsTrue(workflow.Container.NextExecution == 0); // Wait is called
             Assert.AreEqual(10, workflow.Proof.Confirmations);

@@ -13,6 +13,7 @@ using TrustchainCore.Interfaces;
 using Microsoft.Extensions.Logging;
 using TruststampCore.Enumerations;
 using System.Collections.Generic;
+using TruststampCore.Model;
 
 namespace TruststampCore.Workflows
 {
@@ -50,6 +51,7 @@ namespace TruststampCore.Workflows
 
         private IBlockchainService _blockchainService;
         private string _fundingKeyWIF;
+        private AddressTimestamp _blockchainTimestamp;
 
         private ILogger<TimestampWorkflow> _logger;
 
@@ -66,25 +68,7 @@ namespace TruststampCore.Workflows
 
         public override void Execute()
         {
-            // Dependicies
-            _timestampSynchronizationService = WorkflowService.ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
-            _configuration = WorkflowService.ServiceProvider.GetRequiredService<IConfiguration>();
-            _trustDBService = WorkflowService.ServiceProvider.GetRequiredService<ITrustDBService>();
-            _merkleTree = WorkflowService.ServiceProvider.GetRequiredService<IMerkleTree>();
-            _blockchainServiceFactory = WorkflowService.ServiceProvider.GetRequiredService<IBlockchainServiceFactory>();
-            _keyValueService = WorkflowService.ServiceProvider.GetRequiredService<IKeyValueService>();
-            _logger = WorkflowService.ServiceProvider.GetRequiredService<ILogger<TimestampWorkflow>>();
-
-            // Init
-            if (Proof == null)
-            {
-                Proof = new BlockchainProof
-                {
-                    Blockchain = _configuration.Blockchain()
-                };
-            }
-            _blockchainService = _blockchainServiceFactory.GetService(Proof.Blockchain);
-
+            Init();
 
             var time = DateTime.Now.ToUnixTime();
 
@@ -97,6 +81,29 @@ namespace TruststampCore.Workflows
                     MethodCallback.Invoke();
                 }
             }
+        }
+
+        private void Init()
+        {
+            // Dependicies
+            _configuration = WorkflowService.ServiceProvider.GetRequiredService<IConfiguration>();
+            // Init
+            if (Proof == null)
+            {
+                Proof = new BlockchainProof
+                {
+                    Blockchain = _configuration.Blockchain()
+                };
+            }
+
+            _timestampSynchronizationService = WorkflowService.ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
+            _trustDBService = WorkflowService.ServiceProvider.GetRequiredService<ITrustDBService>();
+            _merkleTree = WorkflowService.ServiceProvider.GetRequiredService<IMerkleTree>();
+            _blockchainServiceFactory = WorkflowService.ServiceProvider.GetRequiredService<IBlockchainServiceFactory>();
+            _keyValueService = WorkflowService.ServiceProvider.GetRequiredService<IKeyValueService>();
+            _logger = WorkflowService.ServiceProvider.GetRequiredService<ILogger<TimestampWorkflow>>();
+            _blockchainService = _blockchainServiceFactory.GetService(Proof.Blockchain);
+            _fundingKeyWIF = _configuration.FundingKey(Proof.Blockchain);
         }
 
         public void Synchronization()
@@ -138,7 +145,14 @@ namespace TruststampCore.Workflows
 
         public void Timestamp()
         {
-            _fundingKeyWIF = _configuration.FundingKey(Proof.Blockchain);
+            UpdateProofTimestamp();
+
+            if (Proof.Confirmations >= 0)
+            {
+                SetCurrentState(TimestampStates.AddressVerify);
+                return;
+            }
+
             if (String.IsNullOrWhiteSpace(_fundingKeyWIF))
             {
                 _logger.DateInformation(Container.DatabaseID, $"No server key provided, using remote timestamping");
@@ -149,6 +163,16 @@ namespace TruststampCore.Workflows
                 SetCurrentState(TimestampStates.LocalTimestamp);
             }
 
+        }
+
+        private void UpdateProofTimestamp()
+        {
+            if (_blockchainTimestamp == null)
+            {
+                _blockchainTimestamp = _blockchainService.GetTimestamp(Proof.MerkleRoot);
+                Proof.Confirmations = _blockchainTimestamp.Confirmations;
+                Proof.BlockTime = _blockchainTimestamp.Time;
+            }
         }
 
         public void LocalTimestamp()
@@ -185,8 +209,7 @@ namespace TruststampCore.Workflows
             {
                 RetryAttempts++;
 
-                var blockchainTimestamp = _blockchainService.GetTimestamp(Proof.MerkleRoot);
-                Proof.Confirmations = blockchainTimestamp.Confirmations;
+                UpdateProofTimestamp(); 
 
                 if (Proof.Confirmations >= 0)
                 {

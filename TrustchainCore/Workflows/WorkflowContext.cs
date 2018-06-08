@@ -29,10 +29,17 @@ namespace TrustchainCore.Workflows
         {
             Container = new WorkflowContainer
             {
-                Type = GetType().FullName
+                Type = GetType().AssemblyQualifiedName,
+                State = WorkflowStatusType.New.ToString()
             };
             Logs = new List<IWorkflowLog>();
         }
+
+        public virtual void UpdateContainer()
+        {
+            Container.Data = JsonConvert.SerializeObject(this);
+        }
+
 
         public virtual void Execute()
         {
@@ -40,7 +47,9 @@ namespace TrustchainCore.Workflows
 
         public virtual void Save()
         {
-            Logs = _logDictionary.Values.ToList<IWorkflowLog>();
+            if(_logDictionary != null)
+                Logs = _logDictionary.Values.ToList<IWorkflowLog>();
+
             WorkflowService.Save(this);
         }
 

@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TrustchainCore.Services;
-using TrustchainCore.Model;
 using TrustchainCore.Enumerations;
 using TrustchainCore.Interfaces;
 using System.Collections.Generic;
-//using UnitTest.TrustchainCore.Workflows;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
+using TrustchainCore.Workflows;
 
 namespace UnitTest.TrustchainCore.Workflow
 {
@@ -19,15 +16,12 @@ namespace UnitTest.TrustchainCore.Workflow
         public void Create()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<IWorkflowContext>();
+            var workflow = workflowService.Create<WorkflowContext>();
             Assert.IsNotNull(workflow);
+            workflow.UpdateContainer();
 
-            var container = workflowService.CreateWorkflowContainer(workflow);
-            Assert.IsNotNull(container);
-
-            var workflow2 = workflowService.Create(container);
+            var workflow2 = workflowService.Create(workflow.Container);
             Assert.IsNotNull(workflow2);
-            //Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
         }
 
 
@@ -35,36 +29,19 @@ namespace UnitTest.TrustchainCore.Workflow
         public void CreateGeneric()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<IWorkflowContext>();
+            var workflow = workflowService.Create<WorkflowContext>();
             Assert.IsNotNull(workflow);
-            //workflow.CurrentStepIndex = 1;
+            workflow.UpdateContainer();
 
-            var container = workflowService.CreateWorkflowContainer(workflow);
-            Assert.IsNotNull(container);
-
-            var workflow2 = workflowService.Create(container);
+            var workflow2 = workflowService.Create(workflow.Container);
             Assert.IsNotNull(workflow2);
-            //Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
-        }
-
-        [TestMethod]
-        public void CreateWorkflowContainer()
-        {
-            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<IWorkflowContext>();
-            Assert.IsNotNull(workflow);
-            var container = workflowService.CreateWorkflowContainer(workflow);
-            Assert.IsNotNull(container);
-            Assert.IsNotNull(container.Data);
-            Assert.IsTrue(container.Data.Length > 0);
-            Assert.AreEqual(WorkflowStatusType.New.ToString(), container.State);
         }
 
         [TestMethod]
         public void Save()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<IWorkflowContext>();
+            var workflow = workflowService.Create<WorkflowContext>();
             Assert.IsNotNull(workflow);
 
             var id = workflowService.Save(workflow);
@@ -76,7 +53,7 @@ namespace UnitTest.TrustchainCore.Workflow
         public void CreateFromDB()
         {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<IWorkflowContext>();
+            var workflow = workflowService.Create<WorkflowContext>();
             Assert.IsNotNull(workflow);
 
             var id = workflowService.Save(workflow);
@@ -93,15 +70,12 @@ namespace UnitTest.TrustchainCore.Workflow
         {
             var executionSynchronizationService = ServiceProvider.GetService<IExecutionSynchronizationService>();
 
-            //var list = new List<IWorkflowContext>();
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var workflow = workflowService.Create<IWorkflowContext>();
+            var workflow = workflowService.Create<WorkflowContext>();
             Assert.IsNotNull(workflow);
-            //list.Add(workflow);
+
             workflow.Execute();
-            //workflowService.Execute(list);
             Assert.AreEqual(WorkflowStatusType.New.ToString(), workflow.Container.State);
-            //Assert.AreEqual(0, executionSynchronizationService.Workflows.Count);
         }
 
         [TestMethod]
@@ -113,19 +87,10 @@ namespace UnitTest.TrustchainCore.Workflow
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             for (int i = 0; i < 10; i++)
             {
-                var workflow = workflowService.Create<IWorkflowContext>();
-                //workflow.Container.DatabaseID = i;
+                var workflow = workflowService.Create<WorkflowContext>();
                 workflow.Execute();
                 Assert.AreEqual(WorkflowStatusType.New.ToString(), workflow.Container.State);
             }
-
-            //workflowService.Execute(list);
-            //Assert.AreEqual(0, executionSynchronizationService.Workflows.Count);
-
-            //foreach (var item in list)
-            //{
-                
-            //}
         }
 
         [TestMethod]
@@ -137,15 +102,15 @@ namespace UnitTest.TrustchainCore.Workflow
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             for (int i = 0; i < count; i++)
             {
-                var workflow = workflowService.Create<IWorkflowContext>();
+                var workflow = workflowService.Create<WorkflowContext>();
                 var id = workflowService.Save(workflow);
                 list.Add(workflow);
             }
-            var wf = workflowService.Create<IWorkflowContext>();
+            var wf = workflowService.Create<WorkflowContext>();
             wf.Container.State = WorkflowStatusType.Finished.ToString();
             workflowService.Save(wf);
 
-            wf = workflowService.Create<IWorkflowContext>();
+            wf = workflowService.Create<WorkflowContext>();
             wf.Container.State = WorkflowStatusType.Failed.ToString();
             workflowService.Save(wf);
 

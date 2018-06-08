@@ -56,13 +56,13 @@ namespace TrustchainCore.Services
             var container = Workflows.FirstOrDefault(p => p.DatabaseID == id);
             if (container == null)
                 return default(T);
-            var workflow = (T)Create(container);
+            var workflow = Create<T>(container);
             return workflow;
         }
 
-        public IWorkflowContext Create(WorkflowContainer container) 
+        public T Create<T>(WorkflowContainer container) where T : class, IWorkflowContext
         {
-            var instance = (IWorkflowContext)JsonConvert.DeserializeObject(container.Data);
+            var instance = JsonConvert.DeserializeObject<T>(container.Data);
             instance.Container = container;
             instance.WorkflowService = this;
 
@@ -77,11 +77,23 @@ namespace TrustchainCore.Services
             return instance;
         }
 
+        public IWorkflowContext Create(WorkflowContainer container)
+        {
+            var settings = new JsonSerializerSettings();
+            var type = Type.GetType(container.Type);
+            var instance = (IWorkflowContext)JsonConvert.DeserializeObject(container.Data, type, settings);
+            instance.Container = container;
+            instance.WorkflowService = this;
+
+            return instance;
+
+        }
+
 
 
         public int Save(IWorkflowContext workflow)
         {
-            workflow.Container.Data = JsonConvert.SerializeObject(workflow);
+            workflow.UpdateContainer();
 
             if (workflow.Container.DatabaseID != 0)
             {
@@ -94,17 +106,17 @@ namespace TrustchainCore.Services
             }
         }
 
-        public WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow)
-        {
-            var entity = new WorkflowContainer
-            {
-                Type = workflow.GetType().FullName,
-                State = workflow.Container.State,
-                Tag = workflow.Container.Tag,
-                Data = JsonConvert.SerializeObject(workflow)
-            };
-            return entity;
-        }
+        //public WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow)
+        //{
+        //    var entity = new WorkflowContainer
+        //    {
+        //        Type = workflow.GetType().FullName,
+        //        State = workflow.Container.State,
+        //        Tag = workflow.Container.Tag,
+        //        Data = JsonConvert.SerializeObject(workflow)
+        //    };
+        //    return entity;
+        //}
 
         public void RunWorkflows()
         {
@@ -187,7 +199,7 @@ namespace TrustchainCore.Services
 
         public T EnsureWorkflow<T>() where T : class, IWorkflowContext
         {
-            var container = Workflows.FirstOrDefault(p => p.Type == typeof(T).FullName
+            var container = Workflows.FirstOrDefault(p => p.Type == typeof(T).AssemblyQualifiedName
                                  && p.Active == true);
 
             if (container == null)

@@ -22,6 +22,9 @@ namespace TrustchainCore.Model
         [JsonProperty(PropertyName = "confirmations")]
         public int Confirmations { get; set; }
 
+        [JsonProperty(PropertyName = "blocktime")]
+        public long BlockTime { get; set; }
+
         [JsonProperty(PropertyName = "remote", NullValueHandling = NullValueHandling.Ignore)]
         public BlockchainProof Remote { get; set; }
 

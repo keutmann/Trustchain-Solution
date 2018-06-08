@@ -20,53 +20,17 @@ namespace UnitTest.TruststampCore.Workflows
         [TestMethod]
         public void Serialize()
         {
-            var resolver = ServiceProvider.GetService<IContractResolver>();
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.Objects
-            };
-
-            var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
-            var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
-            var workflow = new TimestampWorkflow(workflowService, timestampSynchronizationService, ServiceProvider);
-            workflow.Initialize();
-            //workflow.CurrentStepIndex = 2;
-            var merkleStep = (IMerkleStep)workflow.Steps[0];
-
-            var reverseResolver = ServiceProvider.GetService<IContractReverseResolver>();
-            var settings2 = new JsonSerializerSettings
-            {
-                ContractResolver = reverseResolver,
-                TypeNameHandling = TypeNameHandling.Objects
-            };
-            var data = JsonConvert.SerializeObject(workflow, Formatting.Indented, settings2);
-            Console.WriteLine(data);
-            var wf2 = (TimestampWorkflow)JsonConvert.DeserializeObject(data, settings);
-            merkleStep = (IMerkleStep)wf2.Steps[0];
-
-            //Assert.AreEqual(workflow.CurrentStepIndex, wf2.CurrentStepIndex);
-            //Assert.AreEqual(((IMerkleStep)workflow.Steps[0]).RootHash[0], ((IMerkleStep)wf2.Steps[0]).RootHash[0]);
-        }
-
-
-        [TestMethod]
-        public void Create()
-        {
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var workflow = workflowService.Create<TimestampWorkflow>();
-            Assert.IsNotNull(workflow);
-            //workflow.CurrentStepIndex = 1;
 
-            var container = workflowService.CreateWorkflowContainer(workflow);
-            Assert.IsNotNull(container);
-            Console.WriteLine(container.Data);
+            var firstTime = workflow.SerializeObject();
+            Console.WriteLine(firstTime);
+            var wf2 = JsonConvert.DeserializeObject<TimestampWorkflow>(firstTime);
+            var secondTime = wf2.SerializeObject();
 
-            var workflow2 = workflowService.Create(container);
-            Assert.IsNotNull(workflow2);
-            Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
-            //Assert.AreEqual(workflow.CurrentStepIndex, workflow2.CurrentStepIndex);
+            Assert.AreEqual(firstTime, secondTime);
         }
+
 
         [TestMethod]
         public void Load()
@@ -83,7 +47,6 @@ namespace UnitTest.TruststampCore.Workflows
 
             var workflow2 = workflowService.Create(container);
             Assert.IsNotNull(workflow2);
-            Assert.AreEqual(workflow.Steps.Count, workflow2.Steps.Count);
         }
     }
 }

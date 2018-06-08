@@ -21,25 +21,17 @@ namespace UnitTest.TruststampCore.Workflows
         [TestMethod]
         public void Serialize()
         {
-            
-
-            var resolver = ServiceProvider.GetService<IContractResolver>();
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.Auto
-            };
-            settings.Converters.Add(new DICustomConverter<TimestampScheduleWorkflow>(ServiceProvider));
-
             var workflowService = ServiceProvider.GetRequiredService<IWorkflowService>();
             var timestampSynchronizationService = ServiceProvider.GetRequiredService<ITimestampSynchronizationService>();
-            var workflow = new TimestampScheduleWorkflow(workflowService, ServiceProvider);
-            workflow.Initialize();
+            var workflow = new TimestampScheduleWorkflow();
+            workflow.WorkflowService = workflowService;
 
-            var data = JsonConvert.SerializeObject(workflow, settings);
-            Console.WriteLine(data);
-            var wf2 = JsonConvert.DeserializeObject<TimestampWorkflow>(data, settings);
-            //Assert.AreEqual(workflow.CurrentStepIndex, wf2.CurrentStepIndex);
+            var firstTime = workflow.SerializeObject();
+            Console.WriteLine(firstTime);
+            var wf2 = JsonConvert.DeserializeObject<TimestampScheduleWorkflow>(firstTime);
+            var secondTime = wf2.SerializeObject();
+
+            Assert.AreEqual(firstTime, secondTime);
         }
 
 

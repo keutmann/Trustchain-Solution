@@ -19,12 +19,14 @@ namespace TrustchainCore.Services
         IQueryable<WorkflowContainer> Workflows { get;  }
 
         T Load<T>(int id) where T : class, IWorkflowContext;
-        IWorkflowContext Create(WorkflowContainer container);
+        //IWorkflowContext Create(WorkflowContainer container);
+        T Create<T>(WorkflowContainer container) where T : class, IWorkflowContext;
         T Create<T>() where T : class, IWorkflowContext;
+        IWorkflowContext Create(WorkflowContainer container);
         //void Execute(Dictionary<string, bool> workflows, WorkflowContainer container, );
         int Save(IWorkflowContext workflow);
         //WorkflowContainer Load();
-        WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);
+        //WorkflowContainer CreateWorkflowContainer(IWorkflowContext workflow);
         IList<WorkflowContainer> GetRunningWorkflows();
         void RunWorkflows();
         void Execute(WorkflowContainer container);
