@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TrustchainCore.Attributes;
 using TrustchainCore.Interfaces;
 
 namespace TrustchainCore.Model
@@ -175,11 +176,12 @@ namespace TrustchainCore.Model
         public string Type { get; set; }
         public bool ShouldSerializeType() { return !string.IsNullOrWhiteSpace(Type); }
 
-        [UIHint("ByteToHex")]
+        [UIHint("ByteToAddress")]
         [JsonProperty(PropertyName = "address")]
+        //[JsonConverter(typeof(ByteBase58CheckConverter))]
         public byte[] Address { get; set; }
 
-        [UIHint("ByteToHex")]
+        //[UIHint("ByteToHex")]
         [JsonProperty(PropertyName = "signature")]
         public byte[] Signature { get; set; }
         public bool ShouldSerializeSignature()

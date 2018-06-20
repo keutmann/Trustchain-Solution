@@ -63,7 +63,8 @@ namespace TruststampCore.Services
             var wf = WorkflowService.Create<TimestampWorkflow>();
             wf.Container.State = WorkflowStatusType.Waiting.ToString();
             wf.Container.NextExecution = DateTime.Now.AddSeconds(_configuration.TimestampInterval()).ToUnixTime();
-            _timestampSynchronizationService.CurrentWorkflowID = WorkflowService.Save(wf);
+            WorkflowService.Save(wf);
+            _timestampSynchronizationService.CurrentWorkflowID = wf.Container.DatabaseID;
         }
 
     }

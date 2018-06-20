@@ -165,7 +165,7 @@ namespace TrustchainCore.Services
                     {
                         var scriptService = _derivationStrategyFactory.GetService(trust.Issuer.Type);
 
-                        if (!scriptService.VerifySignature(trust.Id, trust.Issuer.Signature, trust.Issuer.Address))
+                        if (!scriptService.VerifySignatureMessage(trust.Id, trust.Issuer.Signature, trust.Issuer.Address))
                         {
                             result.Errors.Add(location + "Invalid issuer signature");
                         }
@@ -184,7 +184,7 @@ namespace TrustchainCore.Services
                     {
                         var scriptService = _derivationStrategyFactory.GetService(trust.Subject.Type);
 
-                        if (!scriptService.VerifySignature(trust.Id, trust.Subject.Signature, trust.Subject.Address))
+                        if (!scriptService.VerifySignatureMessage(trust.Id, trust.Subject.Signature, trust.Subject.Address))
                         {
                             result.Errors.Add(location + "Invalid subject signature");
                         }

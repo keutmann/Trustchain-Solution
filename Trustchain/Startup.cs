@@ -9,13 +9,14 @@ using TruststampCore.Extensions;
 using TrustchainCore.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using TrustchainCore.Attributes;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using System;
-using Microsoft.Extensions.Hosting;
+//using Microsoft.Extensions.Hosting;
 using TrustchainCore.Services;
 using Trustchain.Middleware;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -36,9 +37,16 @@ namespace Trustchain
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
             ConfigureDbContext(services);
             
-            services.AddMvc();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info
@@ -81,7 +89,7 @@ namespace Trustchain
 
         public virtual void AddBackgroundServices(IServiceCollection services)
         {
-            services.AddSingleton<IHostedService, WorkflowHostedService>();
+            services.AddHostedService<WorkflowHostedService>();
         }
 
 
@@ -92,21 +100,21 @@ namespace Trustchain
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
-
                 //loggerFactory.AddConsole();
             }
             else
             {
                 app.UseExceptionHandler("/Error");
+                app.UseHsts();
             }
 
             app.Graph(); // Load the Trust Graph from Database
             app.Truststamp();
 
             app.UseMiddleware<SerilogDiagnostics>();
-
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseCookiePolicy();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

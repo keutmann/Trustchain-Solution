@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,10 +11,11 @@ using TrustchainCore.Extensions;
 
 namespace TrustchainCore.Services
 {
-    public class WorkflowHostedService : IHostedService
+    public class WorkflowHostedService : BackgroundService //IHostedService
     {
         private readonly ILogger _logger;
         private IConfiguration _configuration;
+        //private Timer _timer;
 
         public WorkflowHostedService(IServiceProvider services, ILogger<WorkflowHostedService> logger, IConfiguration configuration)
         {
@@ -25,22 +26,11 @@ namespace TrustchainCore.Services
 
         public IServiceProvider Services { get; }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation(
-                "Workflow Hosted Service is starting.");
+            _logger.LogDebug($"Workflow Hosted Service is starting.");
 
-            DoWork(cancellationToken);
-
-            return Task.CompletedTask;
-        }
-
-        private void DoWork(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation(
-                "Workflow Hosted Service is working.");
-
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 using (var scope = Services.CreateScope())
                 {
@@ -49,16 +39,44 @@ namespace TrustchainCore.Services
                         workflowService.RunWorkflows();
                     }
                 }
-                Task.Delay(_configuration.WorkflowInterval()).Wait();
+                await Task.Delay(_configuration.WorkflowInterval(), stoppingToken);
             }
+
+            _logger.LogDebug($"Workflow Hosted Service is stopping.");
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation(
-                "Workflow Hosted Service is stopping.");
+        //protected override async Task StopAsync(CancellationToken stoppingToken)
+        //{
+        //    // Run your graceful clean-up actions
+        //}
 
-            return Task.CompletedTask;
-        }
+        //public Task StartAsync(CancellationToken cancellationToken)
+        //{
+        //    _logger.LogInformation(
+        //        "Workflow Hosted Service is starting.");
+
+        //    _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(_configuration.WorkflowInterval()));
+
+        //    return Task.CompletedTask;
+        //}
+
+        //private void DoWork(object state)
+        //{
+        //    using (var scope = Services.CreateScope())
+        //    {
+        //        var workflowService = scope.ServiceProvider.GetRequiredService<IWorkflowService>();
+        //        {
+        //            workflowService.RunWorkflows();
+        //        }
+        //    }
+        //}
+
+        //public Task StopAsync(CancellationToken cancellationToken)
+        //{
+        //    _logger.LogInformation(
+        //        "Workflow Hosted Service is stopping.");
+
+        //    return Task.CompletedTask;
+        //}
     }
 }
